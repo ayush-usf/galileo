@@ -1,0 +1,400 @@
+
+package galileo.net;
+
+import java.io.IOException;
+
+import java.net.Socket;
+
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import galileo.serialization.Serializer;
+
+/**
+ * Provides an abstract implementation for consuming and publishing messages on
+ * both the server and client side.
+ *
+ * @author malensek
+ */
+public abstract class MessageRouter implements Runnable {
+
+    private static final Logger logger = Logger.getLogger("galileo");
+
+    protected boolean online;
+
+    private List<MessageListener> listeners = new ArrayList<>();
+
+    protected Selector selector;
+
+    private static final int BUFFER_SIZE = 8 * 1024;
+    private ByteBuffer readBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+
+    public MessageRouter() { }
+
+    /**
+     * As long as the MessageRouter is online, monitor connection operations
+     * through the Selector instance.
+     */
+    @Override
+    public void run() {
+        while (online) {
+            try {
+                processSelectionKeys();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Performs a select operation, and then processes the resulting
+     * SelectionKey set based on interest ops.
+     */
+    protected void processSelectionKeys()
+    throws IOException {
+        int updated = selector.select();
+        if (updated == 0) {
+            return;
+        }
+
+        Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
+        while (keys.hasNext()) {
+            SelectionKey key = keys.next();
+            keys.remove();
+
+            if (!key.isValid()) {
+                continue;
+            }
+
+            try {
+                if (key.isAcceptable()) {
+                    accept(key);
+                    continue;
+                }
+
+                if (key.isConnectable()) {
+                    connect(key);
+                    continue;
+                }
+
+                if (key.isReadable()) {
+                    read(key);
+                }
+
+                if (key.isWritable()) {
+                    write(key);
+                }
+
+            } catch (CancelledKeyException e) {
+                /* SelectionKey was cancelled by another thread. */
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Accepts new connections.
+     *
+     * @param key The SelectionKey for the connecting client.
+     */
+    protected void accept(SelectionKey key)
+    throws IOException {
+        ServerSocketChannel servSocket = (ServerSocketChannel) key.channel();
+        SocketChannel channel = servSocket.accept();
+        TransmissionTracker tracker = new TransmissionTracker();
+        logger.info("Accepted connection: " + getClientString(channel));
+        channel.configureBlocking(false);
+        channel.register(selector, SelectionKey.OP_READ, tracker);
+
+    }
+
+    /**
+     * Finishes setting up a connection on a SocketChannel.
+     *
+     * @param key SelectionKey for the SocketChannel.
+     */
+    protected void connect(SelectionKey key) {
+        try {
+            SocketChannel channel = (SocketChannel) key.channel();
+
+            if (channel.finishConnect()) {
+                key.interestOps(SelectionKey.OP_READ);
+            }
+        } catch (IOException e) {
+            disconnect(key);
+        }
+    }
+
+    /**
+     * Read data from a SocketChannel.
+     *
+     * @param key SelectionKey for the SocketChannel.
+     */
+    protected void read(SelectionKey key) {
+        SocketChannel channel = (SocketChannel) key.channel();
+        readBuffer.clear();
+
+        int bytesRead = 0;
+
+        try {
+            /* Read data from the channel */
+            while ((bytesRead = channel.read(readBuffer)) > 0) {
+                readBuffer.flip();
+                processIncomingMessage(key);
+            }
+        } catch (IOException e) {
+            /* Abnormal termination */
+            disconnect(key);
+            return;
+        } catch (BufferUnderflowException e) {
+            /* Incoming packets lied about their size! */
+            logger.log(Level.WARNING, "Incoming packet size mismatch", e);
+        }
+
+        if (bytesRead == -1) {
+            /* Connection was terminated by the client. */
+            disconnect(key);
+            return;
+        }
+    }
+
+    /**
+     * Process data received from a client SocketChannel.  This method is
+     * chiefly concerned with processing incoming data streams into
+     * GalileoMessage packets to be consumed by the system.
+     *
+     * @param key SelectionKey for the client.
+     */
+    protected void processIncomingMessage(SelectionKey key) {
+        TransmissionTracker transmission = TransmissionTracker.fromKey(key);
+        if (transmission.expectedBytes == 0) {
+            /* We don't know how much data the client is sending yet.
+             * Read the message prefix to determine the payload size. */
+            boolean ready = readPrefix(readBuffer, transmission);
+
+            /* Check if we have read the payload size prefix yet.  If
+             * not, then we're done for now. */
+            if (!ready) {
+                return;
+            }
+        }
+
+        int readSize = transmission.expectedBytes - transmission.readPointer;
+        if (readSize > readBuffer.remaining()) {
+            readSize = readBuffer.remaining();
+        }
+
+        readBuffer.get(transmission.payload,
+                transmission.readPointer, readSize);
+        transmission.readPointer += readSize;
+
+        if (transmission.readPointer == transmission.expectedBytes) {
+            /* The payload has been read */
+            GalileoMessage msg = new GalileoMessage(transmission.payload, key);
+            dispatchMessage(msg);
+            transmission.resetCounters();
+
+            if (readBuffer.hasRemaining()) {
+                /* There is another payload to read */
+                processIncomingMessage(key);
+            }
+        }
+    }
+
+    /**
+     * Read the payload size prefix from a channel.
+     * Each message in Galileo is prefixed with a payload size field; this is
+     * read to allocate buffers for the incoming message.
+     *
+     * @return true if the payload size has been determined; false otherwise.
+     */
+    protected static boolean readPrefix(ByteBuffer buffer,
+            TransmissionTracker transmission) {
+        /* Make sure the prefix hasn't already been read. */
+        if (transmission.expectedBytes != 0) {
+            return true;
+        }
+
+        /* Can we determine the payload size in one shot? (1 int = 4 bytes) */
+        if (transmission.prefixPointer == 0 && buffer.remaining() >= 4) {
+            transmission.expectedBytes = buffer.getInt();
+            transmission.allocatePayload();
+            return true;
+        } else {
+            /* Keep reading until we have at least 4 bytes to determine the
+             * payload size.  */
+
+            int prefixLeft = 4 - transmission.prefixPointer;
+            if (buffer.remaining() < prefixLeft) {
+                prefixLeft = buffer.remaining();
+            }
+
+            buffer.get(transmission.prefix,
+                    transmission.prefixPointer, prefixLeft);
+            transmission.prefixPointer += prefixLeft;
+
+            if (transmission.prefixPointer >= 4) {
+                ByteBuffer buf = ByteBuffer.wrap(transmission.prefix);
+                transmission.expectedBytes = buf.getInt();
+                transmission.allocatePayload();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Attempts to write out directly on a SocketChannel, and, if unsuccessful,
+     * registers the OP_WRITE interest op to tell the Selector to deal with the
+     * write.  When letting the Selector deal with the write, pending data is
+     * added to a blocking queue.  This means that if the queue reaches a set
+     * limit, this function may block to prevent queuing too much data.
+     *
+     * @param key SelectionKey for the channel.
+     * @param message GalileoMessage to publish on the channel.
+     */
+    protected void sendMessage(SelectionKey key, GalileoMessage message)
+    throws IOException {
+        SocketChannel channel = (SocketChannel) key.channel();
+        TransmissionTracker tracker = TransmissionTracker.fromKey(key);
+        ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
+        Queue<ByteBuffer> pendingWriteQueue = tracker.getPendingWriteQueue();
+
+        if (!pendingWriteQueue.isEmpty()) {
+            pendingWriteQueue.offer(payload);
+            return;
+        }
+
+        int written = 0;
+        while (payload.hasRemaining()) {
+            written = channel.write(payload);
+
+            if (written == 0) {
+                /* If the write operation failed to write any bytes, register it
+                 * with the Selector so it can be handled during the next
+                 * selection phase. */
+                tracker.getPendingWriteQueue().offer(payload);
+                key.interestOps(SelectionKey.OP_WRITE);
+                selector.wakeup();
+
+                return;
+            }
+        }
+    }
+
+
+    /**
+     * When a <code>SelectionKey</code> is writable, push as much pending data
+     * out on the channel as possible.  This method is called when a message
+     * couldn't be published directly by its originating thread.
+     *
+     * @param key {@link SelectionKey} of the channel to write to.
+     */
+    private void write(SelectionKey key) {
+        TransmissionTracker tracker = TransmissionTracker.fromKey(key);
+        SocketChannel channel = (SocketChannel) key.channel();
+        Queue<ByteBuffer> pendingWrites = tracker.getPendingWriteQueue();
+
+        key.interestOps(SelectionKey.OP_READ);
+
+        while (!pendingWrites.isEmpty()) {
+            ByteBuffer buffer = pendingWrites.peek();
+            if (buffer == null) {
+                break;
+            }
+
+            int written = 0;
+            while (buffer.hasRemaining()) {
+                try {
+                    written = channel.write(buffer);
+                } catch (IOException e) {
+                    /* Broken pipe */
+                    disconnect(key);
+                    return;
+                }
+
+                if (!buffer.hasRemaining()) {
+                    /* Done writing */
+                    pendingWrites.remove();
+                }
+
+                if (written == 0) {
+                    key.interestOps(SelectionKey.OP_WRITE);
+                    return;
+                }
+            }
+        }
+
+        /* At this point, the queue is empty. */
+        return;
+    }
+
+    /**
+     * Handle termination of connections.
+     *
+     * @param key The SelectionKey of the SocketChannel that has disconnected.
+     */
+    protected void disconnect(SelectionKey key) {
+        if (!key.isValid()) {
+            return;
+        }
+
+        SocketChannel channel = (SocketChannel) key.channel();
+        logger.info("Terminating connection: " + getClientString(channel));
+
+        try {
+            key.cancel();
+            key.channel().close();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Failed to disconnect channel", e);
+        }
+    }
+
+    /**
+     * Dispatches a message to all listening consumers.
+     *
+     * @param message {@link GalileoMessage} to dispatch.
+     */
+    protected void dispatchMessage(GalileoMessage message) {
+        for (MessageListener listener : listeners) {
+            listener.onMessage(message);
+        }
+    }
+
+    /**
+     * Adds a message listener (consumer) to this MessageRouter.  Listeners
+     * receive messages that are published by this MessageRouter.
+     *
+     * @param listener {@link MessageListener} that will consume messages
+     * published by this MessageRouter.
+     */
+    public void addListener(MessageListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Determines a connection's hostname and port, then concatenates the two
+     * values, separated by a colon (:).
+     *
+     * @param channel Channel to get client information about.
+     */
+    private static String getClientString(SocketChannel channel) {
+        Socket socket = channel.socket();
+        return socket.getInetAddress().getHostName() + ":" + socket.getPort();
+    }
+}
