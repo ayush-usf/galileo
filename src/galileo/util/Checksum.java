@@ -1,4 +1,3 @@
-
 package galileo.util;
 
 import java.math.BigInteger;
@@ -54,7 +53,7 @@ public class Checksum {
         long targetLen = md.getDigestLength() * 2;
 
         /* Return a formatted zero-padded String */
-        return String.format("%0" + targetLen +"x", bigInt);
+        return String.format("%0" + targetLen + "x", bigInt);
     }
 
     /**
