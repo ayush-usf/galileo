@@ -43,11 +43,17 @@ import galileo.dataset.SpatialRange;
 import galileo.dataset.TemporalRange;
 import galileo.dataset.TemporalRangeImpl;
 
+import galileo.event.EventContainer;
+import galileo.event.EventType;
+import galileo.event.Query;
+import galileo.event.QueryResponse;
 import galileo.event.StorageEvent;
 
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
+
+import galileo.serialization.Serializer;
 
 import galileo.util.GeoHash;
 
@@ -73,6 +79,24 @@ public class TextClient implements MessageListener {
             /* Connection was terminated */
             messageRouter.shutdown();
             return;
+        }
+
+        try {
+            EventContainer container = Serializer.deserialize(
+                    EventContainer.class, message.getPayload());
+
+            if (container.getEventType() == EventType.QUERY_RESPONSE) {
+                QueryResponse response = Serializer.deserialize(
+                        QueryResponse.class, container.getEventPayload());
+
+                for (BlockMetadata meta : response.getMetadata()) {
+                    System.out.println(
+                            meta.getSpatialRange().getUpperBoundForLatitude());
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Could not read event container");
         }
     }
 
@@ -164,5 +188,8 @@ public class TextClient implements MessageListener {
         FileBlock b = new FileBlock(blockData, metadata);
 
         client.store(b);
+
+        Query q = new Query("2013/9/25");
+        client.publisher.publish(q);
     }
 }

@@ -292,7 +292,7 @@ public abstract class MessageRouter implements Runnable {
      * @param key SelectionKey for the channel.
      * @param message GalileoMessage to publish on the channel.
      */
-    protected void sendMessage(SelectionKey key, GalileoMessage message)
+    public void sendMessage(SelectionKey key, GalileoMessage message)
     throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);

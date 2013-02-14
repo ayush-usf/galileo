@@ -27,47 +27,37 @@ package galileo.event;
 
 import java.io.IOException;
 
+import galileo.dataset.MetaArray;
+
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
-/**
- * Encapsulates query information submitted by clients to be processed by
- * StorageNodes.
- */
-public class Query implements GalileoEvent {
-    private String query;
+public class QueryResponse implements GalileoEvent {
 
-    public Query(String query) {
-        this.query = query;
+    private MetaArray metadata;
+
+    public QueryResponse(MetaArray metadata) {
+        this.metadata = metadata;
     }
 
-    /**
-     * Returns the query String this Query represents.
-     *
-     * @return query String
-     */
-    public String getQueryString() {
-        return query;
+    public MetaArray getMetadata() {
+        return metadata;
     }
 
     @Override
     public EventType getType() {
-        return EventType.QUERY;
+        return EventType.QUERY_RESPONSE;
     }
 
-    /**
-     * (Re)construct a query from a SerializationStream.
-     *
-     * @param SerializationInputStream stream to deserialize from.
-     */
-    public Query(SerializationInputStream in)
-    throws IOException {
-        query = in.readString();
+    public QueryResponse(SerializationInputStream in)
+    throws IOException, SerializationException {
+        metadata = new MetaArray(in);
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
-        out.writeString(query);
+        out.writeSerializable(metadata);
     }
 }

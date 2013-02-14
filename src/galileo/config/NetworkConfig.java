@@ -27,6 +27,7 @@ package galileo.config;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -52,9 +53,7 @@ public class NetworkConfig {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
-    //TODO config option
     public static final int DEFAULT_PORT = 5555;
-
     public static final String GROUP_EXT = "group";
 
     /**
@@ -66,11 +65,15 @@ public class NetworkConfig {
      * directory.
      */
     public static NetworkInfo readNetworkDescription(String directory)
-    throws IOException {
+    throws FileNotFoundException, IOException {
 
         NetworkInfo network = new NetworkInfo();
 
         File dir = new File(directory);
+        if (!dir.exists()) {
+            throw new FileNotFoundException("Could not find network " +
+                    "configuration directory");
+        }
 
         for (File file : dir.listFiles()) {
 
@@ -137,9 +140,5 @@ public class NetworkConfig {
         reader.close();
 
         return group;
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println(NetworkConfig.readNetworkDescription("/s/chopin/b/grad/malensek/res/galileo/Galileo/trunk/config/network"));
     }
 }

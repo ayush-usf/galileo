@@ -188,7 +188,7 @@ public class PhysicalGraph {
 
     public BlockMetadata loadMetadata(String metaPath)
     throws FileNotFoundException, IOException, SerializationException {
-        File metaFile = new File(metaPath + METADATA_EXTENSION);
+        File metaFile = new File(metaPath);
         byte[] metaBytes = new byte[(int) metaFile.length()];
 
         FileInputStream metaInStream = new FileInputStream(metaFile);

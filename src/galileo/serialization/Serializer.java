@@ -33,9 +33,6 @@ import java.io.IOException;
 
 import java.lang.reflect.Constructor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * This class provides convenience functions to make the Serialization and
  * Deserialization process easier.
@@ -44,8 +41,6 @@ import java.util.logging.Logger;
  * reading or creating objects, do the work, and then close the streams.
  */
 public class Serializer {
-
-    private static final Logger logger = Logger.getLogger("galileo");
 
     /**
      * Dumps a ByteSerializable object to a portable byte array.
@@ -85,19 +80,37 @@ public class Serializer {
         SerializationInputStream serialIn =
             new SerializationInputStream(buffIn);
 
-        /* ABANDON HOPE, ALL YE WHO ENTER HERE... */
+        T obj = deserialize(type, serialIn);
+        serialIn.close();
+
+        return obj;
+    }
+
+    /**
+     * Loads a ByteSerializable object's binary form from an input stream and
+     * then instantiates a new object using the SerializationInputStream
+     * constructor.  This method is private to enforce users of the
+     * Serialization framework to instantiate deserializable objects using a
+     * SerializationInputStream constructor.
+     *
+     * @param type The type of object to create (deserialize).
+     *             For example, Something.class.
+     *
+     * @param in SerializationInputStream containing a serialized instance of
+     *           the object being loaded.
+     */
+    private static <T extends ByteSerializable> T deserialize(Class<T> type,
+            SerializationInputStream in)
+    throws IOException, SerializationException {
+         /* ABANDON HOPE, ALL YE WHO ENTER HERE... */
         T obj = null;
         try {
             Constructor<T> constructor =
                 type.getConstructor(SerializationInputStream.class);
-            obj = (T) constructor.newInstance(serialIn);
+            obj = (T) constructor.newInstance(in);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to deserialize object.", e);
-
             throw new SerializationException("Could not instantiate object " +
                     "for deserialization.");
-        } finally {
-            serialIn.close();
         }
 
         return obj;

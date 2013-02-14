@@ -25,13 +25,21 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import galileo.config.NetworkConfig;
+import galileo.config.SystemConfig;
+
+import galileo.dataset.MetaArray;
+
 import galileo.event.EventContainer;
 import galileo.event.EventType;
+import galileo.event.Query;
+import galileo.event.QueryResponse;
 import galileo.event.StorageEvent;
 
 import galileo.fs.FileSystem;
@@ -57,12 +65,12 @@ public class StorageNode implements MessageListener {
     private static final Logger logger = Logger.getLogger("galileo");
 
     private int port;
+    private int threads = 4;
+
+    private NetworkInfo network;
 
     private ServerMessageRouter messageRouter;
-
-    private static final int THREADS = 4;
     private Scheduler scheduler;
-
     private FileSystem fs;
 
     public StorageNode(int port) {
@@ -73,16 +81,22 @@ public class StorageNode implements MessageListener {
      * Begins Server execution.
      */
     public void start()
-    throws IOException {
+    throws FileNotFoundException, IOException {
         Version.printSplash();
         System.out.println("Storage node starting.");
 
         /* Initialize the Scheduler */
-        scheduler = new QueueScheduler(THREADS);
+        scheduler = new QueueScheduler(threads);
+
+        /* Read the network configuration; if this is invalid, there is no need
+         * to execute the rest of this method. */
+        network = NetworkConfig.readNetworkDescription(
+                SystemConfig.getNetworkConfDir());
 
         /* Set up the FileSystem. */
         try {
-            setupFileSystem();
+            fs = new FileSystem(SystemConfig.getStorageRoot());
+            fs.recoverMetadata();
         } catch (FileSystemException e) {
             logger.log(Level.SEVERE,
                     "Could not initialize the Galileo File System!", e);
@@ -93,25 +107,9 @@ public class StorageNode implements MessageListener {
         messageRouter = new ServerMessageRouter(port);
         messageRouter.addListener(this);
         messageRouter.listen();
-    }
 
-    /**
-     * Initialize the Galileo file system.
-     *
-     * The following are used to determine where files should be stored:
-     * 1. GALILEO_ROOT environment variable
-     * 2. storageDirectory system property
-     * 3. Current working directory
-     */
-    private void setupFileSystem()
-    throws FileSystemException {
-        String storageRoot = System.getenv("GALILEO_ROOT");
-        if (storageRoot == null) {
-            storageRoot = System.getProperty("storageDirectory", ".");
-        }
-
-        fs = new FileSystem(storageRoot);
-        fs.recoverMetadata();
+        /* Set up our Shutdown hook */
+        Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
     }
 
     @Override
@@ -130,6 +128,7 @@ public class StorageNode implements MessageListener {
 
             handler.message = message;
             handler.eventContainer = container;
+            handler.router = messageRouter;
 
             scheduler.schedule(handler);
 
@@ -152,8 +151,12 @@ public class StorageNode implements MessageListener {
         }
     }
 
+    /**
+     * Handles Storage Events.
+     */
     private class storageHandler extends EventHandler {
-        public void handleEvent() {
+        @Override
+        public void handleEvent() throws Exception {
             try {
                 StorageEvent store = Serializer.deserialize(StorageEvent.class,
                         eventContainer.getEventPayload());
@@ -166,18 +169,27 @@ public class StorageNode implements MessageListener {
     }
 
     private class queryHandler extends EventHandler {
-        public void handleEvent() {
-        //Query query = Serializer.deserialize(Query.class, packet.getPayload());
-        //String queryString = new String(packet.getPayload());
+        @Override
+        public void handleEvent() throws Exception {
+            Query query = Serializer.deserialize(Query.class,
+                    eventContainer.getEventPayload());
 
-//        byte[] queryResult = storageNode.query(query.getQueryString());
-//
-//        ExchangePacket resultPacket =
-//            new ExchangePacket(PacketType.QUERY_RESPONSE, queryResult, false);
-//
-//        Results results = map.createResults(true, true);
-//        results.setResultPayload(Serializer.serialize(resultPacket));
-//        map.writeResults(query.getReplySynopsis(), results);
+            MetaArray results = fs.query(query.getQueryString());
+            QueryResponse response = new QueryResponse(results);
+            publishResponse(response);
+        }
+    }
+
+    /**
+     * Handles cleaning up the system for a graceful shutdown.
+     */
+    public class ShutdownHandler extends Thread {
+        @Override
+        public void run() {
+            /* The logging subsystem may have already shut down, so we revert to
+             * stdout for our final messages */
+            System.out.println("Initiated shutdown.");
+            System.out.println("Goodbye!");
         }
     }
 
@@ -186,7 +198,7 @@ public class StorageNode implements MessageListener {
      */
     public static void main(String[] args)
     throws Exception {
-        int port = 5555;
+        int port = NetworkConfig.DEFAULT_PORT;
         StorageNode node = new StorageNode(port);
         node.start();
     }

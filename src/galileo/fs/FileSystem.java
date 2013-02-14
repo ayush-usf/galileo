@@ -30,6 +30,10 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.FileBlock;
 import galileo.dataset.MetaArray;
@@ -41,6 +45,8 @@ import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 
 public class FileSystem {
+
+    private static final Logger logger = Logger.getLogger("galileo");
 
     public static final String METADATA_EXTENSION = ".gmeta";
     public static final String BLOCK_EXTENSION    = ".gblock";
@@ -62,8 +68,8 @@ public class FileSystem {
         /* Ensure the storage directory exists. */
         storageDirectory = new File(storageRoot);
         if (!storageDirectory.exists()) {
-            System.out.println(" -> Storage directory does not exist.  " +
-                "Attempting to create.");
+            logger.warning("Root storage directory does not exist.  " +
+                    "Attempting to create.");
 
             if (!storageDirectory.mkdirs()) {
                 throw new FileSystemException("Unable to create storage " +
@@ -117,45 +123,51 @@ public class FileSystem {
     public void recoverMetadata() {
 //        logicalGraph.recoverFromJournal();
 
-        //TODO: if we can't recover from the journal, do a manual recovery.
-        //recover();
+        recover();
     }
 
+    /**
+     * Does a full recovery from disk; this scans every block in the system,
+     * reads its metadata, and performs a checksum to verify block integrity.
+     */
     private void recover() {
-        System.out.println("Recovering graph from disk.");
+        logger.info("Recovering graph from disk");
         long recoverStart, recoverEnd, indexStart, indexEnd, metaStart, metaEnd;
 
         recoverStart = System.nanoTime();
 
-        System.out.print(" -> Recovering index...  ");
+        logger.info("Recovering index");
         indexStart = System.nanoTime();
         ArrayList<String> blockPaths = physicalGraph.getBlockPaths();
         indexEnd = System.nanoTime();
-        System.out.println("Took " + (indexEnd - indexStart) * 1E-6 + " ms.");
+        logger.info("Index recovery complete.  Took " +
+                (indexEnd - indexStart) * 1E-6 + " ms.");
 
         metaStart = System.nanoTime();
-        System.out.print(" -> Recovering metadata and building graph...  ");
-        int counter = 0;
+        logger.info("Recovering metadata and building graph");
+        long counter = 0;
         for (String path : blockPaths) {
             try {
                 BlockMetadata metadata = physicalGraph.loadMetadata(path);
                 logicalGraph.addBlock(metadata, path);
                 ++counter;
                 if (counter % 10000 == 0) {
-                    System.out.println(counter);
+                    logger.info(String.format("%d blocks scanned, " +
+                                "recovery %.2f%% complete.", counter,
+                                ((float) counter / blockPaths.size()) * 100));
                 }
             } catch (Exception e) {
-                System.out.println("Couldn't recover metadata: " + path);
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Failed to recover metadata " +
+                        "for block: " + path, e);
             }
         }
         metaEnd = System.nanoTime();
-        System.out.println("Took " + (metaEnd - metaStart) * 1E-6 + " ms.");
+        logger.info("Metadata recovery complete.  Recovered " + counter +
+                " blocks in " + (metaEnd - metaStart) * 1E-6 + " ms.");
 
         recoverEnd = System.nanoTime();
-        System.out.println("Recovery complete.  Took "
+        logger.info("Graph recovery complete.  Took "
             + (recoverEnd - recoverStart) * 1E-6 + " ms.");
-
     }
 
     public void storeBlock(byte[] blockBytes)
@@ -176,7 +188,7 @@ public class FileSystem {
         logicalGraph.addBlock(block.getMetadata(), blockPath);
     }
 
-    public byte[] query(String query)
+    public MetaArray query(String query)
     throws IOException {
         System.out.println(" -> Processing query: " + query);
         LogicalGraphNode[] nodes = logicalGraph.query(query);
@@ -198,10 +210,9 @@ public class FileSystem {
                 continue;
             }
         }
-        //metas.deploymentStream = Resource.dstream;
-        System.out.println(metas.size());
 
-        return Serializer.serialize(metas);
+        System.out.println("huh");
+        return metas;
     }
 
     /**

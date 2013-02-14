@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht;
 
+import java.io.IOException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,9 @@ import galileo.event.EventContainer;
 import galileo.event.GalileoEvent;
 
 import galileo.net.GalileoMessage;
+import galileo.net.MessageRouter;
+
+import galileo.serialization.Serializer;
 
 public abstract class EventHandler implements ProcessingUnit {
 
@@ -39,6 +44,7 @@ public abstract class EventHandler implements ProcessingUnit {
 
     public GalileoMessage message;
     public EventContainer eventContainer;
+    public MessageRouter router;
 
     public EventHandler() { }
 
@@ -60,9 +66,17 @@ public abstract class EventHandler implements ProcessingUnit {
         }
     }
 
-    public void publishResponse(GalileoEvent event) {
+    /**
+     * Publishes a response to the event that triggered this handler.
+     */
+    public void publishResponse(GalileoEvent event)
+    throws IOException {
+        EventContainer container = new EventContainer(event);
+        byte[] messagePayload = Serializer.serialize(container);
+        GalileoMessage response = new GalileoMessage(messagePayload);
 
+        router.sendMessage(message.getSelectionKey(), response);
     }
 
-    public abstract void handleEvent();
+    public abstract void handleEvent() throws Exception;
 }

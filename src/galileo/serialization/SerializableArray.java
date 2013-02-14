@@ -23,51 +23,25 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.event;
+package galileo.serialization;
 
 import java.io.IOException;
 
-import galileo.serialization.SerializationInputStream;
+import java.util.ArrayList;
+
+import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationOutputStream;
 
-/**
- * Encapsulates query information submitted by clients to be processed by
- * StorageNodes.
- */
-public class Query implements GalileoEvent {
-    private String query;
-
-    public Query(String query) {
-        this.query = query;
-    }
-
-    /**
-     * Returns the query String this Query represents.
-     *
-     * @return query String
-     */
-    public String getQueryString() {
-        return query;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.QUERY;
-    }
-
-    /**
-     * (Re)construct a query from a SerializationStream.
-     *
-     * @param SerializationInputStream stream to deserialize from.
-     */
-    public Query(SerializationInputStream in)
-    throws IOException {
-        query = in.readString();
-    }
+public abstract class SerializableArray<T extends ByteSerializable>
+extends ArrayList<T> implements ByteSerializable {
+/* Wow, that was a mouthful. */
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
-        out.writeString(query);
+        out.writeInt(size());
+        for (ByteSerializable element : this) {
+            out.writeSerializable(element);
+        }
     }
 }
