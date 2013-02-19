@@ -1,0 +1,74 @@
+#!/bin/bash
+################################################################################
+# galileo-node - manages the execution of a Galileo Storage Node.
+################################################################################
+
+unset daemonize restart stop
+class="galileo.dht.StorageNode"
+logfile="$(whoami)-node.log"
+
+print_usage() {
+cat <<- EOM
+Usage: $(basename ${0}) [-d] [-r] [-s]
+
+Switches:
+    -d daemonize the process
+    -r restart Galileo node
+    -s stop Galileo node
+EOM
+}
+
+blocking_pkill() {
+    pkill ${@} &> /dev/null
+    if [[ $? -ne 0 ]]; then
+        return 1
+    fi
+
+    while :; do
+        pgrep ${@} &> /dev/null
+        if [[ $? -ne 0 ]]; then
+            return 0
+        else
+            sleep 1
+        fi
+    done
+}
+
+if [[ -z ${GALILEO_HOME} ]]; then
+    if [[ -e "../lib/Galileo*.jar" ]]; then
+        export GALILEO_HOME=".."
+    else
+        echo "The GALILEO_HOME environment variable is not configured!"
+        echo "Please define GALILEO_HOME to point to your Galileo installation."
+        exit 1
+    fi
+fi
+
+while getopts "drs" flag; do
+    case ${flag} in
+        d) daemonize=true ;;
+        r) restart=true ;;
+        s) stop=true ;;
+        ?) print_usage; exit 1 ;;
+    esac
+done
+
+if [[ ${stop} == true || ${restart} == true ]]; then
+    blocking_pkill -U $(whoami) -f ${class}
+
+    if [[ ${stop} == true ]]; then
+        exit 0
+    fi
+fi
+
+run="java -cp ${GALILEO_HOME}/lib/* ${class}"
+
+if [[ ${daemonize} == true ]]; then
+    logdir="/tmp/"
+    if [[ -n ${GALILEO_ROOT} ]]; then
+        logdir="${GALILEO_ROOT}"
+    fi
+    ${run} &> "${logdir}/${logfile}" &
+else
+    ${run}
+fi

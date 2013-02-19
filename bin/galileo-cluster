@@ -1,0 +1,38 @@
+#!/bin/bash
+################################################################################
+# galileo-cluster - manage a Galileo cluster
+#
+# This script is a simple wrapper around galileo-node.  Valid flags passed to
+# this script are simply passed on to galileo-node processes on the cluster.
+################################################################################
+
+print_usage() {
+cat <<- EOM
+Usage: $(basename ${0}) [-r] [-s]
+
+Switches:
+    -r restart cluster
+    -s stop cluster
+EOM
+}
+
+while getopts "rs" flag; do
+    case ${flag} in
+        r) ;;
+        s) ;;
+        ?) print_usage; exit 1 ;;
+    esac
+done
+
+groups=$(ls "${GALILEO_CONF}"/network/*.group 2> /dev/null)
+if [[ $? -ne 0 ]]; then
+    echo "Error: group configuration files not found!"
+    echo "Please ensure \${GALILEO_CONF}/network is populated with group files."
+    exit 1
+fi
+
+for group in ${groups}; do
+    # Remove whitespace, empty lines, and everything after the colon character
+    sed 's/[\t ]//g; /^$/d; s/\(.*\):.*/\1/g' "${group}" | \
+        dssh -pq '${GALILEO_HOME}/bin/galileo-node -d '"${@}"
+done
