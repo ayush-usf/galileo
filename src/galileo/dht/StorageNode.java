@@ -28,6 +28,8 @@ package galileo.dht;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.net.BindException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,10 +85,6 @@ public class StorageNode implements MessageListener {
     public void start()
     throws FileNotFoundException, IOException {
         Version.printSplash();
-        System.out.println("Storage node starting.");
-
-        /* Initialize the Scheduler */
-        scheduler = new QueueScheduler(threads);
 
         /* Read the network configuration; if this is invalid, there is no need
          * to execute the rest of this method. */
@@ -103,13 +101,16 @@ public class StorageNode implements MessageListener {
             return;
         }
 
+        /* Set up our Shutdown hook */
+        Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
+
+        /* Initialize the Scheduler */
+        scheduler = new QueueScheduler(threads);
+
         /* Start listening for incoming messages. */
         messageRouter = new ServerMessageRouter(port);
         messageRouter.addListener(this);
         messageRouter.listen();
-
-        /* Set up our Shutdown hook */
-        Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
     }
 
     @Override
