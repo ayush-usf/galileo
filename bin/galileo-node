@@ -34,15 +34,7 @@ blocking_pkill() {
     done
 }
 
-if [[ -z ${GALILEO_HOME} ]]; then
-    if [[ -e "../lib/Galileo*.jar" ]]; then
-        export GALILEO_HOME=".."
-    else
-        echo "The GALILEO_HOME environment variable is not configured!"
-        echo "Please define GALILEO_HOME to point to your Galileo installation."
-        exit 1
-    fi
-fi
+source "$( cd "$( dirname "$0" )" && pwd )/galileo-environment"
 
 while getopts "drs" flag; do
     case ${flag} in
@@ -61,14 +53,22 @@ if [[ ${stop} == true || ${restart} == true ]]; then
     fi
 fi
 
-run="java -cp ${GALILEO_HOME}/lib/* ${class}"
-
 if [[ ${daemonize} == true ]]; then
     logdir="/tmp/"
     if [[ -n ${GALILEO_ROOT} ]]; then
         logdir="${GALILEO_ROOT}"
     fi
-    ${run} &> "${logdir}/${logfile}" &
+    logpath="${logdir}/${logfile}"
+    java -cp "${GALILEO_HOME}"/lib/\* ${class} &> "${logpath}" &
+    pid=${!}
+
+    # Do a simple check to see if the daemon died right away.
+    sleep 1
+    ps ${pid} &> /dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "Error: failed to launch Galileo daemon on $(hostname)." 1>&2
+        echo "See ${logpath} for details." 1>&2
+    fi
 else
-    ${run}
+    java -cp "${GALILEO_HOME}"/lib/\* ${class}
 fi
