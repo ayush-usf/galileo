@@ -8,13 +8,16 @@ ssh_opts='-oStrictHostkeyChecking=no -oForwardX11=no'
 
 ################################################################################
 
-unset color footer lockfile header host_list ssh_user
+unset color flock footer lockfile header host_list ssh_user
 parallel=false
 quiet=false
 active_threads=0
 max_threads=0
 host_list=""
 hosts="${DSSH_HOSTS}"
+
+# Is there a flock utility we can use?
+which flock &> /dev/null && flock=true
 
 print_usage() {
 cat <<- EOM
@@ -59,6 +62,20 @@ thread_done() {
 }
 trap thread_done SIGUSR1
 
+lock() {
+    if [[ ${flock} == true ]]; then
+        flock -x 40
+        return 0
+    fi
+
+# perl implementation of Linux flock(1) command
+perl <<EOM
+    use Fcntl qw(:flock);
+    open(FH, "<&=40");
+    flock(FH,LOCK_EX);
+EOM
+}
+
 ssh_host() {
     host=${1}
     shift 1
@@ -86,7 +103,7 @@ ssh_host() {
     fi
 
     # acquire lock and print output
-    ( flock -e 40; kill -s SIGUSR1 $$; echo -n "${output}" ) 40> "${lockfile}"
+    ( lock; kill -s SIGUSR1 $$; echo -n "${output}" ) 40> "${lockfile}"
 }
 
 while getopts "cf:l:pqu:t:" flag; do
@@ -129,7 +146,9 @@ if [[ ${parallel} == false ]] ; then
     max_threads=1
 fi
 
-lockfile=$(mktemp)
+lockfile="${TMPDIR:-/tmp}/dssh.$$.$RANDOM.lock"
+touch "${lockfile}"
+trap 'rm -f ${lockfile}' EXIT
 
 set -f # Temporarily disable pathname expansion
 for host in ${hosts}; do
@@ -143,4 +162,4 @@ set +f
 
 until wait; do :; done
 
-rm -f "${lockfile}"
+#rm -f "${lockfile}"
