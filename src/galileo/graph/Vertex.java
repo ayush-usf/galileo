@@ -25,83 +25,97 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
+import java.util.TreeMap;
 
 public class Vertex<L, V> {
 
-    public static int nodeCounter = 0;
-
-    private GraphElement<L, V> element;
-    private Map<L, Vertex<L, V>> edges = new HashMap<L, Vertex<L, V>>();
+    private L label;
+    private V value;
+    private TreeMap<L, Vertex<L, V>> edges = new TreeMap<>();
 
     public Vertex() { }
 
-    public Vertex(GraphElement<L, V> element) {
-        this.element = element;
+    public Vertex(L label, V value) {
+        this.label = label;
+        this.value = value;
     }
 
-    public boolean hasChild(L label) {
+    public boolean hasVertex(L label) {
         return edges.containsKey(label);
     }
 
-    public Vertex<L, V> getChild(L label) {
+    public Vertex<L, V> getVertex(L label) {
         return edges.get(label);
     }
 
-    public Vertex<L, V> addChild(GraphElement<L, V> element) {
-        Vertex<L, V> vertex = edges.get(element.label);
-        if (vertex == null) {
-            nodeCounter++;
-            vertex = new Vertex<L, V>(element);
-            edges.put(element.label, vertex);
+    public Vertex<L, V> addVertex(Vertex<L, V> vertex) {
+        L label = vertex.getLabel();
+        Vertex<L, V> edge = edges.get(label);
+        if (edge == null) {
+            edges.put(label, vertex);
+            return vertex;
+        } else {
+            edge.setValue(vertex.getValue());
+            return edge;
         }
-
-        return vertex;
     }
 
-//    public Vertex<L, V> traversePath(Iterator<L> iter)
-//    throws GraphException, VertexNotFoundException {
-//        if (!iter.hasNext()) {
-//            throw new GraphException("Attempted to traverse empty path.");
-//        }
-//
-//        V value = iter.next();
-//        Vertex<L, V> vertex = edges.get(value);
-//        if (vertex == null) {
-//            throw new VertexNotFoundException("Vertex not found: \n" +
-//                    value.toString());
-//        }
-//
-//        if (iter.hasNext()) {
-//            return vertex.traversePath(iter);
-//        } else {
-//            return this;
-//        }
-//    }
-//
+    public void addPath(Iterator<Vertex<L, V>> path) {
+        if (path.hasNext()) {
+            Vertex<L, V> vertex = path.next();
+            Vertex<L, V> edge = addVertex(vertex);
+            edge.addPath(path);
+        }
+    }
 
-    public GraphElement<L, V> getElement() {
-        return element;
+    public Vertex<L, V> traversePath(Iterator<L> iter)
+    throws GraphException, VertexNotFoundException {
+        if (!iter.hasNext()) {
+            throw new GraphException("Attempted to traverse empty path.");
+        }
+
+        L label = iter.next();
+        Vertex<L, V> vertex = edges.get(label);
+        if (vertex == null) {
+            throw new VertexNotFoundException("Vertex not found: \n" +
+                    value.toString());
+        }
+
+        if (iter.hasNext()) {
+            return vertex.traversePath(iter);
+        } else {
+            return this;
+        }
     }
 
     public L getLabel() {
-        return element.label;
+        return label;
+    }
+
+    public void setLabel(L label) {
+        this.label = label;
     }
 
     public V getValue() {
-        return element.value;
+        return value;
     }
 
-    private String toString(int indent) {
-        String str = element.label + ":\n";
+    public void setValue(V value) {
+        this.value = value;
+    }
 
-        String space = "";
-        for (int i = 0; i <= indent; ++i) {
-            space += " ";
+    /**
+     * Pretty-print this vertex (and its children) with a given indent level.
+     */
+    private String toString(int indent) {
+        String str = "(" + getLabel() + "," + getValue() + ")\n";
+
+        String space = " ";
+        for (int i = 0; i < indent; ++i) {
+            space += "|  ";
         }
+        space += "|-";
         ++indent;
 
         for (Vertex<L, V> vertex : edges.values()) {
