@@ -71,7 +71,6 @@ public class RuntimeMetadataImpl implements RuntimeMetadata, ByteSerializable {
     public RuntimeMetadataImpl(SerializationInputStream in)
     throws IOException {
         storageNodeIdentifier = new String(in.readField());
-        System.out.println(storageNodeIdentifier);
         physicalGraphPath = new String(in.readField());
     }
 
