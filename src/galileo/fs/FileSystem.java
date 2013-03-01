@@ -61,9 +61,10 @@ public class FileSystem {
     /** On-disk representation of the Galileo filesystem.   */
     private PhysicalGraph physicalGraph;
 
-    public FileSystem(String storageRoot) throws FileSystemException {
-        System.out.println("Initializing Galileo File System.");
-        System.out.println("Storage directory: " + storageRoot);
+    public FileSystem(String storageRoot)
+    throws FileSystemException, IOException {
+        logger.info("Initializing Galileo File System.");
+        logger.info("Storage directory: " + storageRoot);
 
         /* Ensure the storage directory exists. */
         storageDirectory = new File(storageRoot);
@@ -77,10 +78,7 @@ public class FileSystem {
             }
         }
 
-        System.out.println("Free space:        " +
-            storageDirectory.getFreeSpace());
-
-        //TODO: inode count
+        logger.info("Free space: " + storageDirectory.getFreeSpace());
 
         /* Verify permissions. */
         boolean read, write, execute;
@@ -88,7 +86,7 @@ public class FileSystem {
         write   = storageDirectory.canWrite();
         execute = storageDirectory.canExecute();
 
-        System.out.println("File system permissions: " +
+        logger.info("File system permissions: " +
                 (read ? 'r' : "") +
                 (write ? 'w' : "") +
                 (execute ? 'x' : ""));
@@ -104,17 +102,13 @@ public class FileSystem {
 
         boolean readOnly = false;
         if (!write) {
-            System.out.println("Warning: storage directory is read-only.");
+            logger.warning("Storage directory is read-only.  Starting " +
+                    "file system in read-only mode.");
             readOnly = true;
         }
 
-        try {
-            journal = Journal.getInstance();
-            journal.setJournalPath(storageRoot + "/journal");
-        } catch (IOException e) {
-            System.out.println("Could not initialize the journal!");
-            e.printStackTrace();
-        }
+        journal = Journal.getInstance();
+        journal.setJournalPath(storageRoot + "/journal");
 
         logicalGraph  = new LogicalGraph();
         physicalGraph = new PhysicalGraph(storageDirectory, readOnly);
@@ -132,8 +126,8 @@ public class FileSystem {
      */
     private void recover() {
         logger.info("Recovering graph from disk");
-        long recoverStart, recoverEnd, indexStart, indexEnd, metaStart, metaEnd;
 
+        long recoverStart, recoverEnd, indexStart, indexEnd, metaStart, metaEnd;
         recoverStart = System.nanoTime();
 
         logger.info("Recovering index");
@@ -156,11 +150,11 @@ public class FileSystem {
                                 "recovery %.2f%% complete.", counter,
                                 ((float) counter / blockPaths.size()) * 100));
                 }
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to recover metadata " +
-                        "for block: " + path, e);
-            }
-        }
+          } catch (Exception e) {
+              logger.log(Level.WARNING, "Failed to recover metadata " +
+                      "for block: " + path, e);
+          }
+      }
         metaEnd = System.nanoTime();
         logger.info("Metadata recovery complete.  Recovered " + counter +
                 " blocks in " + (metaEnd - metaStart) * 1E-6 + " ms.");
@@ -190,7 +184,6 @@ public class FileSystem {
 
     public MetaArray query(String query)
     throws IOException {
-        System.out.println(" -> Processing query: " + query);
         LogicalGraphNode[] nodes = logicalGraph.query(query);
 
         ArrayList<String> nodePaths = new ArrayList<String>();
@@ -211,7 +204,6 @@ public class FileSystem {
             }
         }
 
-        System.out.println("huh");
         return metas;
     }
 
