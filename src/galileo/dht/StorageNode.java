@@ -28,8 +28,7 @@ package galileo.dht;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import java.net.BindException;
-
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,12 +46,15 @@ import galileo.event.StorageEvent;
 import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
 
+import galileo.logging.GalileoFormatter;
+
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.ServerMessageRouter;
 
 import galileo.serialization.Serializer;
 
+import galileo.util.PortTester;
 import galileo.util.Version;
 
 /**
@@ -80,11 +82,19 @@ public class StorageNode implements MessageListener {
     }
 
     /**
-     * Begins Server execution.
+     * Begins Server execution.  This method attempts to fail fast to provide
+     * immediate feedback to wrapper scripts or other user interface tools.
+     * Only once all the prerequisite components are initialized and in a sane
+     * state will the StorageNode begin accepting connections.
      */
     public void start()
     throws FileNotFoundException, IOException {
         Version.printSplash();
+
+        /* First, make sure the port we're binding to is available. */
+        if (PortTester.portAvailable(port) == false) {
+            throw new IOException("Could not bind to port " + port);
+        }
 
         /* Read the network configuration; if this is invalid, there is no need
          * to execute the rest of this method. */
@@ -197,10 +207,13 @@ public class StorageNode implements MessageListener {
     /**
      * Executable entrypoint for a Galileo DHT Storage Node
      */
-    public static void main(String[] args)
-    throws Exception {
+    public static void main(String[] args) {
         int port = NetworkConfig.DEFAULT_PORT;
         StorageNode node = new StorageNode(port);
-        node.start();
+        try {
+            node.start();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Could not start StorageNode.", e);
+        }
     }
 }
