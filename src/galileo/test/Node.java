@@ -36,7 +36,7 @@ import java.util.Map;
 public class Node implements Serializable {
     public static int leafCounter = 0;
     public static int fullLeaves = 0;
-    public static int nodeCounter = 0;
+    public static long nodeCounter = 0;
 
     public Map<Integer, Node> children = new HashMap<Integer, Node>();
     public List<Integer> machines = new ArrayList<Integer>();
@@ -72,6 +72,16 @@ public class Node implements Serializable {
     public Integer[] get(Iterator<Integer> it) {
         if (it.hasNext()) {
             int i = it.next();
+
+            if (i == -1) {
+                for (Node n : children.values()) {
+                    n.get(it);
+                }
+                Integer[] x = new Integer[1];
+                x[0] = 0;
+                return x;
+            }
+
             //System.out.println(i);
             Node child = children.get(i);
             if (child == null) {
