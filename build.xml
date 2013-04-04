@@ -82,17 +82,9 @@
     </target>
 
     <target name="javadoc" description="Generates javadoc" depends="compile">
-        <echo message="Generating javadoc for ${ant.project.name}..." />
         <mkdir dir="${docs}" />
-        <javadoc sourcepath="${src}" destdir="${docs}" useexternalfile="yes"
-                 maxmemory="1024m" doctitle="${doctitle}"
-                 windowtitle="${windowtitle}" author="false"
-                 stylesheetfile="docs/stylesheet.css">
-            <link href="http://java.sun.com/j2ee/1.4/docs/api/" />
-            <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
-            <link href="http://www.naradabrokering.org/api/" />
-            <fileset dir="${src}"/>
-        </javadoc>
+        <javadoc sourcepath="${src}" destdir="${docs}"
+                doctitle="${doctitle}" windowtitle="${windowtitle}" />
     </target>
 
     <target name="clean" depends="releaseclean">
