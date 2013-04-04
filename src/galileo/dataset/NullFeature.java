@@ -25,53 +25,30 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-public class Feature implements Comparable<Feature> {
+/**
+ * This feature extension represents an unknown feature value, in the case of a
+ * sample that does not have all feature readings.
+ *
+ * @author malensek
+ */
+public class NullFeature extends Feature {
 
-    protected String name;
-    protected FeatureType type = FeatureType.FLOAT;
-    protected String description;
-    protected double value;
-
-    public Feature(String name) {
-        this.name = name;
+    public NullFeature(String name) {
+        super(name);
+        this.description = "Null feature";
+        this.type = FeatureType.NULL;
     }
 
-    public Feature(String name, double value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public FeatureType getType() {
-        return type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
     public int compareTo(Feature f) {
-        Double d1 = new Double(f.getValue());
-        Double d2 = new Double(this.getValue());
+        if (f.getType() == FeatureType.NULL) {
+            return 0;
+        }
 
-        //return d2.compareTo(d1);
-        return 0;
-    }
-
-    public double getValue() {
-        return value;
+        return Integer.MIN_VALUE;
     }
 
     @Override
     public String toString() {
-        return name + "=" + value;
+        return name + "=[null]";
     }
 }

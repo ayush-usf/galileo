@@ -25,53 +25,38 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-public class Feature implements Comparable<Feature> {
+import java.util.HashMap;
+import java.util.Map;
 
-    protected String name;
-    protected FeatureType type = FeatureType.FLOAT;
-    protected String description;
-    protected double value;
+public enum FeatureType {
+    NULL (0),
+    INT (1),
+    FLOAT (2);
 
-    public Feature(String name) {
-        this.name = name;
+    private final int type;
+
+    private FeatureType(int type) {
+        this.type = type;
     }
 
-    public Feature(String name, double value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public FeatureType getType() {
+    public int toInt() {
         return type;
     }
 
-    public String getDescription() {
-        return description;
+    static Map<Integer, FeatureType> typeMap = new HashMap<>();
+
+    static {
+        for (FeatureType t : FeatureType.values()) {
+            typeMap.put(t.toInt(), t);
+        }
     }
 
-    @Override
-    public int compareTo(Feature f) {
-        Double d1 = new Double(f.getValue());
-        Double d2 = new Double(this.getValue());
+    public static FeatureType fromInt(int i) {
+        FeatureType t = typeMap.get(i);
+        if (t == null) {
+            return FeatureType.NULL;
+        }
 
-        //return d2.compareTo(d1);
-        return 0;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return name + "=" + value;
+        return t;
     }
 }

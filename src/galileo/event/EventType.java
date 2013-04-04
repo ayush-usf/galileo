@@ -29,13 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum EventType {
-    UNKNOWN        (0),
-    GENERAL        (1),
-    QUERY          (2),
+    UNKNOWN (0),
+    GENERAL (1),
+    QUERY (2),
     QUERY_RESPONSE (3),
-    STORAGE        (4),
-    SYSTEM         (5),
-    DEBUG          (6);
+    STORAGE (4),
+    SYSTEM (5),
+    DEBUG (6);
 
     private final int type;
 

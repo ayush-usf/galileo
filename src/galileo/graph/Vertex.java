@@ -28,64 +28,77 @@ package galileo.graph;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-public class Vertex<L, V> {
+/**
+ * Provides a lightweight generic implementation of a graph vertex backed by a
+ * TreeMap for extensibility.  This provides the basis of the hybrid
+ * trees/graphs used in the system.
+ *
+ * @author malensek
+ */
+public class Vertex<L extends Comparable<L>, V> {
 
-    private L label;
-    private V value;
-    private TreeMap<L, Vertex<L, V>> edges = new TreeMap<>();
+    protected L label;
+    protected V value;
+    protected TreeMap<L, Vertex<L, V>> edges = new TreeMap<>();
 
     public Vertex() { }
 
     public Vertex(L label, V value) {
         this.label = label;
-        this.value = value;
+        setValue(value);
     }
 
-    public boolean hasVertex(L label) {
+    /**
+     * Determines if two vertices are connected.
+     *
+     * @return true if the Vertex label is found on a connecting edge.
+     */
+    public boolean connectedTo(L label) {
         return edges.containsKey(label);
     }
 
-    public Vertex<L, V> getVertex(L label) {
+    /**
+     * Retrieve a neighboring Vertex.
+     *
+     * @param label Neighbor's label.
+     *
+     * @return Neighbor Vertex.
+     */
+    public Vertex<L, V> getNeighbor(L label) {
         return edges.get(label);
     }
 
-    public Vertex<L, V> addVertex(Vertex<L, V> vertex) {
+    /**
+     * Connnects two vertices.  If this vertex is already connected to the
+     * provided vertex label, then the already-connected vertex is returned, and
+     * its <code>value</code> is updated.
+     *
+     * @param vertex The vertex to connect to.
+     *
+     * @return Connected vertex.
+     */
+    public Vertex<L, V> connect(Vertex<L, V> vertex) {
         L label = vertex.getLabel();
-        Vertex<L, V> edge = edges.get(label);
+        Vertex<L, V> edge = getNeighbor(label);
         if (edge == null) {
+            System.out.println("new : " + label);
             edges.put(label, vertex);
             return vertex;
         } else {
+            System.out.println("old : " + label);
             edge.setValue(vertex.getValue());
             return edge;
         }
     }
 
+    /**
+     * Add and connect a collection of vertices in the form of a traversal path.
+     */
     public void addPath(Iterator<Vertex<L, V>> path) {
         if (path.hasNext()) {
             Vertex<L, V> vertex = path.next();
-            Vertex<L, V> edge = addVertex(vertex);
+            Vertex<L, V> edge = connect(vertex);
             edge.addPath(path);
-        }
-    }
-
-    public Vertex<L, V> traversePath(Iterator<L> iter)
-    throws GraphException, VertexNotFoundException {
-        if (!iter.hasNext()) {
-            throw new GraphException("Attempted to traverse empty path.");
-        }
-
-        L label = iter.next();
-        Vertex<L, V> vertex = edges.get(label);
-        if (vertex == null) {
-            throw new VertexNotFoundException("Vertex not found: \n" +
-                    value.toString());
-        }
-
-        if (iter.hasNext()) {
-            return vertex.traversePath(iter);
-        } else {
-            return this;
         }
     }
 
@@ -108,8 +121,9 @@ public class Vertex<L, V> {
     /**
      * Pretty-print this vertex (and its children) with a given indent level.
      */
-    private String toString(int indent) {
-        String str = "(" + getLabel() + "," + getValue() + ")\n";
+    protected String toString(int indent) {
+        String ls = System.lineSeparator();
+        String str = "(" + getLabel() + "," + getValue() + ")" + ls;
 
         String space = " ";
         for (int i = 0; i < indent; ++i) {

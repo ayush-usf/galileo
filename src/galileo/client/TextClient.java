@@ -36,7 +36,7 @@ import galileo.dataset.BlockMetadata;
 import galileo.dataset.BlockMetadataImpl;
 import galileo.dataset.Device;
 import galileo.dataset.DeviceSet;
-import galileo.dataset.FeatureImpl;
+import galileo.dataset.Feature;
 import galileo.dataset.FeatureSet;
 import galileo.dataset.FileBlock;
 import galileo.dataset.SpatialRange;
@@ -170,7 +170,7 @@ public class TextClient implements MessageListener {
         FeatureSet features = new FeatureSet();
         for (int i = 0; i < 5; ++i) {
             String featureName = featSet[randomInt(0, featSet.length - 1)];
-            features.put(new FeatureImpl(featureName, randomFloat() * 100));
+            features.put(new Feature(featureName, randomFloat() * 100));
         }
 
         Device d = new Device("my-gps");

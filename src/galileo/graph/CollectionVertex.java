@@ -23,55 +23,57 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dataset;
+package galileo.graph;
 
-public class Feature implements Comparable<Feature> {
+import java.util.HashSet;
+import java.util.Set;
 
-    protected String name;
-    protected FeatureType type = FeatureType.FLOAT;
-    protected String description;
-    protected double value;
+/**
+ * Vertex that "collects" incoming values by appending them to a set rather than
+ * overriding the old value.
+ *
+ * @author malensek
+ */
+public class CollectionVertex<L extends Comparable<L>, V> extends Vertex<L, Set<V>> {
 
-    public Feature(String name) {
-        this.name = name;
+    private Set<V> values = new HashSet<>();
+
+    public CollectionVertex(L label, V value) {
+        this.label = label;
+        setValue(value);
     }
 
-    public Feature(String name, double value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public FeatureType getType() {
-        return type;
-    }
-
-    public String getDescription() {
-        return description;
+    public Set<V> getValues() {
+        return values;
     }
 
     @Override
-    public int compareTo(Feature f) {
-        Double d1 = new Double(f.getValue());
-        Double d2 = new Double(this.getValue());
-
-        //return d2.compareTo(d1);
-        return 0;
-    }
-
-    public double getValue() {
-        return value;
+    public void setValue(V value) {
+        if (value != null) {
+            getValue().add(value);
+        }
     }
 
     @Override
-    public String toString() {
-        return name + "=" + value;
+    protected String toString(int indent) {
+        String ls = System.lineSeparator();
+        String valueStr = "";
+        for (V value : values) {
+            valueStr += value;
+        }
+        String str = "(" + getLabel() + ",<" + valueStr + ">)" + ls;
+
+        String space = " ";
+        for (int i = 0; i < indent; ++i) {
+            space += "|  ";
+        }
+        space += "|-";
+        ++indent;
+
+        for (Vertex<L, V> vertex : edges.values()) {
+            str += space + vertex.toString(indent);
+        }
+
+        return str;
     }
 }

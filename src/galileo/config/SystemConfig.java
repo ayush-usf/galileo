@@ -72,7 +72,7 @@ public class SystemConfig {
      * Reloads the Galileo system configuration.
      */
     public void reload() {
-        logger.log(Level.INFO, "Reloading system configuration");
+        logger.log(Level.CONFIG, "Reloading system configuration");
         load();
     }
 

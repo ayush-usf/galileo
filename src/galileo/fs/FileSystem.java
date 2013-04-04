@@ -115,8 +115,33 @@ public class FileSystem {
     }
 
     public void recoverMetadata() {
+//TODO: this used to be in LogicalGraph; move elsewhere
 //        logicalGraph.recoverFromJournal();
+/*
+    public void recoverFromJournal() {
+        long numEntries = 0;
+        long recoveryStart = System.nanoTime();
+        System.out.print("Recovering metadata from journal...  ");
 
+        try {
+            BufferedReader reader = journal.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] nodeParts = line.split(",");
+                rootNode.addNodePath(nodeParts[0], nodeParts[1]);
+                ++numEntries;
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading journal!");
+            e.printStackTrace();
+        }
+
+        long recoveryEnd = System.nanoTime();
+        System.out.println("done.");
+        System.out.println("Recovered " + numEntries + " entries in "
+            + (recoveryEnd - recoveryStart) * 1E-6 + "ms.");
+    }
+*/
         recover();
     }
 
