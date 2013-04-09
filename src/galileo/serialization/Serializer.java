@@ -107,7 +107,7 @@ public class Serializer {
         try {
             Constructor<T> constructor =
                 type.getConstructor(SerializationInputStream.class);
-            obj = (T) constructor.newInstance(in);
+            obj = constructor.newInstance(in);
         } catch (Exception e) {
             throw new SerializationException("Could not instantiate object " +
                     "for deserialization.");
