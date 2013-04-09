@@ -32,6 +32,10 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import galileo.comm.Query;
+import galileo.comm.QueryResponse;
+import galileo.comm.StorageEvent;
+
 import galileo.config.NetworkConfig;
 import galileo.config.SystemConfig;
 
@@ -39,9 +43,6 @@ import galileo.dataset.MetaArray;
 
 import galileo.event.EventContainer;
 import galileo.event.EventType;
-import galileo.event.Query;
-import galileo.event.QueryResponse;
-import galileo.event.StorageEvent;
 
 import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
@@ -50,11 +51,11 @@ import galileo.logging.GalileoFormatter;
 
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
+import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
 
 import galileo.serialization.Serializer;
 
-import galileo.util.PortTester;
 import galileo.util.Version;
 
 /**

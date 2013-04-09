@@ -27,20 +27,17 @@ package galileo.util;
 
 public class Version {
 
+    private final static Version version = new galileo.util.Version();
+    private final static Package pkg = version.getClass().getPackage();
+
     public static final String PRODUCT_NAME = "Galileo";
+    public static final String VERSION = pkg.getSpecificationVersion();
 
-    public static final int VERSION_MAJOR = 0;
-    public static final int VERSION_MINOR = 4;
-    public static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
-    public static final String RELEASE = "2012-12-12";
-
-    public Version() {
-
-    }
+    public Version() { }
 
     public static String getVersion() {
-        return (PRODUCT_NAME + " " + VERSION + " : " + RELEASE);
+        return (PRODUCT_NAME + " " + VERSION);
     }
 
 
@@ -56,7 +53,7 @@ public class Version {
         System.out.println("    | |_| | (_| | | | |  __/ (_) |"   );
         System.out.println("     \\____|\\__,_|_|_|_|\\___|\\___/");
         System.out.println();
-        System.out.println("       Version " + VERSION + " : " + RELEASE);
+        System.out.println("             Version  " + VERSION);
         System.out.println();
     }
 }

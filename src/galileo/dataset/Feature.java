@@ -62,8 +62,7 @@ public class Feature implements Comparable<Feature> {
         Double d1 = new Double(f.getValue());
         Double d2 = new Double(this.getValue());
 
-        //return d2.compareTo(d1);
-        return 0;
+        return d2.compareTo(d1);
     }
 
     public double getValue() {
