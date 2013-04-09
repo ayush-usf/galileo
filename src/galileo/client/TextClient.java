@@ -32,6 +32,10 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Random;
 
+import galileo.comm.Query;
+import galileo.comm.QueryResponse;
+import galileo.comm.StorageEvent;
+
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.BlockMetadataImpl;
 import galileo.dataset.Device;
@@ -45,9 +49,6 @@ import galileo.dataset.TemporalRangeImpl;
 
 import galileo.event.EventContainer;
 import galileo.event.EventType;
-import galileo.event.Query;
-import galileo.event.QueryResponse;
-import galileo.event.StorageEvent;
 
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
@@ -134,9 +135,9 @@ public class TextClient implements MessageListener {
         Calendar calendar = Calendar.getInstance();
         int year, month, day;
 
-        year = client.randomInt(2010, 2013);
+        year = randomInt(2010, 2013);
         month = randomInt(0, 11);
-        day = client.randomInt(1, 28);
+        day = randomInt(1, 28);
 
         calendar.set(year, month, day);
 
@@ -158,7 +159,7 @@ public class TextClient implements MessageListener {
         String hash = geoPre;
 
         for (int i = 0; i < 10; ++i) {
-            int random = client.randomInt(0, GeoHash.charMap.length - 1);
+            int random = randomInt(0, GeoHash.charMap.length - 1);
             hash += GeoHash.charMap[random];
         }
 
