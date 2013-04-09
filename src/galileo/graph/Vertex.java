@@ -43,6 +43,10 @@ public class Vertex<L extends Comparable<L>, V> {
 
     public Vertex() { }
 
+    public Vertex(L label) {
+        this.label = label;
+    }
+
     public Vertex(L label, V value) {
         this.label = label;
         setValue(value);
@@ -81,11 +85,9 @@ public class Vertex<L extends Comparable<L>, V> {
         L label = vertex.getLabel();
         Vertex<L, V> edge = getNeighbor(label);
         if (edge == null) {
-            System.out.println("new : " + label);
             edges.put(label, vertex);
             return vertex;
         } else {
-            System.out.println("old : " + label);
             edge.setValue(vertex.getValue());
             return edge;
         }

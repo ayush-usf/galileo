@@ -40,8 +40,7 @@ import galileo.dataset.NullFeature;
 
 /**
  * A type-aware hierarchical graph implementation with each type occupying a
- * level in the hierarchy.  In practice, this somewhat resembles a b-tree with a
- * type hierarchy.
+ * level in the hierarchy.
  *
  * @author malensek
  */
@@ -52,10 +51,17 @@ public class HierarchicalGraph<T> {
     private Vertex<Feature, T> root = new Vertex<>();
     private Map<String, Integer> featureOrder = new HashMap<>();
 
+    public void traverse() {
+        System.out.println(root.getNeighbor(new Feature("wind", 4.2)).getNeighbor(new Feature("humidity", 0.38)));
+    }
+
     public void addPath(Path<Feature, T> path) {
         addNullFeatures(path);
         reorientPath(path);
         optimizePath(path);
+
+        /* Place the path value (traversal result) at the end of this path. */
+        path.get(path.size() - 1).setValue(path.getValue());
 
         root.addPath(path.iterator());
     }
@@ -102,7 +108,7 @@ public class HierarchicalGraph<T> {
      */
     private void optimizePath(Path<Feature, T> path) {
         /* Remove all trailing null features.  During a traversal, trailing null
-         * features can be ignored. */
+         * features are unnecessary to traverse. */
         for (int i = path.size() - 1; i >= 0; --i) {
             if (path.get(i).getLabel().getType() == FeatureType.NULL) {
                 path.remove(i);

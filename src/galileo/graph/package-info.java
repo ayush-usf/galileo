@@ -25,6 +25,9 @@ software, even if advised of the possibility of such damage.
 
 /**
  * Graph-based data structures used in Galileo.
+ *
+ * These classes provide functionality for creating and traversing (querying)
+ * graph-baseed structures.
  */
 
 package galileo.graph;
