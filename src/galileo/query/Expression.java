@@ -23,41 +23,33 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.event;
+package galileo.query;
 
-import java.io.IOException;
+/**
+ * Representation of a query expression.  For example: x != 3.6.  Contains an
+ * operator, and an associated value.
+ *
+ * @author malensek
+ */
+public class Expression {
 
-import galileo.dataset.MetaArray;
+    public Operator operator;
+    public double value;
 
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+    public Expression() { }
 
-public class QueryResponse implements GalileoEvent {
-
-    private MetaArray metadata;
-
-    public QueryResponse(MetaArray metadata) {
-        this.metadata = metadata;
+    public Expression(Operator operator, double value) {
+        this.operator = operator;
+        this.value = value;
     }
 
-    public MetaArray getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.QUERY_RESPONSE;
-    }
-
-    public QueryResponse(SerializationInputStream in)
-    throws IOException, SerializationException {
-        metadata = new MetaArray(in);
+    public Expression(String operator, double value) {
+        this.operator = Operator.fromString(operator);
+        this.value = value;
     }
 
     @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeSerializable(metadata);
+    public String toString() {
+        return operator + " " + value;
     }
 }

@@ -23,51 +23,62 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.event;
+package galileo.graph;
 
-import java.io.IOException;
-
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Encapsulates query information submitted by clients to be processed by
- * StorageNodes.
+ * Vertex that "collects" incoming values by appending them to a set rather than
+ * overwriting the old value.
+ *
+ * @author malensek
  */
-public class Query implements GalileoEvent {
-    private String query;
+public class CollectorVertex<L extends Comparable<L>, V> extends Vertex<L, V> {
 
-    public Query(String query) {
-        this.query = query;
+    private Set<V> values = new HashSet<>();
+
+    public CollectorVertex(L label) {
+        this.label = label;
     }
 
-    /**
-     * Returns the query String this Query represents.
-     *
-     * @return query String
-     */
-    public String getQueryString() {
-        return query;
+    public CollectorVertex(L label, V value) {
+        this.label = label;
+        this.value = value;
+        setValue(value);
     }
 
-    @Override
-    public EventType getType() {
-        return EventType.QUERY;
-    }
-
-    /**
-     * (Re)construct a query from a SerializationStream.
-     *
-     * @param SerializationInputStream stream to deserialize from.
-     */
-    public Query(SerializationInputStream in)
-    throws IOException {
-        query = in.readString();
+    public Set<V> getValues() {
+        return values;
     }
 
     @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(query);
+    public void setValue(V value) {
+        if (value != null) {
+            values.add(value);
+        }
+    }
+
+    @Override
+    protected String toString(int indent) {
+        String ls = System.lineSeparator();
+        String valueStr = "";
+        for (V value : values) {
+            valueStr += value + ",";
+        }
+        String str = "(" + getLabel() + ", [" + valueStr + "])" + ls;
+
+        String space = " ";
+        for (int i = 0; i < indent; ++i) {
+            space += "|  ";
+        }
+        space += "|-";
+        ++indent;
+
+        for (Vertex<L, V> vertex : edges.values()) {
+            str += space + vertex.toString(indent);
+        }
+
+        return str;
     }
 }

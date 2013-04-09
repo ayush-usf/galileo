@@ -23,57 +23,44 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.graph;
+package galileo.comm;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
 
-/**
- * Vertex that "collects" incoming values by appending them to a set rather than
- * overriding the old value.
- *
- * @author malensek
- */
-public class CollectionVertex<L extends Comparable<L>, V> extends Vertex<L, Set<V>> {
+import galileo.dataset.MetaArray;
 
-    private Set<V> values = new HashSet<>();
+import galileo.event.EventType;
+import galileo.event.GalileoEvent;
 
-    public CollectionVertex(L label, V value) {
-        this.label = label;
-        setValue(value);
+import galileo.serialization.SerializationException;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+public class QueryResponse implements GalileoEvent {
+
+    private MetaArray metadata;
+
+    public QueryResponse(MetaArray metadata) {
+        this.metadata = metadata;
     }
 
-    public Set<V> getValues() {
-        return values;
-    }
-
-    @Override
-    public void setValue(V value) {
-        if (value != null) {
-            getValue().add(value);
-        }
+    public MetaArray getMetadata() {
+        return metadata;
     }
 
     @Override
-    protected String toString(int indent) {
-        String ls = System.lineSeparator();
-        String valueStr = "";
-        for (V value : values) {
-            valueStr += value;
-        }
-        String str = "(" + getLabel() + ",<" + valueStr + ">)" + ls;
+    public EventType getType() {
+        return EventType.QUERY_RESPONSE;
+    }
 
-        String space = " ";
-        for (int i = 0; i < indent; ++i) {
-            space += "|  ";
-        }
-        space += "|-";
-        ++indent;
+    public QueryResponse(SerializationInputStream in)
+    throws IOException, SerializationException {
+        metadata = new MetaArray(in);
+    }
 
-        for (Vertex<L, V> vertex : edges.values()) {
-            str += space + vertex.toString(indent);
-        }
-
-        return str;
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeSerializable(metadata);
     }
 }

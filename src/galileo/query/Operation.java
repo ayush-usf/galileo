@@ -23,46 +23,58 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.event;
+package galileo.query;
 
-import java.io.IOException;
-
-import galileo.dataset.FileBlock;
-
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Represents a client request for storage at a DHT {@link StorageNode}.
+ * Encapsulates a query operation.  This involves an operand, and multiple
+ * {@link Expression} pairs.  Each expression pair is joined with the logical
+ * AND operator.
+ *
+ * @author malensek
  */
-public class StorageEvent implements GalileoEvent {
+public class Operation {
 
-    private FileBlock block;
+    private String operandName;
+    private List<Expression> expressions = new ArrayList<>();
 
-    public StorageEvent(FileBlock block) {
-        this.block = block;
+    public Operation(String operandName, Expression expression) {
+        this.operandName = operandName;
+        addExpressions(expression);
     }
 
-    public FileBlock getBlock() {
-        return block;
+    public Operation(String operandName, Expression... expressions) {
+        this.operandName = operandName;
+        addExpressions(expressions);
+    }
+
+    public void addExpressions(Expression... expressions) {
+        for (Expression expression : expressions) {
+            this.expressions.add(expression);
+        }
+    }
+
+    public List<Expression> getExpressions() {
+        return expressions;
+    }
+
+    public String getOperandName() {
+        return operandName;
     }
 
     @Override
-    public EventType getType() {
-        return EventType.STORAGE;
-    }
+    public String toString() {
+        String str = "";
+        for (int i = 0; i < expressions.size(); ++i) {
+            str += operandName + " " + expressions.get(i);
 
-    /**
-     * Deserializes a Storage event.
-     */
-    public StorageEvent(SerializationInputStream in)
-    throws IOException {
-        block = new FileBlock(in);
-    }
+            if (i < expressions.size() - 1) {
+                str += " && ";
+            }
+        }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        block.serialize(out);
+        return "(" + str + ")";
     }
 }
