@@ -1,12 +1,8 @@
 <?xml version="1.0" standalone="yes"?>
 
 <project name="Galileo" basedir="." default="jar">
-    <description>
-        Ant buildfile for the ${ant.project.name} distribution
-    </description>
-
     <!-- Build properties -->
-    <property name="project.version" value="0.4.0" />
+    <property name="project.version" value="0.4" />
     <property name="project.url" value="http://galileo.cs.colostate.edu" />
     <tstamp>
         <format property="build.date" pattern="MM-dd-yyyy" />
@@ -18,15 +14,6 @@
     <property name="dist" value="lib" />
     <property name="docs" value="docs/api" />
 
-    <!-- javadoc properties -->
-    <property name="header" value="The ${ant.project.name} Project" />
-    <property name="Release" value="${project.version}" />
-    <property name="windowtitle"
-        value="${ant.project.name} Documentation - ${Release}" />
-    <property name="doctitle"
-        value="Package List for the ${ant.project.name} Project
-               &lt;br&gt;${Release} ${build.date}" />
-
     <path id="classpath">
         <fileset dir="." includes="lib/*.jar" />
     </path>
@@ -34,57 +21,40 @@
     <property name="jar.name"
             value="${dist}/${ant.project.name}-${project.version}.jar" />
 
-    <!-- Pre-build Preparation -->
-    <target name="prepare">
-        <!-- Create the time stamp -->
+    <target name="compile" description="Compile source files">
         <tstamp />
-        <!-- Create the build directory structure used by compile -->
         <mkdir dir="${build}" />
-    </target>
 
-    <!-- Compile Java source files -->
-    <target name="compile" depends="prepare" description="Compile Java sources">
-        <javac destdir="${build}" debug="on" fork="true"
-               memoryMaximumSize="128m" includeantruntime="false">
+        <javac destdir="${build}" debug="on" includeantruntime="false">
             <src path="${src}" />
             <classpath refid="classpath" />
-
-            <!-- Distribution-specific directives -->
-            <exclude name="ds/granules/learning/clustering/**"
-                     unless="enable.clustering" />
+            <compilerarg value="-Xlint"/>
         </javac>
-        <copy todir="classes">
-            <fileset dir="${src}">
-                <include name="**/*.xsb" />
-                <include name="**/*.class" />
-                <include name="**/bgm.ser" />
-            </fileset>
-        </copy>
     </target>
 
     <target name="jar" depends="compile">
-        <!-- Create the ${dist}/lib directory -->
         <mkdir dir="${dist}" />
+
         <jar basedir="${build}" jarfile="${jar.name}">
             <manifest>
-                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Built-By" value="${user.name}" />
                 <attribute name="Specification-Title"
-                           value="${ant.project.name}" />
+                        value="${ant.project.name}" />
                 <attribute name="Specification-Version"
-                           value="${project.version}" />
-                <attribute name="Specification-URL" value="${project.url}" />
-                <attribute name="Implementation-Version"
-                           value="${project.version}---${build.date}" />
-                <attribute name="Main-Class"
-                           value="ds.galileo.dht.StorageNode" />
+                        value="${project.version}" />
+                <attribute name="Specification-URL"
+                        value="${project.url}" />
             </manifest>
         </jar>
     </target>
 
     <target name="javadoc" description="Generates javadoc" depends="compile">
+        <property name="doctitle"
+                value="${ant.project.name} ${project.version} Documentation" />
+
         <mkdir dir="${docs}" />
         <javadoc sourcepath="${src}" destdir="${docs}"
-                doctitle="${doctitle}" windowtitle="${windowtitle}" />
+                doctitle="${doctitle}" windowtitle="${doctitle}" />
     </target>
 
     <target name="clean" depends="releaseclean">
@@ -110,14 +80,9 @@
             <!-- ignore hidden files -->
             <fileset dir="." excludes="**/.*" />
         </copy>
-        <delete dir="${reldir}/${reldir}" />
-        <delete includeemptydirs="true">
-            <fileset dir="${reldir}"
-                     includes="**/.svn" defaultexcludes="false"/>
-        </delete>
+        <delete dir="${reldir}/release" />
         <zip destfile="${ant.project.name}-${project.version}.zip"
              basedir="release" />
         <delete dir="release" />
     </target>
 </project>
-
