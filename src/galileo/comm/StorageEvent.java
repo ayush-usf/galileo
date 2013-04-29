@@ -36,7 +36,7 @@ import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
 /**
- * Represents a client request for storage at a DHT {@link StorageNode}.
+ * Represents a client request for storage at a DHT {@link galileo.dht.StorageNode}.
  */
 public class StorageEvent implements GalileoEvent {
 

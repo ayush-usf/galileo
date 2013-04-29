@@ -116,9 +116,6 @@ public class PhysicalGraph {
      * @param block
      *     Block to store on disk
      *
-     * @param rawBytes
-     *     bytes for the entire block (data + metadata).  This is used to
-     *
      * @return
      *     String path to the block's location on disk.
      *

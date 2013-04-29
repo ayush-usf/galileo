@@ -59,9 +59,9 @@ public class Query implements GalileoEvent {
     }
 
     /**
-     * (Re)construct a query from a SerializationStream.
+     * (Re)construct a query from a serialization stream.
      *
-     * @param SerializationInputStream stream to deserialize from.
+     * @param in stream to deserialize from.
      */
     public Query(SerializationInputStream in)
     throws IOException {

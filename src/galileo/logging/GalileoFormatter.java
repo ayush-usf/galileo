@@ -37,8 +37,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
- * The basic Galileo logging formatter, based on {@link SimpleFormatter}.  This
- * formatter only prints detailed information if an important message
+ * The basic Galileo logging formatter, based on
+ * {@link java.util.logging.SimpleFormatter}.
+ * This formatter only prints detailed information if an important message
  * (WARNING, SEVERE) is logged or an exception is provided.  Otherwise, messages
  * are written without additional details.
  *

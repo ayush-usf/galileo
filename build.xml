@@ -13,13 +13,13 @@
     <property name="build" value="classes" />
     <property name="dist" value="lib" />
     <property name="docs" value="docs/api" />
+    <property name="jar.name"
+            value="${dist}/${ant.project.name}-${project.version}.jar" />
+
 
     <path id="classpath">
         <fileset dir="." includes="lib/*.jar" />
     </path>
-
-    <property name="jar.name"
-            value="${dist}/${ant.project.name}-${project.version}.jar" />
 
     <target name="compile" description="Compile source files">
         <tstamp />
@@ -34,7 +34,6 @@
 
     <target name="jar" depends="compile">
         <mkdir dir="${dist}" />
-
         <jar basedir="${build}" jarfile="${jar.name}">
             <manifest>
                 <attribute name="Built-By" value="${user.name}" />
@@ -53,13 +52,13 @@
                 value="${ant.project.name} ${project.version} Documentation" />
 
         <mkdir dir="${docs}" />
-        <javadoc sourcepath="${src}" destdir="${docs}"
+        <javadoc sourcepath="${src}" destdir="${docs}" classpathref="classpath"
                 doctitle="${doctitle}" windowtitle="${doctitle}" />
     </target>
 
     <target name="clean" depends="releaseclean">
         <delete dir="${docs}" />
-        <delete file="${dist}/${ant.project.name}.jar" />
+        <delete file="${jar.name}" />
     </target>
 
     <target name="releaseclean">
