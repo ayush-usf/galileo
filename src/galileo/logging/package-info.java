@@ -24,10 +24,7 @@ software, even if advised of the possibility of such damage.
 */
 
 /**
- * Graph-based data structures.
- *
- * These classes provide functionality for creating and traversing (querying)
- * graph-baseed structures.
+ * Management and configuration of log files.
  */
 
-package galileo.graph;
+package galileo.logging;
