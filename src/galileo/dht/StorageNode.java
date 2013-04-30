@@ -36,7 +36,6 @@ import galileo.comm.Query;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
 
-import galileo.config.NetworkConfig;
 import galileo.config.SystemConfig;
 
 import galileo.dataset.MetaArray;

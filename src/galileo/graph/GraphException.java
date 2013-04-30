@@ -27,6 +27,8 @@ package galileo.graph;
 
 public class GraphException extends Exception {
 
+    private static final long serialVersionUID = 5890150314370174832L;
+
     public GraphException() {
         super();
     }

@@ -33,6 +33,8 @@ import galileo.serialization.SerializationInputStream;
 
 public class MetaArray extends SerializableArray<BlockMetadata> {
 
+    private static final long serialVersionUID = 3821982297670342178L;
+
     public MetaArray() { }
 
     public MetaArray(SerializationInputStream in)

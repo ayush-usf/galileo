@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.config;
+package galileo.dht;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,10 +33,6 @@ import java.io.IOException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import galileo.dht.GroupInfo;
-import galileo.dht.NetworkInfo;
-import galileo.dht.NodeInfo;
 
 import galileo.util.FileNames;
 import galileo.util.Pair;

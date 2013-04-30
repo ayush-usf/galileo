@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Node implements Serializable {
+
+    private static final long serialVersionUID = -8845938019887421925L;
+
     public static int leafCounter = 0;
     public static int fullLeaves = 0;
     public static long nodeCounter = 0;
