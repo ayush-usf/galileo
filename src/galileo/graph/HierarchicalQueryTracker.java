@@ -71,13 +71,7 @@ public class HierarchicalQueryTracker<T> {
     }
 
     public List<Vertex<Feature, T>> getQueryResults() {
-        List<Vertex<Feature, T>> queryResults = new ArrayList<>();
 
-        for (int i = (farthestDepth - skip); i < results.size(); ++i) {
-            queryResults.addAll(results.get(i));
-        }
-
-        //return queryResults;
         return results.get(farthestDepth);
     }
 
