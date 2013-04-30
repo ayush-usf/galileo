@@ -25,18 +25,29 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import java.util.logging.Logger;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import galileo.dataset.Feature;
 import galileo.dataset.FeatureType;
 import galileo.dataset.NullFeature;
+
+import galileo.query.Expression;
+import galileo.query.Operation;
+import galileo.query.Operator;
+import galileo.query.Query;
 
 /**
  * A type-aware hierarchical graph implementation with each type occupying a
@@ -50,9 +61,70 @@ public class HierarchicalGraph<T> {
 
     private Vertex<Feature, T> root = new Vertex<>();
     private Map<String, Integer> featureOrder = new HashMap<>();
+    private Queue<String> features = new LinkedList<>();
 
-    public void traverse() {
-        System.out.println(root.getNeighbor(new Feature("wind", 4.2)).getNeighbor(new Feature("humidity", 0.38)));
+    public void evaluateQuery(Query q) {
+        HierarchicalQueryTracker<T> tracker
+            = new HierarchicalQueryTracker<>(root);
+
+        for (String feature : features) {
+            List<Operation> operations = q.getOperations(feature);
+            List<Vertex<Feature, T>> results
+                = evaluateOperations(operations, tracker);
+            tracker.addResults(results);
+        }
+        System.out.println(tracker);
+
+        System.out.println("Results: --- ");
+        for (Vertex<Feature, T> result : tracker.getQueryResults()) {
+            System.out.println(result);
+        }
+    }
+
+    public List<Vertex<Feature, T>> evaluateOperations(
+            List<Operation> operations, HierarchicalQueryTracker<T> tracker) {
+
+        List<Vertex<Feature, T>> results = new ArrayList<>();
+
+        if (operations == null) {
+            tracker.skipLevel();
+
+            // traverse all neighbors
+            for (Vertex<Feature, T> vertex : tracker.getCurrentResults()) {
+                results.addAll(vertex.getAllNeighbors());
+            }
+        } else {
+            tracker.addLevel();
+
+            for (Operation op : operations) {
+                for (Vertex<Feature, T> vertex : tracker.getCurrentResults()) {
+                    Collection<Vertex<Feature, T>> resultCollection
+                        = evaluateExpressions(op.getExpressions(), vertex);
+                    results.addAll(resultCollection);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private Collection<Vertex<Feature, T>> evaluateExpressions(
+            List<Expression> expressions, Vertex<Feature, T> vertex) {
+
+        Set<Vertex<Feature, T>> resultSet
+            = new HashSet<>(vertex.getAllNeighbors());
+
+        for (Expression expression : expressions) {
+            if (expression.operator == Operator.EQUAL) {
+                Vertex<Feature, T> neighbor
+                    = vertex.getNeighbor(new Feature(expression.value));
+                Set<Vertex<Feature, T>> neighborSet = new HashSet<>();
+                neighborSet.add(neighbor);
+                resultSet.retainAll(neighborSet);
+            }
+        }
+
+        return resultSet;
     }
 
     public void addPath(Path<Feature, T> path) {
@@ -131,10 +203,17 @@ public class HierarchicalGraph<T> {
     private int getOrder(Feature feature) {
         Integer order = featureOrder.get(feature.getName());
         if (order == null) {
-            logger.info("New feature: " + feature.getName());
-            order = featureOrder.keySet().size();
-            featureOrder.put(feature.getName(), order);
+            order = addNewFeature(feature.getName());
         }
+
+        return order;
+    }
+
+    private int addNewFeature(String feature) {
+        logger.info("New feature: " + feature);
+        Integer order = featureOrder.keySet().size();
+        featureOrder.put(feature, order);
+        features.offer(feature);
 
         return order;
     }

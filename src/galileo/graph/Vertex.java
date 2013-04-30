@@ -25,7 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -70,6 +72,24 @@ public class Vertex<L extends Comparable<L>, V> {
      */
     public Vertex<L, V> getNeighbor(L label) {
         return edges.get(label);
+    }
+
+    /**
+     * Retrieve the labels of all neighboring vertices.
+     *
+     * @return Neighbor Vertex labels.
+     */
+    public Set<L> getNeighborLabels() {
+        return edges.keySet();
+    }
+
+    /**
+     * Traverse all edges to return all neighboring vertices.
+     *
+     * @return collection of all neighboring vertices.
+     */
+    public Collection<Vertex<L, V>> getAllNeighbors() {
+        return edges.values();
     }
 
     /**
