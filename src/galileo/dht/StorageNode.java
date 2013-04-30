@@ -169,14 +169,10 @@ public class StorageNode implements MessageListener {
     private class storageHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
-            try {
-                StorageEvent store = Serializer.deserialize(StorageEvent.class,
-                        eventContainer.getEventPayload());
+            StorageEvent store = Serializer.deserialize(StorageEvent.class,
+                    eventContainer.getEventPayload());
 
-                fs.storeBlock(store.getBlock());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error handling storage event", e);
-            }
+            fs.storeBlock(store.getBlock());
         }
     }
 
