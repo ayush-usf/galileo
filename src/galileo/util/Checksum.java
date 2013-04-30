@@ -30,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Provides convenience functions for dealing with MessageDigest algorithms.
+ *
+ * @author malensek
  */
 public class Checksum {
     private MessageDigest md;
