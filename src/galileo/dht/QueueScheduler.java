@@ -43,7 +43,6 @@ public class QueueScheduler implements Scheduler {
 
     @Override
     public void schedule(ProcessingUnit unit) {
-        //ClientRequest request = new ClientRequest(client);
         executor.submit(unit);
     }
 }
