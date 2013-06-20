@@ -36,7 +36,6 @@ import java.util.Date;
 import java.util.UUID;
 
 import galileo.dataset.BlockMetadata;
-import galileo.dataset.BlockMetadataImpl;
 import galileo.dataset.FileBlock;
 
 import galileo.serialization.SerializationException;
@@ -192,7 +191,7 @@ public class PhysicalGraph {
         metaInStream.read(metaBytes);
         metaInStream.close();
 
-        return Serializer.deserialize(BlockMetadataImpl.class, metaBytes);
+        return Serializer.deserialize(BlockMetadata.class, metaBytes);
     }
 
 
@@ -213,7 +212,7 @@ public class PhysicalGraph {
         String directory = "";
 
         BlockMetadata metadata = block.getMetadata();
-        Date blockDate = metadata.getTemporalRange().getLowerBound();
+        Date blockDate = metadata.getTemporalProperties().getLowerBound();
 
         /* Date */
         SimpleDateFormat formatter = new SimpleDateFormat();
@@ -221,7 +220,9 @@ public class PhysicalGraph {
         directory = formatter.format(blockDate);
 
         /* GeoHash */
-        directory += GeoHash.encode(metadata.getSpatialRange(), 2);
+        //directory += GeoHash.encode(metadata.getSpatialRange(), 2);
+        directory += GeoHash.encode(
+                metadata.getSpatialProperties().getSpatialRange(), 2);
 
         return directory;
     }

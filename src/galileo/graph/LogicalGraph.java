@@ -86,7 +86,7 @@ public class LogicalGraph {
 
     private String getGraphPath(BlockMetadata metadata) {
         String path = "";
-        Date blockDate = metadata.getTemporalRange().getLowerBound();
+        Date blockDate = metadata.getTemporalProperties().getLowerBound();
 
         /* Date */
         SimpleDateFormat formatter = new SimpleDateFormat();
@@ -94,7 +94,9 @@ public class LogicalGraph {
         path = formatter.format(blockDate);
 
         /* GeoHash */
-        path += GeoHash.encode(metadata.getSpatialRange(), 2);
+        //path += GeoHash.encode(metadata.getSpatialRange(), 2);
+        path += GeoHash.encode(
+                metadata.getSpatialProperties().getSpatialRange(), 2);
 
         return path;
     }

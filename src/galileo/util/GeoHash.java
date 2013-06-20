@@ -30,7 +30,6 @@ import java.util.HashMap;
 
 import galileo.dataset.Coordinates;
 import galileo.dataset.SpatialRange;
-import galileo.dataset.SpatialRangeImpl;
 
 /**
  * This class provides an implementation of the GeoHash (http://www.geohash.org)
@@ -72,14 +71,32 @@ public class GeoHash {
     }
 
     /**
-     * Encode <code>SpatialRange</code> into a GeoHash string.
+     * Encode a set of {@link Coordinates} into a GeoHash string.
+     *
+     * @param coords
+     *     Coordinates to get GeoHash for.
+     *
+     * @param precision
+     *     Desired number of characters in the returned GeoHash String.  More
+     *     characters means more precision.
+     *
+     * @return GeoHash string.
+     */
+    public static String encode(Coordinates coords, int precision) {
+        return encode(coords.getLatitude(), coords.getLongitude(), precision);
+    }
+
+    /**
+     * Encode {@link SpatialRange} into a GeoHash string.
      *
      * @param range
-     *     <code>SpatialRange</code> to get GeoHash for.
+     *     SpatialRange to get GeoHash for.
      *
      * @param precision
      *     Number of characters in the returned GeoHash String.
      *     More characters is more precise.
+     *
+     * @return GeoHash string.
      */
     public static String encode(SpatialRange range, int precision) {
         Coordinates rangeCoords = range.getCenterPoint();
@@ -183,7 +200,7 @@ public class GeoHash {
         float[] longitude = decodeBits(bits, false);
         float[] latitude  = decodeBits(bits, true);
 
-        return new SpatialRangeImpl(latitude[0], latitude[1],
+        return new SpatialRange(latitude[0], latitude[1],
                                     longitude[0], longitude[1]);
     }
 

@@ -27,11 +27,30 @@ package galileo.serialization;
 
 import java.io.IOException;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Describes an interface for classes that can be serialized to portable
  * byte form.
  */
 public interface ByteSerializable {
+
+    /**
+     * Annotates constructors used for creating new object instances from a
+     * {@link SerializationInputStream}.
+     *
+     * This annotation is intended to increase code readability and also ensure
+     * that a constructor with a SerializationInputStream is intended for
+     * deserialization purposes.
+     */
+    @Target(ElementType.CONSTRUCTOR)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface Deserialize { }
 
     /**
      * Serializes this object to binary form by passing it through a
