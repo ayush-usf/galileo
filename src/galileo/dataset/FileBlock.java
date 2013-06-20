@@ -83,7 +83,7 @@ public class FileBlock implements ByteSerializable {
     throws IOException, SerializationException {
         this.data = data;
         this.metadata =
-            Serializer.deserialize(BlockMetadataImpl.class, metadata);
+            Serializer.deserialize(BlockMetadata.class, metadata);
     }
 
     /**
@@ -93,7 +93,7 @@ public class FileBlock implements ByteSerializable {
      */
     public FileBlock(SerializationInputStream in)
     throws IOException {
-        metadata = new BlockMetadataImpl(in);
+        metadata = new BlockMetadata(in);
         data = in.readField();
     }
 

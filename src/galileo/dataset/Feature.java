@@ -25,7 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-public class Feature implements Comparable<Feature> {
+import java.io.IOException;
+
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+public class Feature implements Comparable<Feature>, ByteSerializable {
 
     protected String name;
     protected FeatureType type = FeatureType.FLOAT;
@@ -76,5 +82,23 @@ public class Feature implements Comparable<Feature> {
     @Override
     public String toString() {
         return name + "=" + value;
+    }
+
+    @Deserialize
+    public Feature(SerializationInputStream in)
+    throws IOException {
+        name = new String(in.readString());
+        type = FeatureType.fromInt(in.readInt());
+        description = new String(in.readString());
+        value = in.readDouble();
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeString(name);
+        out.writeInt(type.toInt());
+        out.writeString(description);
+        out.writeDouble(value);
     }
 }

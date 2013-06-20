@@ -25,44 +25,72 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+/**
+ * Generic class for representing points in 2D or 3D space.
+ *
+ * @author malensek
+ */
+public class Point<T> {
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+    private T x;
+    private T y;
+    private T z;
 
-public class FeatureSet implements ByteSerializable {
+    private boolean hasZ;
 
-    private Map<String, Feature> features = new HashMap<String, Feature>();
-
-    public FeatureSet() { }
-
-    public void put(Feature feature) {
-        features.put(feature.getName(), feature);
+    /**
+     * Constructs a 2D point.
+     *
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     */
+    public Point(T x, T y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public Feature get(String name) {
-        return features.get(name);
+    /**
+     * Constructs a 3D point.
+     *
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     * @param z Z-coordinate
+     */
+    public Point(T x, T y, T z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        hasZ = true;
     }
 
-    @Deserialize
-    public FeatureSet(SerializationInputStream in)
-    throws IOException {
-        int numFeatures = in.readInt();
-        for (int i = 0; i < numFeatures; ++i) {
-            Feature feature = new Feature(in);
-            put(feature);
-        }
+    /**
+     * Reports whether this Point has a third (Z) dimension.
+     *
+     * @return true if a third dimension is available.
+     */
+    public boolean hasZ() {
+        return hasZ;
+    }
+
+    public T X() {
+        return x;
+    }
+
+    public T Y() {
+        return y;
+    }
+
+    public T Z() {
+        return z;
     }
 
     @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(features.size());
-        for (Feature feature : features.values()) {
-            out.writeSerializable(feature);
+    public String toString() {
+        if (hasZ()) {
+            return "(" + x + ", " + y + ", " + z + ")";
+        } else {
+            return "(" + x + ", " + y + ")";
         }
     }
 }

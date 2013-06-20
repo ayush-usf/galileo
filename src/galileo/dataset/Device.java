@@ -25,7 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-public class Device {
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+import java.io.IOException;
+
+public class Device implements ByteSerializable {
     private String name;
 
     public Device(String name) {
@@ -34,5 +40,17 @@ public class Device {
 
     public String getName() {
         return name;
+    }
+
+    @Deserialize
+    public Device(SerializationInputStream in)
+    throws IOException {
+        name = new String(in.readString());
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeString(name);
     }
 }

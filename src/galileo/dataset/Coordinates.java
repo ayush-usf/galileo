@@ -25,10 +25,16 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
+import java.io.IOException;
+
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
 /**
  * Encapsulates a point in space with latitude, longitude coordinates.
  */
-public class Coordinates {
+public class Coordinates implements ByteSerializable {
     private float lat;
     private float lon;
 
@@ -72,5 +78,18 @@ public class Coordinates {
     @Override
     public String toString() {
         return "(" + lat + ", " + lon + ")";
+    }
+
+    public Coordinates(SerializationInputStream in)
+    throws IOException {
+        this.lat = in.readFloat();
+        this.lon = in.readFloat();
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeFloat(lat);
+        out.writeFloat(lon);
     }
 }

@@ -41,7 +41,7 @@ public class MetaArray extends SerializableArray<BlockMetadata> {
     throws IOException, SerializationException {
         int size = in.readInt();
         for (int i = 0; i < size; ++i) {
-            BlockMetadataImpl meta = new BlockMetadataImpl(in);
+            BlockMetadata meta = new BlockMetadata(in);
             add(meta);
         }
     }

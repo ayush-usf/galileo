@@ -25,11 +25,15 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-//TODO this should implement Map<String, Device>
-public class DeviceSet {
+public class DeviceSet implements ByteSerializable {
 
     private Map<String, Device> devices = new HashMap<String, Device>();
 
@@ -41,5 +45,24 @@ public class DeviceSet {
 
     public Device get(String name) {
         return devices.get(name);
+    }
+
+    @Deserialize
+    public DeviceSet(SerializationInputStream in)
+    throws IOException {
+        int numDevices = in.readInt();
+        for (int i = 0; i < numDevices; ++i) {
+            Device device = new Device(in);
+            put(device);
+        }
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeInt(devices.size());
+        for (Device device : devices.values()) {
+            out.writeSerializable(device);
+        }
     }
 }
