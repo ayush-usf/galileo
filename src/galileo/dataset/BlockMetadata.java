@@ -25,25 +25,73 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
+import java.io.IOException;
+
 import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
 
-public interface BlockMetadata extends ByteSerializable {
+public class BlockMetadata implements ByteSerializable {
 
-    public String getIdentifier();
+    private RuntimeMetadata runtimeMetadata = new RuntimeMetadata();
 
-    public RuntimeMetadata getRuntimeMetadata();
-    public void setRuntimeMetadata(RuntimeMetadata runtimeMetadata);
+    private TemporalProperties temporalProperties;
+    private SpatialProperties spatialProperties;
 
-    public TemporalRange getTemporalRange();
+    private FeatureSet features;
+    private DeviceSet devices;
 
-    public SpatialRange getSpatialRange();
+    public BlockMetadata(TemporalProperties temporalProperties,
+            SpatialProperties spatialProperties,
+            FeatureSet features, DeviceSet devices) {
 
-    public FeatureSet getFeatures();
+        this.temporalProperties = temporalProperties;
+        this.spatialProperties = spatialProperties;
+        this.features = features;
+        this.devices  = devices;
+    }
 
-    public DeviceSet getDevices();
+    public RuntimeMetadata getRuntimeMetadata() {
+        return runtimeMetadata;
+    }
 
-    public byte[] getChecksumInfo();
+    public void setRuntimeMetadata(RuntimeMetadata runtimeMetadata) {
+        this.runtimeMetadata = runtimeMetadata;
+    }
 
-    /** This needs to be elaborated on a little more. */
-    public void getAccessPermissions();
+    public TemporalProperties getTemporalProperties() {
+        return temporalProperties;
+    }
+
+    public SpatialProperties getSpatialProperties() {
+        return spatialProperties;
+    }
+
+    public FeatureSet getFeatures() {
+        return features;
+    }
+
+    public DeviceSet getDevices() {
+        return devices;
+    }
+
+    @Deserialize
+    public BlockMetadata(SerializationInputStream in)
+    throws IOException {
+        temporalProperties = new TemporalProperties(in);
+        spatialProperties = new SpatialProperties(in);
+        features = new FeatureSet(in);
+        devices = new DeviceSet(in);
+        runtimeMetadata = new RuntimeMetadata(in);
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeSerializable(temporalProperties);
+        out.writeSerializable(spatialProperties);
+        out.writeSerializable(features);
+        out.writeSerializable(devices);
+        out.writeSerializable(runtimeMetadata);
+    }
 }

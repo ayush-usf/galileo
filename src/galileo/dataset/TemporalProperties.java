@@ -30,13 +30,25 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 
+import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
-public class TemporalRangeImpl implements TemporalRange {
+public class TemporalProperties implements ByteSerializable {
 
     private Date start;
     private Date end;
+
+    /**
+     * Creates TemporalProperties with a simple timestamp (no temporal range).
+     *
+     * @param timestamp Timestamp for these TemporalProperties
+     */
+    public TemporalProperties(long timestamp) {
+        Date d = new Date(timestamp);
+        this.start = d;
+        this.end = d;
+    }
 
     /**
      * Creates a simple temporal range from a start and end time pair,
@@ -45,7 +57,7 @@ public class TemporalRangeImpl implements TemporalRange {
      * @param start Start of the temporal range
      * @param end   End of the temporal range
      */
-    public TemporalRangeImpl(long start, long end)
+    public TemporalProperties(long start, long end)
     throws IllegalArgumentException {
         this.start = new Date(start);
         this.end   = new Date(end);
@@ -60,7 +72,7 @@ public class TemporalRangeImpl implements TemporalRange {
      * @param start Start of the temporal range
      * @param end   End of the temporal range
      */
-    public TemporalRangeImpl(String start, String end)
+    public TemporalProperties(String start, String end)
     throws ParseException, IllegalArgumentException {
         DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
         this.start = formatter.parse(start);
@@ -73,29 +85,43 @@ public class TemporalRangeImpl implements TemporalRange {
      * Ensure the start time comes before the end time for this Temporal range.
      */
     private void verifyRange() throws IllegalArgumentException {
-        if (end.getTime() - start.getTime() < 0) {
+        if (end.getTime() - start.getTime() <= 0) {
             throw new IllegalArgumentException("Upper bound of temporal range" +
                 " must be larger than the lower bound.");
         }
     }
 
     /**
-     * Retrieves the upper bound of this temporal range.
+     * Retrieves the upper bound of this temporal range (if applicable).
      */
-    @Override
     public Date getUpperBound() {
         return end;
     }
 
     /**
-     * Retrieves the lower bound of this temporal range.
+     * Retrieves the lower bound of this temporal range (if applicable).
      */
-    @Override
     public Date getLowerBound() {
         return start;
     }
 
-    public TemporalRangeImpl(SerializationInputStream in)
+    /** 
+     * If the temporal range stored in these TemporalProperties is of length
+     * zero (i.e., start == end) then it is considered a Timestamp.  To retrieve
+     * the value of a Timestamp, both the upper and lower bounds are valid.
+     *
+     * @return true if these TemporalProperties represent a Timestamp.
+     */
+    public boolean isTimestamp() {
+        if (start.equals(end)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Deserialize
+    public TemporalProperties(SerializationInputStream in)
     throws IOException {
         start = new Date(in.readLong());
         end = new Date(in.readLong());

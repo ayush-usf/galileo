@@ -25,36 +25,54 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
+import java.io.IOException;
+
 import galileo.serialization.ByteSerializable;
 
-public interface RuntimeMetadata extends ByteSerializable {
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
 
-    /** Retrieve the storage node identifier for the node currently hosting
-     * associated metadata or blocks.
-     *
-     * @return String with the storage node UUID.
-     */
-    public String getStorageNodeIdentifier();
+public class RuntimeMetadata implements ByteSerializable {
 
-    /** Set the storage node identifier for this metadata.
-     *
-     * @param identifier String containing the storage node UUID.
-     */
-    public void setStorageNodeIdentifier(String identifier);
+    private String storageNodeIdentifier = "";
+    private String physicalGraphPath = "";
 
-    /**
-     * Retrieve the location of this Metadata on disk.
-     * The file path is relative to $GALILEO_ROOT so if the root is moved the
-     * paths should still be valid.
-     *
-     * @return String with the location of the Metadata.
-     */
-    public String getPhysicalGraphPath();
+    public RuntimeMetadata() { }
 
-    /**
-     * Set the physical graph path for this metadata.
-     *
-     * @param path The path of the data in the physical graph.
-     */
-    public void setPhysicalGraphPath(String path);
+    public RuntimeMetadata(String storageNodeIdentifier,
+            String physicalGraphPath) {
+
+        this.storageNodeIdentifier = storageNodeIdentifier;
+        this.physicalGraphPath = physicalGraphPath;
+    }
+
+    public String getStorageNodeIdentifier() {
+        return storageNodeIdentifier;
+    }
+
+    public void setStorageNodeIdentifier(String identifier) {
+        storageNodeIdentifier = identifier;
+    }
+
+    public String getPhysicalGraphPath() {
+        return physicalGraphPath;
+    }
+
+    public void setPhysicalGraphPath(String path) {
+        physicalGraphPath = path;
+    }
+
+    @Deserialize
+    public RuntimeMetadata(SerializationInputStream in)
+    throws IOException {
+        storageNodeIdentifier = new String(in.readField());
+        physicalGraphPath = new String(in.readField());
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeField(storageNodeIdentifier.getBytes());
+        out.writeField(physicalGraphPath.getBytes());
+    }
 }

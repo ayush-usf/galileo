@@ -25,35 +25,111 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
+import java.io.IOException;
+
 import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
 
-public interface SpatialRange extends ByteSerializable {
+public class SpatialRange implements ByteSerializable {
+    private float upperLat;
+    private float lowerLat;
+    private float upperLon;
+    private float lowerLon;
 
-    public float getUpperBoundForLatitude();
+    private boolean hasElevation;
+    private float upperElevation;
+    private float lowerElevation;
 
-    public float getLowerBoundForLatitude();
+    public SpatialRange(float lowerLat, float upperLat,
+            float lowerLon, float upperLon) {
+        this.lowerLat = lowerLat;
+        this.upperLat = upperLat;
+        this.lowerLon = lowerLon;
+        this.upperLon = upperLon;
 
-    public float getUpperBoundForLongitude();
+        hasElevation = false;
+    }
 
-    public float getLowerBoundForLongitude();
+    public SpatialRange(float lowerLat, float upperLat,
+            float lowerLon, float upperLon,
+            float upperElevation, float lowerElevation) {
+        this.lowerLat = lowerLat;
+        this.upperLat = upperLat;
+        this.lowerLon = lowerLon;
+        this.upperLon = upperLon;
 
-    /**
-     * Returns the center point of the spatial range, which is half way between
-     * the upper and lower bounds for latitude and longitude.
-     *
-     * @return latitude, longitude coordinate pair
-     */
-    public Coordinates getCenterPoint();
+        hasElevation = true;
+        this.upperElevation = upperElevation;
+        this.lowerElevation = lowerElevation;
+    }
 
-    public boolean hasElevationBounds();
+    public float getUpperBoundForLatitude() {
+        return upperLat;
+    }
 
-    public float getUpperBoundForElevation();
+    public float getLowerBoundForLatitude() {
+        return lowerLat;
+    }
 
-    public float getLowerBoundForElevation();
+    public float getUpperBoundForLongitude() {
+        return upperLon;
+    }
 
-    public String getMeasurementUnitForElevation();
+    public float getLowerBoundForLongitude() {
+        return lowerLon;
+    }
 
-    public String getMeasurementUnitForLatitude();
+    public Coordinates getCenterPoint() {
+        float latDifference = upperLat - lowerLat;
+        float latDistance = latDifference / 2;
 
-    public String getMeasurementUnitForLongitude();
+        float lonDifference = upperLon - lowerLon;
+        float lonDistance = lonDifference / 2;
+
+        return new Coordinates(lowerLat + latDistance,
+                               lowerLon + lonDistance);
+    }
+
+    public boolean hasElevationBounds() {
+        return hasElevation;
+    }
+
+    public float getUpperBoundForElevation() {
+        return upperElevation;
+    }
+
+    public float getLowerBoundForElevation() {
+        return lowerElevation;
+    }
+
+    @Deserialize
+    public SpatialRange(SerializationInputStream in)
+    throws IOException {
+        lowerLat = in.readFloat();
+        upperLat = in.readFloat();
+        lowerLon = in.readFloat();
+        upperLon = in.readFloat();
+
+        hasElevation = in.readBoolean();
+        if (hasElevation) {
+            lowerElevation = in.readFloat();
+            upperElevation = in.readFloat();
+        }
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeFloat(lowerLat);
+        out.writeFloat(upperLat);
+        out.writeFloat(lowerLon);
+        out.writeFloat(upperLon);
+
+        out.writeBoolean(hasElevation);
+        if (hasElevation) {
+            out.writeFloat(lowerElevation);
+            out.writeFloat(upperElevation);
+        }
+    }
 }
