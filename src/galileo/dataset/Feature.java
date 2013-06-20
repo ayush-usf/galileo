@@ -42,10 +42,6 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
         this.name = name;
     }
 
-    public Feature(double value) {
-        this.value = value;
-    }
-
     public Feature(String name, double value) {
         this.name = name;
         this.value = value;

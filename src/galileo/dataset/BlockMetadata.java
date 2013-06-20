@@ -38,8 +38,8 @@ public class BlockMetadata implements ByteSerializable {
     private TemporalProperties temporalProperties;
     private SpatialProperties spatialProperties;
 
-    private FeatureSet features;
-    private DeviceSet devices;
+    private FeatureSet features = new FeatureSet();
+    private DeviceSet devices = new DeviceSet();
 
     public BlockMetadata(TemporalProperties temporalProperties,
             SpatialProperties spatialProperties,
