@@ -190,7 +190,7 @@ public class StorageNode implements MessageListener {
     /**
      * Handles cleaning up the system for a graceful shutdown.
      */
-    public class ShutdownHandler extends Thread {
+    private class ShutdownHandler extends Thread {
         @Override
         public void run() {
             /* The logging subsystem may have already shut down, so we revert to
