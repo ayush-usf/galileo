@@ -11,10 +11,10 @@
     <!-- Directories -->
     <property name="src" value="src" />
     <property name="build" value="classes" />
-    <property name="dist" value="lib" />
+    <property name="lib" value="lib" />
     <property name="docs" value="docs/api" />
     <property name="jar.name"
-            value="${dist}/${ant.project.name}-${project.version}.jar" />
+            value="${lib}/${ant.project.name}-${project.version}.jar" />
 
 
     <path id="classpath">
@@ -22,21 +22,25 @@
     </path>
 
     <target name="compile" description="Compile source files">
-        <tstamp />
         <mkdir dir="${build}" />
 
-        <javac destdir="${build}" debug="on" includeantruntime="false">
-            <src path="${src}" />
-            <classpath refid="classpath" />
-            <compilerarg value="-Xlint"/>
+        <javac srcdir="${src}"
+                destdir="${build}"
+                classpathref="classpath"
+                debug="on"
+                includeantruntime="false">
+
+            <compilerarg value="-Xlint" />
         </javac>
     </target>
 
     <target name="jar" depends="compile">
-        <mkdir dir="${dist}" />
+        <mkdir dir="${lib}" />
+
         <jar basedir="${build}" jarfile="${jar.name}">
             <manifest>
-                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Built-By"
+                        value="${user.name}" />
                 <attribute name="Specification-Title"
                         value="${ant.project.name}" />
                 <attribute name="Specification-Version"
@@ -48,12 +52,16 @@
     </target>
 
     <target name="javadoc" description="Generates javadoc" depends="compile">
+        <mkdir dir="${docs}" />
+
         <property name="doctitle"
                 value="${ant.project.name} ${project.version} Documentation" />
 
-        <mkdir dir="${docs}" />
-        <javadoc sourcepath="${src}" destdir="${docs}" classpathref="classpath"
-                doctitle="${doctitle}" windowtitle="${doctitle}" />
+        <javadoc sourcepath="${src}"
+                destdir="${docs}"
+                classpath="${classpath}"
+                doctitle="${doctitle}"
+                windowtitle="${doctitle}" />
     </target>
 
     <target name="clean" depends="releaseclean">
