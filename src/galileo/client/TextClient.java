@@ -37,15 +37,13 @@ import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
 
 import galileo.dataset.BlockMetadata;
-import galileo.dataset.BlockMetadataImpl;
 import galileo.dataset.Device;
 import galileo.dataset.DeviceSet;
 import galileo.dataset.Feature;
 import galileo.dataset.FeatureSet;
 import galileo.dataset.FileBlock;
-import galileo.dataset.SpatialRange;
-import galileo.dataset.TemporalRange;
-import galileo.dataset.TemporalRangeImpl;
+import galileo.dataset.SpatialProperties;
+import galileo.dataset.TemporalProperties;
 
 import galileo.event.EventContainer;
 import galileo.event.EventType;
@@ -91,8 +89,10 @@ public class TextClient implements MessageListener {
                         QueryResponse.class, container.getEventPayload());
 
                 for (BlockMetadata meta : response.getMetadata()) {
+                    SpatialProperties spatialProperties
+                        = meta.getSpatialProperties();
                     System.out.println(
-                            meta.getSpatialRange().getUpperBoundForLatitude());
+                            spatialProperties.getCoordinates().getLatitude());
                 }
             }
 
@@ -130,7 +130,7 @@ public class TextClient implements MessageListener {
         client.connect(serverHostName, serverPort);
 
         /* Let's make some data to store. */
-        
+
         /* First, a temporal range for this data "sample" */
         Calendar calendar = Calendar.getInstance();
         int year, month, day;
@@ -146,7 +146,8 @@ public class TextClient implements MessageListener {
         long startTime = calendar.getTimeInMillis();
         long endTime   = startTime + 1;
 
-        TemporalRange tempRange = new TemporalRangeImpl(startTime, endTime);
+        TemporalProperties temporalProperties
+            = new TemporalProperties(startTime, endTime);
 
 
         /* The continental US */
@@ -163,7 +164,8 @@ public class TextClient implements MessageListener {
             hash += GeoHash.charMap[random];
         }
 
-        SpatialRange spatialRange = GeoHash.decodeHash(hash);
+        SpatialProperties spatialProperties
+            = new SpatialProperties(GeoHash.decodeHash(hash));
 
         String[] featSet = { "wind_speed", "wind_direction", "condensation",
                              "temperature", "humidity" };
@@ -178,8 +180,8 @@ public class TextClient implements MessageListener {
         DeviceSet devices = new DeviceSet();
         devices.put(d);
 
-        BlockMetadata metadata =
-            new BlockMetadataImpl(tempRange, spatialRange, features, devices);
+        BlockMetadata metadata = new BlockMetadata(
+                temporalProperties, spatialProperties, features, devices);
 
         /* Now let's make some "data" to associate with our metadata. */
         Random r = new Random(System.nanoTime());
