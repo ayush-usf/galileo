@@ -31,15 +31,29 @@ import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
+/**
+ * Represents FileBlock metadata.
+ *
+ * @author malensek
+ */
 public class BlockMetadata implements ByteSerializable {
 
-    private RuntimeMetadata runtimeMetadata = new RuntimeMetadata();
+    private String name = "";
 
     private TemporalProperties temporalProperties;
     private SpatialProperties spatialProperties;
 
     private FeatureSet features = new FeatureSet();
     private DeviceSet devices = new DeviceSet();
+
+    private RuntimeMetadata runtimeMetadata = new RuntimeMetadata();
+
+    public BlockMetadata(String name, TemporalProperties temporalProperties,
+            SpatialProperties spatialProperties,
+            FeatureSet features, DeviceSet devices) {
+        this(temporalProperties, spatialProperties, features, devices);
+        this.name = name;
+    }
 
     public BlockMetadata(TemporalProperties temporalProperties,
             SpatialProperties spatialProperties,
@@ -57,6 +71,10 @@ public class BlockMetadata implements ByteSerializable {
 
     public void setRuntimeMetadata(RuntimeMetadata runtimeMetadata) {
         this.runtimeMetadata = runtimeMetadata;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public TemporalProperties getTemporalProperties() {
@@ -78,6 +96,7 @@ public class BlockMetadata implements ByteSerializable {
     @Deserialize
     public BlockMetadata(SerializationInputStream in)
     throws IOException {
+        name = new String(in.readString());
         temporalProperties = new TemporalProperties(in);
         spatialProperties = new SpatialProperties(in);
         features = new FeatureSet(in);
@@ -88,6 +107,7 @@ public class BlockMetadata implements ByteSerializable {
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
+        out.writeString(name);
         out.writeSerializable(temporalProperties);
         out.writeSerializable(spatialProperties);
         out.writeSerializable(features);
