@@ -28,6 +28,11 @@ package galileo.dht;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Describes a Galileo network layout.
+ *
+ * @author malensek
+ */
 public class NetworkInfo {
 
     private List<GroupInfo> groups = new ArrayList<>();

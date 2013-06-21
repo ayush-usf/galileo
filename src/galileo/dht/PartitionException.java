@@ -25,35 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht;
 
-import galileo.dataset.BlockMetadata;
+public class PartitionException extends Exception {
 
-/**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
- *
- * @author malensek
- */
-public abstract class Partitioner {
-
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
-
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
+    public PartitionException() {
+        super();
     }
 
-    /**
-     * Determines where a file belongs in the system based on its metadata
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
-     *
-     * Ultimately, this function will determine the DHT hierarchy.
-     *
-     * @param metadata {@link FileBlock} Metadata to inspect and determine its
-     * proper location in the network.
-     */
-    public abstract NodeInfo locateData(BlockMetadata metadata)
-        throws PartitionException;
+    public PartitionException(String s) {
+        super(s);
+    }
 }

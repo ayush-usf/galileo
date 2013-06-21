@@ -26,34 +26,30 @@ software, even if advised of the possibility of such damage.
 package galileo.dht;
 
 import galileo.dataset.BlockMetadata;
+import galileo.util.Checksum;
 
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
+ * Example Partitioner that creates a classic DHT.
  *
  * @author malensek
  */
-public abstract class Partitioner {
+public class SHA1Partitioner extends Partitioner {
 
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
-
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
+    public SHA1Partitioner(StorageNode storageNode, NetworkInfo network) {
+        super(storageNode, network);
     }
 
-    /**
-     * Determines where a file belongs in the system based on its metadata
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
-     *
-     * Ultimately, this function will determine the DHT hierarchy.
-     *
-     * @param metadata {@link FileBlock} Metadata to inspect and determine its
-     * proper location in the network.
-     */
-    public abstract NodeInfo locateData(BlockMetadata metadata)
-        throws PartitionException;
+    @Override
+    public NodeInfo locateData(BlockMetadata metadata)
+    throws PartitionException {
+        String fileName = metadata.getName();
+        if (fileName == null || fileName.equals("")) {
+            throw new PartitionException("Cannot locate unnamed file.");
+        }
+
+        Checksum check = new Checksum();
+        check.hash(fileName.getBytes());
+
+        return null;
+    }
 }

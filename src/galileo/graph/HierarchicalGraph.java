@@ -117,7 +117,7 @@ public class HierarchicalGraph<T> {
         for (Expression expression : expressions) {
             if (expression.operator == Operator.EQUAL) {
                 Vertex<Feature, T> neighbor
-                    = vertex.getNeighbor(new Feature(expression.value));
+                    = vertex.getNeighbor(new Feature("", expression.value));
                 Set<Vertex<Feature, T>> neighborSet = new HashSet<>();
                 neighborSet.add(neighbor);
                 resultSet.retainAll(neighborSet);

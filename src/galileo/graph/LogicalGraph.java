@@ -94,7 +94,6 @@ public class LogicalGraph {
         path = formatter.format(blockDate);
 
         /* GeoHash */
-        //path += GeoHash.encode(metadata.getSpatialRange(), 2);
         path += GeoHash.encode(
                 metadata.getSpatialProperties().getSpatialRange(), 2);
 

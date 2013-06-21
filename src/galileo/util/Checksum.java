@@ -39,9 +39,13 @@ public class Checksum {
     /**
      * Initializes a new Checksum generator using the default SHA-1 algorithm.
      */
-    public Checksum()
-    throws NoSuchAlgorithmException {
-        md = MessageDigest.getInstance("SHA1");
+    public Checksum() {
+        /* We assume the "SHA1" algorithm is always available */
+        try {
+            md = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("SHA1 message digest algorithm not found!");
+        }
     }
 
     /**
