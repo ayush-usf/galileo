@@ -41,6 +41,10 @@ public class NetworkInfo {
         groups.add(group);
     }
 
+    public List<GroupInfo> getGroups() {
+        return groups;
+    }
+
     @Override
     public String toString() {
         String str = "Network Information:" + System.lineSeparator();

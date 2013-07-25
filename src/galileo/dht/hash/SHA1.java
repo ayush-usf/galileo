@@ -23,37 +23,38 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.dht.hash;
 
-import galileo.dataset.BlockMetadata;
-import galileo.dht.hash.HashException;
+import galileo.util.Checksum;
+
+import java.math.BigInteger;
+import java.util.Random;
 
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
+ * Provides an SHA1 HashFunction.
  *
  * @author malensek
  */
-public abstract class Partitioner<T> {
+public class SHA1 implements HashFunction<byte[]> {
 
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
+    private Checksum checksum = new Checksum();
+    private Random random = new Random();
 
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
+    @Override
+    public synchronized BigInteger hash(byte[] data) throws HashException {
+        return new BigInteger(1, checksum.hash(data));
     }
 
-    /**
-     * Determines where a file belongs in the system based on its
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
-     *
-     * Ultimately, this function will determine the DHT hierarchy.
-     *
-     * @param data data to find the location in the network for.
-     */
-    public abstract NodeInfo locateData(T data)
-    throws HashException, PartitionException;
+    @Override
+    public BigInteger maxValue() {
+        int hashBytes = checksum.getMessageDigest().getDigestLength();
+        return BigInteger.valueOf(2).pow(hashBytes * 8);
+    }
+
+    @Override
+    public synchronized BigInteger randomHash() throws HashException {
+        byte[] randomBytes = new byte[1024];
+        random.nextBytes(randomBytes);
+        return hash(randomBytes);
+    }
 }

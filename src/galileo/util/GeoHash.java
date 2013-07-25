@@ -39,10 +39,9 @@ import galileo.dataset.SpatialRange;
  */
 public class GeoHash {
 
-    private final static byte BITS_PER_CHAR   = 5;
-
-    private final static int  LATITUDE_RANGE  = 90;
-    private final static int  LONGITUDE_RANGE = 180;
+    public final static byte BITS_PER_CHAR   = 5;
+    public final static int  LATITUDE_RANGE  = 90;
+    public final static int  LONGITUDE_RANGE = 180;
 
     /**
      * This character array maps integer values (array indices) to their

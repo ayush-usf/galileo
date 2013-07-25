@@ -31,9 +31,10 @@ import galileo.serialization.SerializationOutputStream;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class DeviceSet implements ByteSerializable {
+public class DeviceSet implements ByteSerializable, Iterable<Device> {
 
     private Map<String, Device> devices = new HashMap<String, Device>();
 
@@ -45,6 +46,11 @@ public class DeviceSet implements ByteSerializable {
 
     public Device get(String name) {
         return devices.get(name);
+    }
+
+    @Override
+    public Iterator<Device> iterator() {
+        return devices.values().iterator();
     }
 
     @Deserialize

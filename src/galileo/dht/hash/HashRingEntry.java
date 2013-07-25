@@ -23,37 +23,41 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.dht.hash;
 
-import galileo.dataset.BlockMetadata;
-import galileo.dht.hash.HashException;
+import java.math.BigInteger;
 
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
- *
- * @author malensek
+ * Represents a node entry in a hash ring.  This implementation is
+ * singly-linked; nodes maintain a reference to their successor only.
  */
-public abstract class Partitioner<T> {
+public class HashRingEntry {
 
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
+    /** Position in the hash space */
+    public BigInteger position;
 
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
+    /** Next neighboring node in the hash space */
+    public HashRingEntry neighbor;
+
+    /**
+     * Creates the first entry in a hash ring (neighbor is self).
+     *
+     * @param position the position of the entry in the hash space
+     */
+    public HashRingEntry(BigInteger position) {
+        this.position = position;
+        this.neighbor = this;
     }
 
     /**
-     * Determines where a file belongs in the system based on its
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
+     * Creates a hash ring entry with a provided position and neighbor.
      *
-     * Ultimately, this function will determine the DHT hierarchy.
-     *
-     * @param data data to find the location in the network for.
+     * @param position the position of the entry in the hash space
+     * @param neighbor neighboring entry (based on position) in the hash
+     * space.
      */
-    public abstract NodeInfo locateData(T data)
-    throws HashException, PartitionException;
+    public HashRingEntry(BigInteger position, HashRingEntry neighbor) {
+        this.position = position;
+        this.neighbor = neighbor;
+    }
 }

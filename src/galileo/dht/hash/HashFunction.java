@@ -23,37 +23,41 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.dht.hash;
 
-import galileo.dataset.BlockMetadata;
-import galileo.dht.hash.HashException;
+import java.math.BigInteger;
 
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
+ * Interface for mapping arbitrary data to a specific location in a hash space.
  *
  * @author malensek
  */
-public abstract class Partitioner<T> {
-
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
-
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
-    }
+public interface HashFunction<T> {
 
     /**
-     * Determines where a file belongs in the system based on its
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
+     * Maps some given data to an integer location in the implemented hash
+     * space.
      *
-     * Ultimately, this function will determine the DHT hierarchy.
+     * @param data Data to hash against.
      *
-     * @param data data to find the location in the network for.
+     * @return location in the hash space for the data.
      */
-    public abstract NodeInfo locateData(T data)
-    throws HashException, PartitionException;
+    public BigInteger hash(T data) throws HashException;
+
+    /**
+     * Determines the maximum hash value that this hash function can produce.
+     * For example, a 160-bit SHA1 max value would be 2^160.
+     *
+     * @return maximum possible value this hash function will produce.
+     */
+    public BigInteger maxValue();
+
+    /**
+     * Returns a random location in the hash space.  This is used for seeding
+     * the first nodes in an overlay, or providing random positions to place
+     * nodes.
+     *
+     * @return random position in the hash space.
+     */
+    public BigInteger randomHash() throws HashException;
 }

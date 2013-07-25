@@ -31,9 +31,10 @@ import galileo.serialization.SerializationOutputStream;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class FeatureSet implements ByteSerializable {
+public class FeatureSet implements ByteSerializable, Iterable<Feature> {
 
     private Map<String, Feature> features = new HashMap<String, Feature>();
 
@@ -45,6 +46,11 @@ public class FeatureSet implements ByteSerializable {
 
     public Feature get(String name) {
         return features.get(name);
+    }
+
+    @Override
+    public Iterator<Feature> iterator() {
+        return features.values().iterator();
     }
 
     @Deserialize

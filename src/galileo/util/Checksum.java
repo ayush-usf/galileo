@@ -22,11 +22,14 @@ any theory of liability, whether in contract, strict liability, or tort
 (including negligence or otherwise) arising in any way out of the use of this
 software, even if advised of the possibility of such damage.
 */
+
 package galileo.util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides convenience functions for dealing with MessageDigest algorithms.
@@ -34,6 +37,9 @@ import java.security.NoSuchAlgorithmException;
  * @author malensek
  */
 public class Checksum {
+
+    private static final Logger logger = Logger.getLogger("galileo");
+
     private MessageDigest md;
 
     /**
@@ -44,7 +50,8 @@ public class Checksum {
         try {
             md = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {
-            System.err.println("SHA1 message digest algorithm not found!");
+            logger.log(Level.SEVERE,
+                    "SHA1 message digest algorithm not found!", e);
         }
     }
 

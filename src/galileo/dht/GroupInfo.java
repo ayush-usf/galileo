@@ -28,11 +28,18 @@ package galileo.dht;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Records network group information.  Groups can contain arbitrary subgroups,
+ * and, of course, a number of nodes.
+ *
+ * @author malensek
+ */
 public class GroupInfo {
 
     private String name;
 
     List<NodeInfo> nodes = new ArrayList<>();
+    List<GroupInfo> groups = new ArrayList<>();
 
     public GroupInfo(String name) {
         this.name = name;
@@ -42,9 +49,28 @@ public class GroupInfo {
         nodes.add(node);
     }
 
+    public List<NodeInfo> getNodes() {
+        return nodes;
+    }
+
+    public void addGroup(GroupInfo group) {
+        groups.add(group);
+    }
+
+    public List<GroupInfo> getGroups() {
+        return groups;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         String str = "Group: " + name + System.lineSeparator();
+        for (GroupInfo group : groups) {
+            str += "    " + group + System.lineSeparator();
+        }
         for (NodeInfo node : nodes) {
             str += "    " + node + System.lineSeparator();
         }

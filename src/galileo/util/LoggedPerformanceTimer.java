@@ -23,37 +23,55 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.util;
 
-import galileo.dataset.BlockMetadata;
-import galileo.dht.hash.HashException;
+import java.io.Closeable;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
+ * A very simple performance timer implementation using System.nanoTime() that
+ * writes its results to a file.
+ *
+ * This class can record multiple samples (time intervals), print them, etc.
+ * As with any IO-based class, the LoggedPerformanceTimer should be closed to
+ * flush its contents to disk.
  *
  * @author malensek
  */
-public abstract class Partitioner<T> {
+public class LoggedPerformanceTimer extends PerformanceTimer
+    implements Closeable {
 
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
+    private PrintWriter writer;
 
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
+    /**
+     * Creates a logged performance timer with the given log file name.
+     */
+    public LoggedPerformanceTimer(String logFileName)
+    throws FileNotFoundException {
+        super();
+        writer = new PrintWriter(logFileName);
     }
 
     /**
-     * Determines where a file belongs in the system based on its
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
-     *
-     * Ultimately, this function will determine the DHT hierarchy.
-     *
-     * @param data data to find the location in the network for.
+     * Creates a logged performance timer with the given log file name and
+     * timer name.
      */
-    public abstract NodeInfo locateData(T data)
-    throws HashException, PartitionException;
+    public LoggedPerformanceTimer(String fileName, String timerName)
+    throws FileNotFoundException {
+        this(fileName);
+        this.name = timerName;
+    }
+
+    @Override
+    public void stop() {
+        PerformanceSample sample = samples.peekFirst();
+        super.stop();
+        writer.println(sample);
+    }
+
+    @Override
+    public void close() {
+        writer.close();
+    }
 }

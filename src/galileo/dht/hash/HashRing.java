@@ -23,37 +23,35 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.dht.hash;
 
-import galileo.dataset.BlockMetadata;
-import galileo.dht.hash.HashException;
+import java.math.BigInteger;
 
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
+ * Provides a generic interface for representing a hash space.  Here we use the
+ * "ring" metaphor that is commonly employed in DHT topologies.
  *
  * @author malensek
  */
-public abstract class Partitioner<T> {
-
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
-
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
-    }
+public interface HashRing<T> {
 
     /**
-     * Determines where a file belongs in the system based on its
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
+     * Add a node to the overlay network topology.
      *
-     * Ultimately, this function will determine the DHT hierarchy.
+     * @param data key for the node being added
      *
-     * @param data data to find the location in the network for.
+     * @return the location of the new node in the hash space.
      */
-    public abstract NodeInfo locateData(T data)
-    throws HashException, PartitionException;
+    public BigInteger addNode(T data)
+    throws HashException, HashTopologyException;
+
+    /**
+     * Determine the node that is responsible for the given data.
+     *
+     * @param data the data to hash against
+     *
+     * @return identifier of the node responsible for the provided data.
+     */
+    public BigInteger locate(T data) throws HashException;
+
 }

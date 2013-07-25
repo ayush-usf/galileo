@@ -23,33 +23,55 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.dht.hash;
+
+import galileo.dataset.SpatialProperties;
+import galileo.util.GeoHash;
+
+import java.math.BigInteger;
+import java.util.Random;
 
 /**
- * Records network 'node' informaton: hostname/port pairs.
+ * Provides a Geohash-based hash function for spatial data.
  *
  * @author malensek
  */
-public class NodeInfo {
+public class SpatialHash implements HashFunction<SpatialProperties> {
 
-    private String hostname;
-    private int port;
+    private static final int PRECISION = 12;
 
-    public NodeInfo(String hostname, int port) {
-        this.hostname = hostname;
-        this.port = port;
-    }
+    private Random random = new Random();
 
-    public String getHostname() {
-        return hostname;
-    }
+    @Override
+    public BigInteger hash(SpatialProperties spatialProps)
+    throws HashException {
 
-    public int getPort() {
-        return port;
+        String hash = "";
+
+        if (spatialProps.hasRange()) {
+            hash = GeoHash.encode(spatialProps.getSpatialRange(), PRECISION);
+        } else {
+            hash = GeoHash.encode(spatialProps.getCoordinates(), PRECISION);
+        }
+
+        return BigInteger.valueOf(GeoHash.hashToLong(hash));
     }
 
     @Override
-    public String toString() {
-        return hostname + ":" + port;
+    public BigInteger maxValue() {
+        /* 12 chars * 5 bits/char = 60 bits for a 12-char hash. */
+        return BigInteger.valueOf(2).pow(PRECISION * GeoHash.BITS_PER_CHAR);
+    }
+
+    @Override
+    public BigInteger randomHash() {
+        float lat = random.nextFloat() * GeoHash.LATITUDE_RANGE
+            * (random.nextBoolean() ? 1 : -1 ); // randomly negate
+
+        float lon = random.nextFloat() * GeoHash.LONGITUDE_RANGE
+            * (random.nextBoolean() ? 1 : -1 );
+
+        String hash = GeoHash.encode(lat, lon, PRECISION);
+        return BigInteger.valueOf(GeoHash.hashToLong(hash));
     }
 }

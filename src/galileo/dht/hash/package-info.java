@@ -23,37 +23,8 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
-
-import galileo.dataset.BlockMetadata;
-import galileo.dht.hash.HashException;
-
 /**
- * This provides an abstract implementation of a Galileo Partitioner, which
- * determines where all information is distributed in the system.
- *
- * @author malensek
+ * Provides functionality for dealing with hash spaces and logical network
+ * topologies.
  */
-public abstract class Partitioner<T> {
-
-    protected StorageNode storageNode;
-    protected NetworkInfo network;
-
-    public Partitioner(StorageNode storageNode, NetworkInfo network) {
-        this.storageNode = storageNode;
-        this.network = network;
-    }
-
-    /**
-     * Determines where a file belongs in the system based on its
-     * properties.  This function could implement a simple hash-based
-     * partitioning scheme, something more dynamic, utilize the feature graph,
-     * etc.
-     *
-     * Ultimately, this function will determine the DHT hierarchy.
-     *
-     * @param data data to find the location in the network for.
-     */
-    public abstract NodeInfo locateData(T data)
-    throws HashException, PartitionException;
-}
+package galileo.dht.hash;

@@ -103,6 +103,12 @@ public class SpatialRange implements ByteSerializable {
         return lowerElevation;
     }
 
+    @Override
+    public String toString() {
+        return "(" + lowerLat + ", " + lowerLon
+            + "), (" + upperLat + ", " + upperLon + ")";
+    }
+
     @Deserialize
     public SpatialRange(SerializationInputStream in)
     throws IOException {
