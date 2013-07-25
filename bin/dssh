@@ -1,7 +1,10 @@
 #!/bin/bash
 ################################################################################
-# dssh - distributed ssh tool
-#        Executes commands across multiple machines in parallel through ssh.
+# dssh - Distributed ssh tool. Executes commands across multiple machines in
+#        parallel via ssh.
+#
+#        Version: 0.4
+#        Contact: Matthew Malensek (matthew@malensek.net)
 ################################################################################
 
 ssh_opts='-oStrictHostkeyChecking=no -oForwardX11=no'
