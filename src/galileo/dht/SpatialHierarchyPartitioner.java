@@ -105,7 +105,10 @@ public class SpatialHierarchyPartitioner extends Partitioner<BlockMetadata> {
         logger.info(String.format("Node [%s] placed in Group '%s' at %d",
                     node, group.getName(), nodePosition));
 
-        nodePositions.put(groupPosition, new HashMap<BigInteger, NodeInfo>());
+        if (nodePositions.get(groupPosition) == null) {
+            nodePositions.put(groupPosition,
+                    new HashMap<BigInteger, NodeInfo>());
+        }
         nodePositions.get(groupPosition).put(nodePosition, node);
     }
 
@@ -128,6 +131,11 @@ public class SpatialHierarchyPartitioner extends Partitioner<BlockMetadata> {
         HashRing<byte[]> nodeHash = nodeHashRings.get(group);
         BigInteger node = nodeHash.locate(combinedAttrs.getBytes());
         System.out.println(group);
+        System.out.println(node);
+        System.out.println("tes");
+        for (BigInteger m : nodePositions.get(group).keySet()) {
+            System.out.println(m);
+        }
         return nodePositions.get(group).get(node);
     }
 }
