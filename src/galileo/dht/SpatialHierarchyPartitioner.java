@@ -130,12 +130,10 @@ public class SpatialHierarchyPartitioner extends Partitioner<BlockMetadata> {
 
         HashRing<byte[]> nodeHash = nodeHashRings.get(group);
         BigInteger node = nodeHash.locate(combinedAttrs.getBytes());
-        System.out.println(group);
-        System.out.println(node);
-        System.out.println("tes");
-        for (BigInteger m : nodePositions.get(group).keySet()) {
-            System.out.println(m);
+        NodeInfo info = nodePositions.get(group).get(node);
+        if (info == null) {
+            throw new PartitionException("Could not locate specified data");
         }
-        return nodePositions.get(group).get(node);
+        return info;
     }
 }
