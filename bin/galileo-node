@@ -56,8 +56,6 @@ if [[ ${stop} == true || ${restart} == true ]]; then
     if [[ ${stop} == true ]]; then
         print_status "Offline"
         exit 0
-    else
-        print_status "Restarting"
     fi
 fi
 
