@@ -37,5 +37,6 @@ for group in ${groups}; do
     # Remove whitespace, empty lines, and everything after the colon character
     sed 's/[\t ]//g; /^$/d; s/\(.*\):.*/\1/g' "${group}" | \
         "${GALILEO_HOME}"/bin/dssh -pq \
-        '${GALILEO_HOME}/bin/galileo-node -d '"${@}"
+        '${GALILEO_HOME}/bin/galileo-node -d '"${@}" &
 done
+wait
