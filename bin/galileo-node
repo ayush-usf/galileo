@@ -3,9 +3,10 @@
 # galileo-node - manages the execution of a Galileo Storage Node.
 ################################################################################
 
-unset daemonize restart stop
+unset daemonize restart statuspath stop
 class="galileo.dht.StorageNode"
 logfile="$(whoami)-node.log"
+statusfile="status.txt"
 
 print_usage() {
 cat <<- EOM
@@ -16,6 +17,10 @@ Switches:
     -r restart Galileo node
     -s stop Galileo node
 EOM
+}
+
+print_status() {
+    echo "[$(hostname)] ${@}"
 }
 
 blocking_pkill() {
@@ -49,25 +54,37 @@ if [[ ${stop} == true || ${restart} == true ]]; then
     blocking_pkill -U $(whoami) -f ${class}
 
     if [[ ${stop} == true ]]; then
+        print_status "Offline"
         exit 0
+    else
+        print_status "Restarting"
     fi
 fi
 
 if [[ ${daemonize} == true ]]; then
-    logdir="/tmp/"
-    if [[ -n ${GALILEO_ROOT} ]]; then
+    logdir="${TMPDIR:-/tmp}"
+    if [[ -n ${GALILEO_ROOT} && -w ${GALILEO_ROOT} ]]; then
         logdir="${GALILEO_ROOT}"
+        statuspath="${GALILEO_ROOT}/${statusfile}"
     fi
+
     logpath="${logdir}/${logfile}"
+
     java -cp "${GALILEO_HOME}"/lib/\* ${class} &> "${logpath}" &
     pid=${!}
 
-    # Do a simple check to see if the daemon died right away.
-    sleep 1
-    ps ${pid} &> /dev/null
-    if [[ $? -ne 0 ]]; then
-        echo "Error: failed to launch Galileo daemon on $(hostname)." 1>&2
-        echo "See ${logpath} for details." 1>&2
+    sleep 2
+    if [[ -n "${statuspath}" && -e "${statuspath}" ]]; then
+        read status < "${statuspath}"
+        print_status "${status}"
+    else
+        # Do a simple check to see if the daemon died right away.
+        ps ${pid} &> /dev/null
+        if [[ $? -ne 0 ]]; then
+            print_status "FAILED"
+        else
+            print_status "UNKNOWN"
+        fi
     fi
 else
     java -cp "${GALILEO_HOME}"/lib/\* ${class}

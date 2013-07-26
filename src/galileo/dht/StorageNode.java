@@ -27,7 +27,7 @@ package galileo.dht;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
+import java.io.PrintWriter;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,26 +35,22 @@ import java.util.logging.Logger;
 import galileo.comm.Query;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
-
 import galileo.config.SystemConfig;
-
+import galileo.dataset.BlockMetadata;
 import galileo.dataset.MetaArray;
-
+import galileo.dht.hash.HashException;
+import galileo.dht.hash.HashTopologyException;
 import galileo.event.EventContainer;
 import galileo.event.EventType;
-
 import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
-
 import galileo.logging.GalileoFormatter;
-
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
-
 import galileo.serialization.Serializer;
-
+import galileo.util.StatusLine;
 import galileo.util.Version;
 
 /**
@@ -67,6 +63,7 @@ import galileo.util.Version;
 public class StorageNode implements MessageListener {
 
     private static final Logger logger = Logger.getLogger("galileo");
+    private StatusLine nodeStatus;
 
     private int port;
     private int threads = 4;
@@ -77,8 +74,11 @@ public class StorageNode implements MessageListener {
     private Scheduler scheduler;
     private FileSystem fs;
 
+    private Partitioner<BlockMetadata> partitioner;
+
     public StorageNode(int port) {
         this.port = port;
+        nodeStatus = new StatusLine(SystemConfig.getRootDir() + "/status.txt");
     }
 
     /**
@@ -88,22 +88,25 @@ public class StorageNode implements MessageListener {
      * state will the StorageNode begin accepting connections.
      */
     public void start()
-    throws FileNotFoundException, IOException {
+    throws Exception {
         Version.printSplash();
 
         /* First, make sure the port we're binding to is available. */
+        nodeStatus.set("Attempting to bind to port");
         if (PortTester.portAvailable(port) == false) {
             throw new IOException("Could not bind to port " + port);
         }
 
         /* Read the network configuration; if this is invalid, there is no need
          * to execute the rest of this method. */
+        nodeStatus.set("Reading network configuration");
         network = NetworkConfig.readNetworkDescription(
                 SystemConfig.getNetworkConfDir());
 
         /* Set up the FileSystem. */
+        nodeStatus.set("Initializing file system");
         try {
-            fs = new FileSystem(SystemConfig.getStorageRoot());
+            fs = new FileSystem(SystemConfig.getRootDir());
             fs.recoverMetadata();
         } catch (FileSystemException e) {
             logger.log(Level.SEVERE,
@@ -111,8 +114,13 @@ public class StorageNode implements MessageListener {
             return;
         }
 
+        nodeStatus.set("Initializing communications");
+
         /* Set up our Shutdown hook */
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
+
+        /* Pre-scheduler setup tasks */
+        configurePartitioner();
 
         /* Initialize the Scheduler */
         scheduler = new QueueScheduler(threads);
@@ -121,6 +129,17 @@ public class StorageNode implements MessageListener {
         messageRouter = new ServerMessageRouter(port);
         messageRouter.addListener(this);
         messageRouter.listen();
+        nodeStatus.set("Online");
+    }
+
+    private void configurePartitioner()
+    throws HashException, HashTopologyException, PartitionException {
+        String[] geohashes = { "c2", "c8", "cb", "f0", "f2",
+                               "9r", "9x", "9z", "dp", "dr",
+                               "9q", "9w", "9y", "dn", "dq",
+                               "9m", "9t", "9v", "dj" };
+
+        partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
     }
 
     @Override
@@ -157,8 +176,17 @@ public class StorageNode implements MessageListener {
 
         switch (type) {
             case STORAGE: return new storageHandler();
+            case STORAGE_REQUEST: return new storageRequestHandler();
+
             case QUERY: return new queryHandler();
             default: return null;
+        }
+    }
+
+    private class storageRequestHandler extends EventHandler {
+        @Override
+        public void handleEvent() throws Exception {
+
         }
     }
 
@@ -209,6 +237,7 @@ public class StorageNode implements MessageListener {
         try {
             node.start();
         } catch (Exception e) {
+            node.nodeStatus.set("Startup failure");
             logger.log(Level.SEVERE, "Could not start StorageNode.", e);
         }
     }

@@ -41,15 +41,21 @@ public class SystemConfig {
 
     private final static String networkDir = "network";
 
-    private static String storageRoot;
-    private static String configurationDirectory;
+    /** Storage root */
+    private static String rootDir;
+
+    /** Configuration directory */
+    private static String confDir;
+
+    /** Galileo install directory (binaries, libraries) */
+    private static String homeDir;
 
     /**
-     * Retrieves the system storage root.  This directory is where Galileo
+     * Retrieves the system root directory.  This directory is where Galileo
      * stores files.
      */
-    public static String getStorageRoot() {
-        return storageRoot;
+    public static String getRootDir() {
+        return rootDir;
     }
 
     /**
@@ -57,7 +63,15 @@ public class SystemConfig {
      * configuration directives.
      */
     public static String getConfDir() {
-        return configurationDirectory;
+        return confDir;
+    }
+
+    /**
+     * Retrieves the Galileo installation directory, which contains the
+     * binaries, scripts, and libraries required to run Galileo.
+     */
+    public static String getInstallDir() {
+        return homeDir;
     }
 
     /**
@@ -65,7 +79,7 @@ public class SystemConfig {
      * groups and the nodes assigned to them.
      */
     public static String getNetworkConfDir() {
-        return configurationDirectory + "/" + networkDir;
+        return confDir + "/" + networkDir;
     }
 
     /**
@@ -80,17 +94,25 @@ public class SystemConfig {
      * Loads all system configuration settings.
      */
     private static void load() {
+        String home = System.getenv("GALILEO_HOME");
+        if (home == null) {
+            home = System.getProperty("installDirectory", ".");
+        }
+        homeDir = home;
+
         String storageDir = System.getenv("GALILEO_ROOT");
         if (storageDir == null) {
-            storageDir = System.getProperty("storageDirectory", ".");
+            storageDir = System.getProperty("storageDirectory", home);
         }
-        storageRoot = storageDir;
+        rootDir = storageDir;
 
         String configDir = System.getenv("GALILEO_CONF");
         if (configDir == null) {
-            configDir = System.getProperty("configDirectory", "./config");
+            configDir = System.getProperty("configDirectory",
+                    rootDir + "/config");
         }
-        configurationDirectory = configDir;
+        confDir = configDir;
+
     }
 
     static {

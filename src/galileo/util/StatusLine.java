@@ -23,45 +23,49 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.event;
+package galileo.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public enum EventType {
-    UNKNOWN (0),
-    GENERAL (1),
-    QUERY (2),
-    QUERY_RESPONSE (3),
-    STORAGE (4),
-    SYSTEM (5),
-    DEBUG (6),
-    STORAGE_REQUEST (7);
+/**
+ * This class provides a very simple way to inform users of status information
+ * at a glance.  For more sophisticated debugging, the user should consult
+ * relevant log files; however, this simple status log can provide a starting
+ * point.  The StatusLine should be updated infrequently; each call will open
+ * and close the status file.
+ *
+ * @author malensek
+ */
+public class StatusLine {
 
-    private final int type;
+    private static final Logger logger = Logger.getLogger("galileo");
 
-    private EventType(int type) {
-        this.type = type;
+    private String fileName;
+
+    /**
+     * Creates a new StatusLine that will be written to the given file name.
+     *
+     * @param fileName status file
+     */
+    public StatusLine(String fileName) {
+        this.fileName = fileName;
     }
 
-    public int toInt() {
-        return type;
-    }
-
-    static Map<Integer, EventType> typeMap = new HashMap<>();
-
-    static {
-        for (EventType t : EventType.values()) {
-            typeMap.put(t.toInt(), t);
+    /**
+     * Sets the current status.  Previous status information will be replaced.
+     *
+     * @param status the new status line to write to disk immediately.
+     */
+    public void set(String status) {
+        try {
+            PrintWriter writer = new PrintWriter(fileName);
+            writer.println(status);
+            writer.close();
+            writer = null;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not update status line.", e);
         }
-    }
-
-    public static EventType fromInt(int i) {
-        EventType t = typeMap.get(i);
-        if (t == null) {
-            return EventType.UNKNOWN;
-        }
-
-        return t;
     }
 }
