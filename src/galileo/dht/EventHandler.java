@@ -26,16 +26,22 @@ software, even if advised of the possibility of such damage.
 package galileo.dht;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import galileo.client.EventPublisher;
 import galileo.event.EventContainer;
 import galileo.event.GalileoEvent;
 
 import galileo.net.GalileoMessage;
 import galileo.net.MessageRouter;
 
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 
 public abstract class EventHandler implements ProcessingUnit {
@@ -69,13 +75,27 @@ public abstract class EventHandler implements ProcessingUnit {
     /**
      * Publishes a response to the event that triggered this handler.
      */
-    public void publishResponse(GalileoEvent event)
+    protected void publishResponse(GalileoEvent event)
     throws IOException {
-        EventContainer container = new EventContainer(event);
-        byte[] messagePayload = Serializer.serialize(container);
-        GalileoMessage response = new GalileoMessage(messagePayload);
-
+        GalileoMessage response = EventPublisher.wrapEvent(event);
         router.sendMessage(message.getSelectionKey(), response);
+    }
+
+    protected void publishEvent(GalileoEvent event, NodeInfo destination)
+    throws IOException {
+        Socket socket = new Socket(destination.getHostname(),
+                destination.getPort());
+
+        OutputStream out = socket.getOutputStream();
+        GalileoMessage message = EventPublisher.wrapEvent(event);
+        out.write(Serializer.serialize(message));
+
+        socket.close();
+    }
+
+    protected <T extends ByteSerializable> T deserializeEvent(Class<T> type)
+    throws IOException, SerializationException {
+        return Serializer.deserialize(type, eventContainer.getEventPayload());
     }
 
     public abstract void handleEvent() throws Exception;

@@ -25,9 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,21 +35,32 @@ import java.util.logging.Logger;
 import galileo.comm.Query;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
+import galileo.comm.StorageRequest;
+
 import galileo.config.SystemConfig;
+
 import galileo.dataset.BlockMetadata;
+import galileo.dataset.FileBlock;
 import galileo.dataset.MetaArray;
+
 import galileo.dht.hash.HashException;
 import galileo.dht.hash.HashTopologyException;
+
 import galileo.event.EventContainer;
 import galileo.event.EventType;
+
 import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
+
 import galileo.logging.GalileoFormatter;
+
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
+
 import galileo.serialization.Serializer;
+
 import galileo.util.StatusLine;
 import galileo.util.Version;
 
@@ -94,6 +105,7 @@ public class StorageNode implements MessageListener {
         /* First, make sure the port we're binding to is available. */
         nodeStatus.set("Attempting to bind to port");
         if (PortTester.portAvailable(port) == false) {
+            nodeStatus.set("Could not bind to port " + port + ".");
             throw new IOException("Could not bind to port " + port);
         }
 
@@ -109,6 +121,7 @@ public class StorageNode implements MessageListener {
             fs = new FileSystem(SystemConfig.getRootDir());
             fs.recoverMetadata();
         } catch (FileSystemException e) {
+            nodeStatus.set("File system initialization failure");
             logger.log(Level.SEVERE,
                     "Could not initialize the Galileo File System!", e);
             return;
@@ -174,6 +187,8 @@ public class StorageNode implements MessageListener {
     private EventHandler getHandler(EventContainer container) {
         EventType type = container.getEventType();
 
+        logger.log(Level.INFO, "Processing event type: {0}", type);
+
         switch (type) {
             case STORAGE: return new storageHandler();
             case STORAGE_REQUEST: return new storageRequestHandler();
@@ -186,19 +201,26 @@ public class StorageNode implements MessageListener {
     private class storageRequestHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
+            StorageRequest request = deserializeEvent(StorageRequest.class);
 
+            /* Determine where this block goes. */
+            FileBlock file = request.getBlock();
+            BlockMetadata metadata = file.getMetadata();
+            NodeInfo node = partitioner.locateData(metadata);
+
+            StorageEvent store = new StorageEvent(file);
+            publishEvent(store, node);
+
+            logger.log(Level.INFO, "Storage destination: {0}", node);
         }
     }
 
-    /**
-     * Handles Storage Events.
-     */
     private class storageHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
-            StorageEvent store = Serializer.deserialize(StorageEvent.class,
-                    eventContainer.getEventPayload());
+            StorageEvent store = deserializeEvent(StorageEvent.class);
 
+            logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
             fs.storeBlock(store.getBlock());
         }
     }
@@ -206,10 +228,10 @@ public class StorageNode implements MessageListener {
     private class queryHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
-            Query query = Serializer.deserialize(Query.class,
-                    eventContainer.getEventPayload());
+            Query query = deserializeEvent(Query.class);
 
             MetaArray results = fs.query(query.getQueryString());
+            logger.info("Got " + results.size() + "results");
             QueryResponse response = new QueryResponse(results);
             publishResponse(response);
         }
@@ -237,7 +259,6 @@ public class StorageNode implements MessageListener {
         try {
             node.start();
         } catch (Exception e) {
-            node.nodeStatus.set("Startup failure");
             logger.log(Level.SEVERE, "Could not start StorageNode.", e);
         }
     }
