@@ -67,4 +67,13 @@ public class EventPublisher {
 
         return container.getEventId();
     }
+
+    public static GalileoMessage wrapEvent(GalileoEvent event)
+    throws IOException {
+        EventContainer container = new EventContainer(event);
+        byte[] messagePayload = Serializer.serialize(container);
+        GalileoMessage message = new GalileoMessage(messagePayload);
+ 
+        return message;
+    }
 }
