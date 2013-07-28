@@ -35,7 +35,6 @@ public class NullFeature extends Feature {
 
     public NullFeature(String name) {
         super(name);
-        this.description = "Null feature";
         this.type = FeatureType.NULL;
     }
 
