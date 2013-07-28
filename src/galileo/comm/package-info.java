@@ -24,7 +24,8 @@ software, even if advised of the possibility of such damage.
 */
 
 /**
- * Deals with various communication operations in Galileo.
+ * Deals with various communication operations in Galileo.  This functionality
+ * represents a higher level of abstraction than the galileo.net package.  It
+ * provides event implementations and other communication structures.
  */
-
 package galileo.comm;
