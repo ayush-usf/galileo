@@ -93,6 +93,17 @@ public class BlockMetadata implements ByteSerializable {
         return devices;
     }
 
+    @Override
+    public String toString() {
+        return "BlockMetadata Descriptor:" + System.lineSeparator() +
+            "Name: '" + name + "'" + System.lineSeparator() +
+            temporalProperties + System.lineSeparator() +
+            spatialProperties + System.lineSeparator() +
+            features + System.lineSeparator() +
+            devices + System.lineSeparator() +
+            runtimeMetadata;
+    }
+
     @Deserialize
     public BlockMetadata(SerializationInputStream in)
     throws IOException {

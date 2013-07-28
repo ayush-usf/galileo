@@ -84,6 +84,24 @@ public class SpatialProperties implements ByteSerializable {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (hasRange()) {
+            sb.append("Spatial Range: " + getSpatialRange());
+        }
+
+        if (hasRange() && hasCoordinates()) {
+            sb.append(System.lineSeparator());
+        }
+
+        if (hasCoordinates()) {
+            sb.append("Coordinates: " + getCoordinates());
+        }
+
+        return sb.toString();
+    }
+
     @Deserialize
     public SpatialProperties(SerializationInputStream in)
     throws IOException {

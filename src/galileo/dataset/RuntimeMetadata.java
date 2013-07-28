@@ -62,6 +62,13 @@ public class RuntimeMetadata implements ByteSerializable {
         physicalGraphPath = path;
     }
 
+    @Override
+    public String toString() {
+        return "StorageNode Identifier: " + storageNodeIdentifier
+            + System.lineSeparator()
+            + "Physical Graph Location: " + physicalGraphPath;
+    }
+
     @Deserialize
     public RuntimeMetadata(SerializationInputStream in)
     throws IOException {

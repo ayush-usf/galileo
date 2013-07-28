@@ -33,6 +33,11 @@ import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 import galileo.serialization.Serializer;
 
+/**
+ * The basic unit of storage in Galileo.
+ *
+ * @author malensek
+ */
 public class FileBlock implements ByteSerializable {
     private byte[] data;
     private BlockMetadata metadata;
@@ -84,6 +89,14 @@ public class FileBlock implements ByteSerializable {
         this.data = data;
         this.metadata =
             Serializer.deserialize(BlockMetadata.class, metadata);
+    }
+
+    @Override
+    public String toString() {
+        return "Galileo FileBlock header" + System.lineSeparator() +
+               "------------------------" + System.lineSeparator() +
+               "Size: " + data.length + System.lineSeparator() +
+               metadata.toString();
     }
 
     /**

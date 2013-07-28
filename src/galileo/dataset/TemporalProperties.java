@@ -120,6 +120,15 @@ public class TemporalProperties implements ByteSerializable {
         }
     }
 
+    @Override
+    public String toString() {
+        if (isTimestamp()) {
+            return "Timestamp: " + start;
+        } else {
+            return "Temporal Range: " + start + " -- " + end;
+        }
+    }
+
     @Deserialize
     public TemporalProperties(SerializationInputStream in)
     throws IOException {

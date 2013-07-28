@@ -42,6 +42,11 @@ public class Device implements ByteSerializable {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     @Deserialize
     public Device(SerializationInputStream in)
     throws IOException {

@@ -35,7 +35,6 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
 
     protected String name;
     protected FeatureType type = FeatureType.FLOAT;
-    protected String description;
     protected double value;
 
     public Feature(String name) {
@@ -47,20 +46,12 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
         this.value = value;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getName() {
         return name;
     }
 
     public FeatureType getType() {
         return type;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     @Override
@@ -85,7 +76,6 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     throws IOException {
         name = new String(in.readString());
         type = FeatureType.fromInt(in.readInt());
-        description = new String(in.readString());
         value = in.readDouble();
     }
 
@@ -94,7 +84,6 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     throws IOException {
         out.writeString(name);
         out.writeInt(type.toInt());
-        out.writeString(description);
         out.writeDouble(value);
     }
 }

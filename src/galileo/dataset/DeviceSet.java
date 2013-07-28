@@ -34,6 +34,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Contains a set of {@link Device} descriptors.
+ *
+ * @author malensek
+ */
 public class DeviceSet implements ByteSerializable, Iterable<Device> {
 
     private Map<String, Device> devices = new HashMap<String, Device>();
@@ -51,6 +56,17 @@ public class DeviceSet implements ByteSerializable, Iterable<Device> {
     @Override
     public Iterator<Device> iterator() {
         return devices.values().iterator();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(devices.values().size() + " features in DeviceSet:");
+        for (Device device : devices.values()) {
+            sb.append(System.lineSeparator());
+            sb.append(device.toString());
+        }
+        return sb.toString();
     }
 
     @Deserialize

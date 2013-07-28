@@ -34,6 +34,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Contains a set of {@link Feature}s.
+ *
+ * @author malensek
+ */
 public class FeatureSet implements ByteSerializable, Iterable<Feature> {
 
     private Map<String, Feature> features = new HashMap<String, Feature>();
@@ -51,6 +56,17 @@ public class FeatureSet implements ByteSerializable, Iterable<Feature> {
     @Override
     public Iterator<Feature> iterator() {
         return features.values().iterator();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(features.values().size() + " features in FeatureSet:");
+        for (Feature feature : features.values()) {
+            sb.append(System.lineSeparator());
+            sb.append(feature.toString());
+        }
+        return sb.toString();
     }
 
     @Deserialize
