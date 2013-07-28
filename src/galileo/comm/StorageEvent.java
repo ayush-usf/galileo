@@ -36,7 +36,7 @@ import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
 /**
- * Represents a client request for storage at a DHT {@link galileo.dht.StorageNode}.
+ * Represents an internal storage event at a {@link galileo.dht.StorageNode}.
  */
 public class StorageEvent implements GalileoEvent {
 
@@ -55,9 +55,7 @@ public class StorageEvent implements GalileoEvent {
         return EventType.STORAGE;
     }
 
-    /**
-     * Deserializes a Storage event.
-     */
+    @Deserialize
     public StorageEvent(SerializationInputStream in)
     throws IOException {
         block = new FileBlock(in);
