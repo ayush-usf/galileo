@@ -34,7 +34,7 @@ import java.util.Random;
 
 import galileo.comm.Query;
 import galileo.comm.QueryResponse;
-import galileo.comm.StorageEvent;
+import galileo.comm.StorageRequest;
 
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.Device;
@@ -72,6 +72,10 @@ public class TextClient implements MessageListener {
         messageRouter.connectTo(hostname, port);
     }
 
+    public void disconnect() {
+        messageRouter.shutdown();
+    }
+
     @Override
     public void onMessage(GalileoMessage message) {
         if (message == null) {
@@ -88,6 +92,10 @@ public class TextClient implements MessageListener {
                 QueryResponse response = Serializer.deserialize(
                         QueryResponse.class, container.getEventPayload());
 
+                if (response.getMetadata().size() == 0) {
+                    System.out.println("Query returned no results.");
+                }
+
                 for (BlockMetadata meta : response.getMetadata()) {
                     SpatialProperties spatialProperties
                         = meta.getSpatialProperties();
@@ -103,7 +111,7 @@ public class TextClient implements MessageListener {
 
     public void store(FileBlock fb)
     throws Exception {
-        StorageEvent store = new StorageEvent(fb);
+        StorageRequest store = new StorageRequest(fb);
         publisher.publish(store);
     }
 
@@ -115,22 +123,7 @@ public class TextClient implements MessageListener {
         return randomGenerator.nextFloat();
     }
 
-    public static void main(String[] args)
-    throws Exception {
-        if (args.length != 2) {
-            System.out.println("Usage: galileo.client.TextClient " +
-                    "<server-hostname> <server-port> ");
-            return;
-        }
-
-        String serverHostName = args[0];
-        int serverPort = Integer.parseInt(args[1]);
-
-        TextClient client = new TextClient();
-        client.connect(serverHostName, serverPort);
-
-        /* Let's make some data to store. */
-
+    private FileBlock generateData() {
         /* First, a temporal range for this data "sample" */
         Calendar calendar = Calendar.getInstance();
         int year, month, day;
@@ -190,7 +183,25 @@ public class TextClient implements MessageListener {
 
         FileBlock b = new FileBlock(blockData, metadata);
 
-        client.store(b);
+        return b;
+    }
+
+    public static void main(String[] args)
+    throws Exception {
+        if (args.length != 2) {
+            System.out.println("Usage: galileo.client.TextClient " +
+                    "<server-hostname> <server-port> ");
+            return;
+        }
+
+        String serverHostName = args[0];
+        int serverPort = Integer.parseInt(args[1]);
+
+        TextClient client = new TextClient();
+        client.connect(serverHostName, serverPort);
+
+        FileBlock block = client.generateData();
+        client.store(block);
 
         Query q = new Query("2013/9/25");
         client.publisher.publish(q);
