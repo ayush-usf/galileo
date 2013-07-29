@@ -34,8 +34,9 @@ import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
 /**
- * Encapsulates query information submitted by clients to be processed by
- * StorageNodes.
+ * Contains an internal query between StorageNodes.
+ *
+ * @author malensek
  */
 public class Query implements GalileoEvent {
     private String query;

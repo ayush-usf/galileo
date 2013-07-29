@@ -27,45 +27,54 @@ package galileo.comm;
 
 import java.io.IOException;
 
-import galileo.dataset.FileBlock;
-
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
 
+import galileo.net.NetworkDestination;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
 /**
- * Represents an internal storage event at a {@link galileo.dht.StorageNode}.
+ * Signals a disconnection from a network endpoint.
  *
  * @author malensek
  */
-public class StorageEvent implements GalileoEvent {
+public class Disconnect implements GalileoEvent {
+    private NetworkDestination destination;
 
-    private FileBlock block;
-
-    public StorageEvent(FileBlock block) {
-        this.block = block;
+    /**
+     * Creates a new disconnect event referring to the specified destination.
+     */
+    public Disconnect(NetworkDestination destination) {
+        this.destination = destination;
     }
 
-    public FileBlock getBlock() {
-        return block;
+    public NetworkDestination getDestination() {
+        return destination;
     }
 
     @Override
     public EventType getType() {
-        return EventType.STORAGE;
+        return EventType.DISCONNECT;
+    }
+
+    @Override
+    public String toString() {
+        return destination.toString();
     }
 
     @Deserialize
-    public StorageEvent(SerializationInputStream in)
+    public Disconnect(SerializationInputStream in)
     throws IOException {
-        block = new FileBlock(in);
+        String hostname = in.readString();
+        int port = in.readInt();
+        destination = new NetworkDestination(hostname, port);
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
-        block.serialize(out);
+        out.writeString(destination.getHostname());
+        out.writeInt(destination.getPort());
     }
 }

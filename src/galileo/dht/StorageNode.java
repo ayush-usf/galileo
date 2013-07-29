@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import galileo.comm.Query;
+import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
 import galileo.comm.StorageRequest;
@@ -192,8 +193,8 @@ public class StorageNode implements MessageListener {
         switch (type) {
             case STORAGE: return new storageHandler();
             case STORAGE_REQUEST: return new storageRequestHandler();
-
             case QUERY: return new queryHandler();
+            case QUERY_REQUEST: return new queryRequestHandler();
             default: return null;
         }
     }
@@ -208,10 +209,9 @@ public class StorageNode implements MessageListener {
             BlockMetadata metadata = file.getMetadata();
             NodeInfo node = partitioner.locateData(metadata);
 
+            logger.log(Level.INFO, "Storage destination: {0}", node);
             StorageEvent store = new StorageEvent(file);
             publishEvent(store, node);
-
-            logger.log(Level.INFO, "Storage destination: {0}", node);
         }
     }
 
@@ -222,6 +222,14 @@ public class StorageNode implements MessageListener {
 
             logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
             fs.storeBlock(store.getBlock());
+        }
+    }
+
+    private class queryRequestHandler extends EventHandler {
+        @Override
+        public void handleEvent() throws Exception {
+            QueryRequest request = deserializeEvent(QueryRequest.class);
+            //featureGraph.query(
         }
     }
 

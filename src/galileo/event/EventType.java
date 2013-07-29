@@ -28,6 +28,11 @@ package galileo.event;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Enumerates the supported event types.
+ *
+ * @author malensek
+ */
 public enum EventType {
     UNKNOWN (0),
     GENERAL (1),
@@ -36,7 +41,9 @@ public enum EventType {
     STORAGE (4),
     SYSTEM (5),
     DEBUG (6),
-    STORAGE_REQUEST (7);
+    STORAGE_REQUEST (7),
+    QUERY_REQUEST (8),
+    DISCONNECT(9);
 
     private final int type;
 

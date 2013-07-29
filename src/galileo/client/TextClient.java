@@ -32,6 +32,7 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Random;
 
+import galileo.comm.Disconnect;
 import galileo.comm.Query;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
@@ -51,6 +52,7 @@ import galileo.event.EventType;
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
+import galileo.net.NetworkDestination;
 
 import galileo.serialization.Serializer;
 
@@ -67,9 +69,9 @@ public class TextClient implements MessageListener {
         messageRouter.addListener(this);
     }
 
-    public void connect(String hostname, int port)
+    public NetworkDestination connect(String hostname, int port)
     throws UnknownHostException, IOException {
-        messageRouter.connectTo(hostname, port);
+        return messageRouter.connectTo(hostname, port);
     }
 
     public void disconnect() {
@@ -104,15 +106,22 @@ public class TextClient implements MessageListener {
                 }
             }
 
+            if (container.getEventType() == EventType.DISCONNECT) {
+                Disconnect disconnect = Serializer.deserialize(
+                        Disconnect.class, container.getEventPayload());
+
+                System.out.println("Disconnected from " + disconnect);
+            }
+
         } catch (Exception e) {
             System.out.println("Could not read event container");
         }
     }
 
-    public void store(FileBlock fb)
+    public void store(NetworkDestination destination, FileBlock fb)
     throws Exception {
         StorageRequest store = new StorageRequest(fb);
-        publisher.publish(store);
+        publisher.publish(destination, store);
     }
 
     public static int randomInt(int start, int end) {
@@ -198,12 +207,15 @@ public class TextClient implements MessageListener {
         int serverPort = Integer.parseInt(args[1]);
 
         TextClient client = new TextClient();
-        client.connect(serverHostName, serverPort);
+        NetworkDestination server = client.connect(serverHostName, serverPort);
 
         FileBlock block = client.generateData();
-        client.store(block);
+        client.store(server, block);
 
-        Query q = new Query("2013/9/25");
-        client.publisher.publish(q);
+        //Query q = new Query("2013/9/25");
+        //client.publisher.publish(q);
+        Thread.sleep(5000);
+        System.out.println("Disconnecting.");
+        client.disconnect();
     }
 }

@@ -27,8 +27,6 @@ package galileo.comm;
 
 import java.io.IOException;
 
-import galileo.dataset.FileBlock;
-
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
 
@@ -36,36 +34,42 @@ import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
 /**
- * Represents an internal storage event at a {@link galileo.dht.StorageNode}.
+ * Encapsulates query information submitted by clients to be processed by
+ * StorageNodes.
  *
  * @author malensek
  */
-public class StorageEvent implements GalileoEvent {
+public class QueryRequest implements GalileoEvent {
 
-    private FileBlock block;
+    private String query;
 
-    public StorageEvent(FileBlock block) {
-        this.block = block;
+    public QueryRequest(String query) {
+        this.query = query;
     }
 
-    public FileBlock getBlock() {
-        return block;
+    /**
+     * Returns the query String this Query represents.
+     *
+     * @return query String
+     */
+    public String getQueryString() {
+        return query;
     }
 
     @Override
     public EventType getType() {
-        return EventType.STORAGE;
+        return EventType.QUERY_REQUEST;
     }
 
     @Deserialize
-    public StorageEvent(SerializationInputStream in)
+    public QueryRequest(SerializationInputStream in)
     throws IOException {
-        block = new FileBlock(in);
+        query = in.readString();
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
-        block.serialize(out);
+        out.writeString(query);
     }
 }

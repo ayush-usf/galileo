@@ -56,7 +56,7 @@ import galileo.serialization.Serializer;
  */
 public abstract class MessageRouter implements Runnable {
 
-    private static final Logger logger = Logger.getLogger("galileo");
+    protected static final Logger logger = Logger.getLogger("galileo");
 
     protected boolean online;
 
@@ -115,12 +115,12 @@ public abstract class MessageRouter implements Runnable {
                     continue;
                 }
 
-                if (key.isReadable()) {
-                    read(key);
-                }
-
                 if (key.isWritable()) {
                     write(key);
+                }
+
+                if (key.isReadable()) {
+                    read(key);
                 }
 
             } catch (CancelledKeyException e) {

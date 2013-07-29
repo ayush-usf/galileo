@@ -25,6 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+import galileo.client.EventPublisher;
+import galileo.comm.Disconnect;
+
 import java.io.IOException;
 
 import java.net.ConnectException;
@@ -33,11 +36,18 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class ClientMessageRouter extends MessageRouter {
 
-    private SelectionKey key;
     private SocketChannel channel;
+
+    private Map<NetworkDestination, SelectionKey> connectedHosts
+        = new HashMap<>();
+    private Map<SelectionKey, NetworkDestination> activeKeys
+        = new HashMap<>();
 
     private Thread selectorThread;
 
@@ -45,22 +55,37 @@ public class ClientMessageRouter extends MessageRouter {
      * Connect to a server ({@link ServerMessageRouter}) using the specified
      * hostname and port.
      */
-    public void connectTo(String host, int port)
+    public NetworkDestination connectTo(String hostname, int port)
+    throws IOException {
+        return connectTo(new NetworkDestination(hostname, port));
+    }
+
+    /**
+     * Connect to a server ({@link ServerMessageRouter}) using the specified
+     * network destination.
+     */
+    private NetworkDestination connectTo(NetworkDestination destination)
     throws IOException {
 
         this.selector = Selector.open();
 
         channel = SocketChannel.open();
         channel.configureBlocking(false);
-        InetSocketAddress address = new InetSocketAddress(host, port);
+        InetSocketAddress address = new InetSocketAddress(
+                destination.getHostname(), destination.getPort());
         channel.connect(address);
 
         TransmissionTracker tracker = new TransmissionTracker();
 
         /* Register with our Selector */
-        key = channel.register(this.selector, SelectionKey.OP_CONNECT, tracker);
+        SelectionKey key
+            = channel.register(this.selector, SelectionKey.OP_CONNECT, tracker);
+        connectedHosts.put(destination, key);
+        activeKeys.put(key, destination);
 
-        selectorThread = new Thread(this);
+        if (selectorThread == null) {
+            selectorThread = new Thread(this);
+        }
 
         /* Run one iteration of the selection loop.  This ensures our connection
          * is set up before we return. */
@@ -70,13 +95,19 @@ public class ClientMessageRouter extends MessageRouter {
             /* We're not connected; the connection was refused. */
             throw new ConnectException("Connection refused");
         }
+
+        return destination;
     }
 
     /**
-     * Shuts down the message processor and disconnects from the server.
+     * Shuts down the message processor and disconnects from the server(s).
      */
     public void shutdown() {
         this.online = false;
+        for (SelectionKey key : connectedHosts.values()) {
+            disconnect(key);
+        }
+        selector.wakeup();
     }
 
     public boolean online() {
@@ -90,8 +121,10 @@ public class ClientMessageRouter extends MessageRouter {
 
             if (channel.finishConnect()) {
                 key.interestOps(SelectionKey.OP_READ);
-                this.online = true;
-                selectorThread.start();
+                if (!online()) {
+                    this.online = true;
+                    selectorThread.start();
+                }
             }
         } catch (IOException e) {
             disconnect(key);
@@ -99,10 +132,28 @@ public class ClientMessageRouter extends MessageRouter {
     }
 
     /**
-     * Sends a message to the connected server.
+     * Broadcasts a message to the connected servers.
      */
-    public void sendMessage(GalileoMessage message)
+    public void broadcastMessage(GalileoMessage message)
     throws IOException {
+        for (SelectionKey key : connectedHosts.values()) {
+            sendMessage(key, message);
+        }
+    }
+
+    /**
+     * Sends a message to the specified network destination.
+     */
+    public void sendMessage(NetworkDestination destination,
+            GalileoMessage message)
+    throws IOException {
+
+        SelectionKey key = connectedHosts.get(destination);
+        if (key == null) {
+            throw new IOException("Not connected to destination: "
+                    + destination);
+        }
+
         sendMessage(key, message);
     }
 
@@ -115,8 +166,20 @@ public class ClientMessageRouter extends MessageRouter {
      */
     @Override
     protected void disconnect(SelectionKey key) {
-        super.online = false;
-        super.dispatchMessage(null);
+        NetworkDestination destination = activeKeys.get(key);
+        Disconnect disconnect = new Disconnect(destination);
+
+        GalileoMessage message = null;
+        try {
+            message = EventPublisher.wrapEvent(disconnect);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not publish Disconnect event.", e);
+        }
+
+        connectedHosts.remove(destination);
+        activeKeys.remove(key);
+
+        super.dispatchMessage(message);
         super.disconnect(key);
     }
 }

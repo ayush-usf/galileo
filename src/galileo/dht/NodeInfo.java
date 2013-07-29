@@ -25,31 +25,16 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht;
 
+import galileo.net.NetworkDestination;
+
 /**
  * Records network 'node' informaton: hostname/port pairs.
  *
  * @author malensek
  */
-public class NodeInfo {
-
-    private String hostname;
-    private int port;
+public class NodeInfo extends NetworkDestination {
 
     public NodeInfo(String hostname, int port) {
-        this.hostname = hostname;
-        this.port = port;
-    }
-
-    public String getHostname() {
-        return hostname;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public String toString() {
-        return hostname + ":" + port;
+        super(hostname, port);
     }
 }

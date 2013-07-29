@@ -23,49 +23,65 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.comm;
-
-import java.io.IOException;
-
-import galileo.dataset.FileBlock;
-
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
-
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+package galileo.net;
 
 /**
- * Represents an internal storage event at a {@link galileo.dht.StorageNode}.
+ * Represents a TCP network endpoint; a host/port pair.
  *
  * @author malensek
  */
-public class StorageEvent implements GalileoEvent {
+public class NetworkDestination {
 
-    private FileBlock block;
+    private String hostname;
+    private int port;
 
-    public StorageEvent(FileBlock block) {
-        this.block = block;
+    public NetworkDestination(String hostname, int port) {
+        this.hostname = hostname;
+        this.port = port;
     }
 
-    public FileBlock getBlock() {
-        return block;
+    public String getHostname() {
+        return hostname;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    private String stringRepresentation() {
+        return hostname + ":" + port;
     }
 
     @Override
-    public EventType getType() {
-        return EventType.STORAGE;
-    }
-
-    @Deserialize
-    public StorageEvent(SerializationInputStream in)
-    throws IOException {
-        block = new FileBlock(in);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((hostname == null) ? 0 : hostname.hashCode());
+        result = prime * result + port;
+        return result;
     }
 
     @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        block.serialize(out);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        NetworkDestination other = (NetworkDestination) obj;
+        return this.stringRepresentation().equals(other.stringRepresentation());
+    }
+
+    @Override
+    public String toString() {
+        return stringRepresentation();
     }
 }
