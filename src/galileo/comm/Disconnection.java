@@ -39,13 +39,14 @@ import galileo.serialization.SerializationOutputStream;
  *
  * @author malensek
  */
-public class Disconnect implements GalileoEvent {
+public class Disconnection implements GalileoEvent {
+
     private NetworkDestination destination;
 
     /**
      * Creates a new disconnect event referring to the specified destination.
      */
-    public Disconnect(NetworkDestination destination) {
+    public Disconnection(NetworkDestination destination) {
         this.destination = destination;
     }
 
@@ -64,7 +65,7 @@ public class Disconnect implements GalileoEvent {
     }
 
     @Deserialize
-    public Disconnect(SerializationInputStream in)
+    public Disconnection(SerializationInputStream in)
     throws IOException {
         String hostname = in.readString();
         int port = in.readInt();
