@@ -27,8 +27,7 @@ package galileo.comm;
 
 import java.io.IOException;
 
-import galileo.dataset.MetaArray;
-
+import galileo.dht.NodeArray;
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
 
@@ -36,39 +35,57 @@ import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
-public class QueryResponse implements GalileoEvent {
-
+/**
+ * Represents a "Query Preamble" -- a set of information sent back to a client
+ * before the query results start being transmitted.
+ *
+ * @author malensek
+ */
+public class QueryPreamble implements GalileoEvent {
     private String id;
-    private MetaArray metadata;
+    private String query;
+    private NodeArray nodesInvolved;
 
-    public QueryResponse(String id, MetaArray metadata) {
+    public QueryPreamble(String id, String query, NodeArray nodesInvolved) {
         this.id = id;
-        this.metadata = metadata;
+        this.query = query;
+        this.nodesInvolved = nodesInvolved;
     }
 
-    public String getId() {
+    public String getQueryString() {
+        return query;
+    }
+
+    public String getQueryId() {
         return id;
     }
 
-    public MetaArray getMetadata() {
-        return metadata;
+    /**
+     * Retrieves the list of StorageNodes involved in servicing a QueryRequest.
+     * Each node in the list should reply with resulting metadata.
+     */
+    public NodeArray getNodesInvolved() {
+        return nodesInvolved;
     }
 
     @Override
     public EventType getType() {
-        return EventType.QUERY_RESPONSE;
+        return EventType.QUERY_PREAMBLE;
     }
 
-    public QueryResponse(SerializationInputStream in)
+    @Deserialize
+    public QueryPreamble(SerializationInputStream in)
     throws IOException, SerializationException {
         id = in.readString();
-        metadata = new MetaArray(in);
+        query = in.readString();
+        nodesInvolved = new NodeArray(in);
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
         out.writeString(id);
-        out.writeSerializable(metadata);
+        out.writeString(query);
+        out.writeSerializable(nodesInvolved);
     }
 }

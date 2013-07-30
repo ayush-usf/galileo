@@ -23,52 +23,33 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.comm;
+package galileo.dht;
 
-import java.io.IOException;
+import java.nio.channels.SelectionKey;
 
-import galileo.dataset.MetaArray;
+public class QueryTracker {
 
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
+    private static final Object counterLock = new Object();
+    private static long queryCounter = 0;
+    private long queryId;
+    private SelectionKey key;
 
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
-
-public class QueryResponse implements GalileoEvent {
-
-    private String id;
-    private MetaArray metadata;
-
-    public QueryResponse(String id, MetaArray metadata) {
-        this.id = id;
-        this.metadata = metadata;
+    public QueryTracker(SelectionKey key) {
+        synchronized (counterLock) {
+            this.queryId = QueryTracker.queryCounter++;
+        }
+        this.key = key;
     }
 
-    public String getId() {
-        return id;
+    public long getQueryId() {
+        return queryId;
     }
 
-    public MetaArray getMetadata() {
-        return metadata;
+    public String getIdString(String sessionId) {
+        return sessionId + "$" + queryId;
     }
 
-    @Override
-    public EventType getType() {
-        return EventType.QUERY_RESPONSE;
-    }
-
-    public QueryResponse(SerializationInputStream in)
-    throws IOException, SerializationException {
-        id = in.readString();
-        metadata = new MetaArray(in);
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(id);
-        out.writeSerializable(metadata);
+    public SelectionKey getSelectionKey() {
+        return key;
     }
 }

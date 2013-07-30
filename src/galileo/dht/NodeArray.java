@@ -23,52 +23,24 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.comm;
+package galileo.dht;
 
 import java.io.IOException;
 
-import galileo.dataset.MetaArray;
-
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
-
+import galileo.serialization.SerializableArray;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
 
-public class QueryResponse implements GalileoEvent {
+public class NodeArray extends SerializableArray<NodeInfo> {
 
-    private String id;
-    private MetaArray metadata;
+    public NodeArray() { }
 
-    public QueryResponse(String id, MetaArray metadata) {
-        this.id = id;
-        this.metadata = metadata;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public MetaArray getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.QUERY_RESPONSE;
-    }
-
-    public QueryResponse(SerializationInputStream in)
+    public NodeArray(SerializationInputStream in)
     throws IOException, SerializationException {
-        id = in.readString();
-        metadata = new MetaArray(in);
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(id);
-        out.writeSerializable(metadata);
+        int size = in.readInt();
+        for (int i = 0; i < size; ++i) {
+            NodeInfo node = new NodeInfo(in);
+            add(node);
+        }
     }
 }

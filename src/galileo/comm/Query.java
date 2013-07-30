@@ -39,9 +39,11 @@ import galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class Query implements GalileoEvent {
+    private String id;
     private String query;
 
-    public Query(String query) {
+    public Query(String id, String query) {
+        this.id = id;
         this.query = query;
     }
 
@@ -54,24 +56,26 @@ public class Query implements GalileoEvent {
         return query;
     }
 
+    public String getQueryId() {
+        return id;
+    }
+
     @Override
     public EventType getType() {
         return EventType.QUERY;
     }
 
-    /**
-     * (Re)construct a query from a serialization stream.
-     *
-     * @param in stream to deserialize from.
-     */
+    @Deserialize
     public Query(SerializationInputStream in)
     throws IOException {
+        id = in.readString();
         query = in.readString();
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
+        out.writeString(id);
         out.writeString(query);
     }
 }

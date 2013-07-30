@@ -37,12 +37,13 @@ public enum EventType {
     UNKNOWN (0),
     GENERAL (1),
     QUERY (2),
+    QUERY_REQUEST (8),
     QUERY_RESPONSE (3),
+    QUERY_PREAMBLE (10),
     STORAGE (4),
+    STORAGE_REQUEST (7),
     SYSTEM (5),
     DEBUG (6),
-    STORAGE_REQUEST (7),
-    QUERY_REQUEST (8),
     DISCONNECT(9);
 
     private final int type;
