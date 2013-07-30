@@ -23,27 +23,33 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package galileo.net;
 
 import java.io.IOException;
-
-import galileo.net.NetworkDestination;
-import galileo.serialization.SerializationInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Records network 'node' informaton: hostname/port pairs.
+ * Extends the standard {@link ClientMessageRouter} by aging out connections
+ * over time and caching frequently-used connections.  This modification is
+ * well-suited for environments with high counts of outgoing connections.
  *
  * @author malensek
  */
-public class NodeInfo extends NetworkDestination {
+public class ClientConnectionPool extends ClientMessageRouter {
 
-    public NodeInfo(String hostname, int port) {
-        super(hostname, port);
+    protected Map<NetworkDestination, Long> connectionAge = new HashMap<>();
+
+    public ClientConnectionPool()
+    throws IOException {
+        super();
     }
 
-    @Deserialize
-    public NodeInfo(SerializationInputStream in)
+    @Override
+    public void sendMessage(NetworkDestination destination,
+            GalileoMessage message)
     throws IOException {
-        super(in);
+        super.sendMessage(destination, message);
+        connectionAge.put(destination, System.nanoTime());
     }
 }

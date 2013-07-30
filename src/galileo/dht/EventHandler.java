@@ -26,9 +26,9 @@ software, even if advised of the possibility of such damage.
 package galileo.dht;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.channels.SelectionKey;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +37,7 @@ import galileo.client.EventPublisher;
 import galileo.event.EventContainer;
 import galileo.event.GalileoEvent;
 
+import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageRouter;
 
@@ -51,6 +52,7 @@ public abstract class EventHandler implements ProcessingUnit {
     public GalileoMessage message;
     public EventContainer eventContainer;
     public MessageRouter router;
+    public ClientConnectionPool connectionPool;
 
     public EventHandler() { }
 
@@ -81,16 +83,30 @@ public abstract class EventHandler implements ProcessingUnit {
         router.sendMessage(message.getSelectionKey(), response);
     }
 
+    /**
+     * Publishes an event to the specified StorageNode.
+     */
     protected void publishEvent(GalileoEvent event, NodeInfo destination)
     throws IOException {
-        Socket socket = new Socket(destination.getHostname(),
-                destination.getPort());
-
-        OutputStream out = socket.getOutputStream();
         GalileoMessage message = EventPublisher.wrapEvent(event);
-        out.write(Serializer.serialize(message));
+        connectionPool.connectTo(destination);
+        connectionPool.sendMessage(destination, message);
+    }
 
-        socket.close();
+    /**
+     * Publishes an event to the specified SelectionKey.
+     */
+    protected void publishEvent(GalileoEvent event, SelectionKey key)
+    throws IOException {
+        router.sendMessage(key, EventPublisher.wrapEvent(event));
+    }
+
+    /**
+     * Sends a message on the specified SelectionKey.
+     */
+    protected void sendMessage(GalileoMessage message, SelectionKey key)
+    throws IOException {
+        router.sendMessage(key, message);
     }
 
     protected <T extends ByteSerializable> T deserializeEvent(Class<T> type)

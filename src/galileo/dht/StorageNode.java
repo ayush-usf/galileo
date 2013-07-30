@@ -26,13 +26,12 @@ software, even if advised of the possibility of such damage.
 package galileo.dht;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.logging.ConsoleHandler;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import galileo.comm.Query;
+import galileo.comm.QueryPreamble;
 import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
@@ -55,7 +54,9 @@ import galileo.fs.FileSystemException;
 
 import galileo.logging.GalileoFormatter;
 
+import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
+import galileo.net.HostIdentifier;
 import galileo.net.MessageListener;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
@@ -78,18 +79,25 @@ public class StorageNode implements MessageListener {
     private StatusLine nodeStatus;
 
     private int port;
-    private int threads = 4;
+    private int threads = 1;
 
     private NetworkInfo network;
 
     private ServerMessageRouter messageRouter;
+    private ClientConnectionPool connectionPool;
     private Scheduler scheduler;
     private FileSystem fs;
 
     private Partitioner<BlockMetadata> partitioner;
 
+    private ConcurrentHashMap<String, QueryTracker> queryTrackers
+        = new ConcurrentHashMap<>();
+
+    private String sessionId;
+
     public StorageNode(int port) {
         this.port = port;
+        this.sessionId = HostIdentifier.getSessionId(port);
         nodeStatus = new StatusLine(SystemConfig.getRootDir() + "/status.txt");
     }
 
@@ -134,6 +142,8 @@ public class StorageNode implements MessageListener {
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
 
         /* Pre-scheduler setup tasks */
+        connectionPool = new ClientConnectionPool();
+        connectionPool.addListener(this);
         configurePartitioner();
 
         /* Initialize the Scheduler */
@@ -173,6 +183,7 @@ public class StorageNode implements MessageListener {
             handler.message = message;
             handler.eventContainer = container;
             handler.router = messageRouter;
+            handler.connectionPool = connectionPool;
 
             scheduler.schedule(handler);
 
@@ -195,10 +206,16 @@ public class StorageNode implements MessageListener {
             case STORAGE_REQUEST: return new storageRequestHandler();
             case QUERY: return new queryHandler();
             case QUERY_REQUEST: return new queryRequestHandler();
+            case QUERY_RESPONSE: return new queryResponseHandler();
             default: return null;
         }
     }
 
+    /**
+     * Handles a storage request from a client.  This involves determining where
+     * the data belongs via a {@link Partitioner} implementation and then
+     * forwarding the data on to its destination.
+     */
     private class storageRequestHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
@@ -225,14 +242,53 @@ public class StorageNode implements MessageListener {
         }
     }
 
+    /**
+     * Handles a query request from a client.  Query requests result in a number
+     * of subqueries being performed across the Galileo network.
+     */
     private class queryRequestHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
             QueryRequest request = deserializeEvent(QueryRequest.class);
+            String queryString = request.getQueryString();
+            logger.log(Level.INFO, "Query request: {0}", queryString);
+
+            /* Determine StorageNodes that contain relevant data. */
             //featureGraph.query(
+            NodeArray queryNodes = new NodeArray();
+            queryNodes.addAll(network.getAllNodes());
+
+            /* Set up QueryTracker for this request */
+            QueryTracker tracker = new QueryTracker(message.getSelectionKey());
+            String clientId = tracker.getIdString(sessionId);
+            queryTrackers.put(clientId, tracker);
+
+            /* Send a Query Preamble to the client */
+            QueryPreamble preamble = new QueryPreamble(
+                    clientId, queryString, queryNodes);
+            publishResponse(preamble);
+
+            /* Optionally write out where this query is going */
+            if (logger.getLevel() == Level.INFO) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Forwarding Query to nodes: ");
+                for (NodeInfo node : queryNodes) {
+                    sb.append(node.toString() + " ");
+                }
+                logger.info(sb.toString());
+            }
+
+            Query query = new Query(tracker.getIdString(sessionId),
+                    request.getQueryString());
+            for (NodeInfo node : queryNodes) {
+                publishEvent(query, node);
+            }
         }
     }
 
+    /**
+     * Handles an internal Query request (from another StorageNode)
+     */
     private class queryHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
@@ -240,8 +296,24 @@ public class StorageNode implements MessageListener {
 
             MetaArray results = fs.query(query.getQueryString());
             logger.info("Got " + results.size() + "results");
-            QueryResponse response = new QueryResponse(results);
+            QueryResponse response
+                = new QueryResponse(query.getQueryId(), results);
             publishResponse(response);
+        }
+    }
+
+    private class queryResponseHandler extends EventHandler {
+        @Override
+        public void handleEvent() throws Exception {
+            QueryResponse response = deserializeEvent(QueryResponse.class);
+            QueryTracker tracker = queryTrackers.get(response.getId());
+            if (tracker == null) {
+                logger.log(Level.WARNING,
+                        "Unknown query response received: {0}",
+                        response.getId());
+                return;
+            }
+            sendMessage(message, tracker.getSelectionKey());
         }
     }
 

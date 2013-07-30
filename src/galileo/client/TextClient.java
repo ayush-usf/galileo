@@ -32,8 +32,9 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Random;
 
-import galileo.comm.Disconnect;
+import galileo.comm.Disconnection;
 import galileo.comm.Query;
+import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
 
@@ -62,10 +63,13 @@ public class TextClient implements MessageListener {
 
     private static Random randomGenerator = new Random(System.nanoTime());
 
-    private ClientMessageRouter messageRouter = new ClientMessageRouter();
-    private EventPublisher publisher = new EventPublisher(messageRouter);
+    private ClientMessageRouter messageRouter;
+    private EventPublisher publisher;
 
-    public TextClient() {
+    public TextClient() throws IOException {
+        messageRouter = new ClientMessageRouter();
+        publisher = new EventPublisher(messageRouter);
+
         messageRouter.addListener(this);
     }
 
@@ -107,8 +111,8 @@ public class TextClient implements MessageListener {
             }
 
             if (container.getEventType() == EventType.DISCONNECT) {
-                Disconnect disconnect = Serializer.deserialize(
-                        Disconnect.class, container.getEventPayload());
+                Disconnection disconnect = Serializer.deserialize(
+                        Disconnection.class, container.getEventPayload());
 
                 System.out.println("Disconnected from " + disconnect);
             }
@@ -122,6 +126,12 @@ public class TextClient implements MessageListener {
     throws Exception {
         StorageRequest store = new StorageRequest(fb);
         publisher.publish(destination, store);
+    }
+
+    public void query(NetworkDestination destination, String queryString)
+    throws IOException {
+        QueryRequest query = new QueryRequest(queryString);
+        publisher.publish(destination, query);
     }
 
     public static int randomInt(int start, int end) {
@@ -208,14 +218,13 @@ public class TextClient implements MessageListener {
 
         TextClient client = new TextClient();
         NetworkDestination server = client.connect(serverHostName, serverPort);
+        //NetworkDestination server2 = client.connect("lattice-22", serverPort);
+        //NetworkDestination server3 = client.connect("lattice-22", 5555);
+        System.out.println("sending");
 
         FileBlock block = client.generateData();
         client.store(server, block);
 
-        //Query q = new Query("2013/9/25");
-        //client.publisher.publish(q);
-        Thread.sleep(5000);
-        System.out.println("Disconnecting.");
-        client.disconnect();
+        client.query(server, "2013/9/25");
     }
 }

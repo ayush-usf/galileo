@@ -45,6 +45,16 @@ public class NetworkInfo {
         return groups;
     }
 
+    public List<NodeInfo> getAllNodes() {
+        List<NodeInfo> nodeList = new ArrayList<>();
+        for (GroupInfo group : groups) {
+            List<NodeInfo> groupNodes = group.getAllNodes();
+            nodeList.addAll(groupNodes);
+        }
+
+        return nodeList;
+    }
+
     @Override
     public String toString() {
         String str = "Network Information:" + System.lineSeparator();

@@ -61,6 +61,15 @@ public class GroupInfo {
         return groups;
     }
 
+    public List<NodeInfo> getAllNodes() {
+        List<NodeInfo> nodeList = new ArrayList<>();
+        for (GroupInfo group : groups) {
+            nodeList.addAll(group.getAllNodes());
+        }
+        nodeList.addAll(nodes);
+        return nodeList;
+    }
+
     public String getName() {
         return name;
     }
