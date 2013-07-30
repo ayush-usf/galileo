@@ -143,7 +143,6 @@ public abstract class MessageRouter implements Runnable {
         logger.info("Accepted connection: " + getClientString(channel));
         channel.configureBlocking(false);
         channel.register(selector, SelectionKey.OP_READ, tracker);
-
     }
 
     /**
@@ -323,7 +322,7 @@ public abstract class MessageRouter implements Runnable {
 
 
     /**
-     * When a <code>SelectionKey</code> is writable, push as much pending data
+     * When a {@link SelectionKey} is writable, push as much pending data
      * out on the channel as possible.  This method is called when a message
      * couldn't be published directly by its originating thread.
      *
@@ -409,6 +408,16 @@ public abstract class MessageRouter implements Runnable {
      */
     public void addListener(MessageListener listener) {
         listeners.add(listener);
+    }
+
+    /**
+     * Determines whether or not this MessageRouter is online.  As long as the
+     * router is online, the selector thread will continue to run.
+     *
+     * @return true if the MessageRouter instance is online and running.
+     */
+    public boolean isOnline() {
+        return this.online;
     }
 
     /**
