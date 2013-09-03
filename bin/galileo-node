@@ -82,16 +82,16 @@ if [[ -n ${1} ]]; then
 fi
 
 # determine paths
-logdir="${TMPDIR:-/tmp/$(whoami)-galileo}"
+logdir="${TMPDIR:-/tmp/}$(whoami)-galileo"
 # if the root directory is set and writable, use it for logging.
 if [[ -n ${GALILEO_ROOT} && -w ${GALILEO_ROOT} ]]; then
     logdir="${GALILEO_ROOT}"
-    statuspath="${GALILEO_ROOT}/${statusfile}"
 fi
 
 mkdir -p "${logdir}" &> /dev/null
 logpath="${logdir}/${logfile}"
 pidpath="${logdir}/${pidfile}"
+statuspath="${logdir}/${statusfile}"
 
 # status
 if [[ ${status} == true ]]; then
@@ -127,7 +127,7 @@ fi
 java -classpath "${GALILEO_HOME}"/lib/\* -D"pidFile=${pidpath}" \
     ${class} &> "${logpath}" &
 
-echo "${!}" > "${pidpath}" 2> /dev/null
+(echo "${!}") 2> /dev/null > "${pidpath}"
 (echo "Starting") 2> /dev/null > "${statuspath}"
 sleep 1
 check_status
