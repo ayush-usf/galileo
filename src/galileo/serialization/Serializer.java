@@ -71,8 +71,8 @@ public class Serializer {
      *
      * @param bytes Binary form of the object being loaded.
      */
-    public static
-    <T extends ByteSerializable> T deserialize(Class<T> type, byte[] bytes)
+    public static <T extends ByteSerializable> T
+        deserialize(Class<T> type, byte[] bytes)
     throws IOException, SerializationException {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
         BufferedInputStream buffIn = new BufferedInputStream(byteIn);
@@ -102,7 +102,7 @@ public class Serializer {
     private static <T extends ByteSerializable> T deserialize(Class<T> type,
             SerializationInputStream in)
     throws IOException, SerializationException {
-         /* ABANDON HOPE, ALL YE WHO ENTER HERE... */
+        /* ABANDON HOPE, ALL YE WHO ENTER HERE... */
         T obj = null;
         try {
             Constructor<T> constructor =
