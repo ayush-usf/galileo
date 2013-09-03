@@ -12,7 +12,7 @@ colorize() {
     shift 1
 
     if [[ ${use_color} == true ]]; then
-        echo -en "\e[01;${color}m${@}\e[0m"
+        echo -en "\e[0;${color}m${@}\e[0m"
     else
         echo -n "${@}"
     fi
