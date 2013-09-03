@@ -50,7 +50,7 @@ check_status() {
             print_status "$(colorize 31 'FAILED')"
             return 1
         else
-            print_status "Offline"
+            print_status "$(colorize 31 'Offline')"
             return 0
         fi
     fi
