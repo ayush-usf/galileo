@@ -25,6 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package galileo.util;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +35,8 @@ import java.util.logging.Logger;
  * at a glance.  For more sophisticated debugging, the user should consult
  * relevant log files; however, this simple status log can provide a starting
  * point.  The StatusLine should be updated infrequently; each call will open
- * and close the status file.
+ * and close the status file unless a standard out based StatusLine is being
+ * used.
  *
  * @author malensek
  */
@@ -43,6 +45,15 @@ public class StatusLine {
     private static final Logger logger = Logger.getLogger("galileo");
 
     private String fileName;
+    private boolean useStdout = false;
+    private boolean active = true;
+
+    /**
+     * Creates a new StatusLine that will be written to standard out.
+     */
+    public StatusLine() {
+        useStdout = true;
+    }
 
     /**
      * Creates a new StatusLine that will be written to the given file name.
@@ -51,6 +62,19 @@ public class StatusLine {
      */
     public StatusLine(String fileName) {
         this.fileName = fileName;
+
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(fileName);
+            writer.println("");
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Status file is not writable! "
+                    + "Falling back to standard out for status messages.");
+            useStdout = true;
+        } finally {
+            writer.close();
+            writer = null;
+        }
     }
 
     /**
@@ -59,6 +83,15 @@ public class StatusLine {
      * @param status the new status line to write to disk immediately.
      */
     public void set(String status) {
+        if (!active) {
+            return;
+        }
+
+        if (useStdout) {
+            System.out.println(status);
+            return;
+        }
+
         try {
             PrintWriter writer = new PrintWriter(fileName);
             writer.println(status);
@@ -67,5 +100,16 @@ public class StatusLine {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not update status line.", e);
         }
+    }
+
+    /**
+     * Deactivates the status line and removes the text file (if any) from disk.
+     */
+    public void close() {
+        if (!useStdout) {
+            File line = new File(fileName);
+            line.delete();
+        }
+        active = false;
     }
 }
