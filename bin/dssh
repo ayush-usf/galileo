@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ################################################################################
 # dssh - Distributed ssh tool. Executes commands across multiple machines in
 #        parallel via ssh.
