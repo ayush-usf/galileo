@@ -326,6 +326,7 @@ public class StorageNode implements MessageListener {
             /* The logging subsystem may have already shut down, so we revert to
              * stdout for our final messages */
             System.out.println("Initiated shutdown.");
+            nodeStatus.close();
             System.out.println("Goodbye!");
         }
     }
