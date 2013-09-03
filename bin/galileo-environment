@@ -1,10 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ################################################################################
 # galileo-environment - ensures all Galileo environment variables are set up
-#                       correctly
+#                       correctly.
+#
+#                       GALILEO_HOME - the location of the Galileo install
+#                       directory.  This being configured is a minimum
+#                       requirement, but the script can also attempt to
+#                       automatically configure the variable.
+#
+#                       GALILEO_CONF - location of Galileo configuration files.
+#                       This defaults to GALILEO_HOME/conf, the default
+#                       configuration directory.
+#
+#                       GALILEO_ROOT - root directory for the file system.  This
+#                       also contains log files, status information, etc.
 ################################################################################
 
-script_dir=$( cd "$( dirname "$0" )" && pwd )
+script_dir=$(cd "$(dirname "$0")" && pwd)
 
 if [[ -z ${GALILEO_HOME} ]]; then
     jar=$(ls "${script_dir}"/../lib/Galileo*.jar 2> /dev/null)

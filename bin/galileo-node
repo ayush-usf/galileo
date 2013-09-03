@@ -1,89 +1,138 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ################################################################################
 # galileo-node - manages the execution of a Galileo Storage Node.
 ################################################################################
 
-unset daemonize restart statuspath stop
+unset daemonize restart statuspath status stop use_color
+daemonize=true
+signal="SIGTERM"
+
 class="galileo.dht.StorageNode"
-logfile="$(whoami)-node.log"
+logfile="storage-node.log"
+pidfile="storage-node.pid"
 statusfile="status.txt"
 
 print_usage() {
-cat <<- EOM
-Usage: $(basename ${0}) [-d] [-r] [-s]
+cat <<EOM
+Usage: $(basename ${0}) [-fo] [command]
 
-Switches:
-    -d daemonize the process
-    -r restart Galileo node
-    -s stop Galileo node
+Commands:
+    start (default) - starts a Storage Node instance.
+    stop - cleanly shuts down active Storage Node instances.
+    restart - performs the 'stop' and then 'start' commands.
+    status - print the current status of the active Storage Node (if any)
+
+Options:
+    -c colorize output
+    -f forceful shutdown (SIGKILL)
+    -o output to terminal (do not daemonize)
 EOM
 }
 
-print_status() {
-    echo "[$(hostname)] ${@}"
-}
+check_status() {
+    # Do a check to see if the daemon has died
+    online=false
+    pgrep --pidfile "${pidpath}" &> /dev/null
+    [[ ${?} -eq 0 ]] && online=true
 
-blocking_pkill() {
-    pkill ${@} &> /dev/null
-    if [[ $? -ne 0 ]]; then
-        return 1
-    fi
-
-    while :; do
-        pgrep ${@} &> /dev/null
-        if [[ $? -ne 0 ]]; then
+    if [[ ${online} == true ]]; then
+        # find out if a status line is availabile
+        if [[ -n "${statuspath}" && -e "${statuspath}" ]]; then
+            read status < "${statuspath}"
+            print_status "${status}"
             return 0
         else
-            sleep 1
+            print_status "$(colorize 33 'Status Unknown')"
+            return 1
         fi
-    done
+    else
+        # If the daemon is offline, but a status line is present, then the
+        # daemon has failed.  Otherwise, the daemon is just offline; a clean
+        # shutdown requires the status line to be removed.
+        if [[ -n "${statuspath}" && -e "${statuspath}" ]]; then
+            read status < "${statuspath}"
+            print_status "$(colorize 31 'FAILED:') ${status}"
+            return 1
+        else
+            print_status "Offline"
+            return 0
+        fi
+    fi
 }
 
-source "$( cd "$( dirname "$0" )" && pwd )/galileo-environment"
+source "$(cd "$(dirname "$0")" && pwd)/galileo-environment"
+source "$(cd "$(dirname "$0")" && pwd)/util/funcs.sh"
 
-while getopts "drs" flag; do
+# parse options
+while getopts "cfo" flag; do
     case ${flag} in
-        d) daemonize=true ;;
-        r) restart=true ;;
-        s) stop=true ;;
+        c) use_color=true ;;
+        f) signal="SIGKILL" ;;
+        o) daemonize=false ;;
         ?) print_usage; exit 1 ;;
     esac
 done
 
+# parse commands
+shift $(($OPTIND - 1))
+if [[ -n ${1} ]]; then
+    case ${1,,} in
+        "start") ;;
+        "stop") stop=true ;;
+        "restart") restart=true ;;
+        "status") status=true ;;
+
+        *) echo "Unknown command: ${1}"; exit 1 ;;
+    esac
+fi
+
+# determine paths
+logdir="${TMPDIR:-/tmp}"
+# if the root directory is set and writable, use it for logging.
+if [[ -n ${GALILEO_ROOT} && -w ${GALILEO_ROOT} ]]; then
+    logdir="${GALILEO_ROOT}"
+    statuspath="${GALILEO_ROOT}/${statusfile}"
+fi
+
+logpath="${logdir}/${logfile}"
+pidpath="${logdir}/${pidfile}"
+
+# status
+if [[ ${status} == true ]]; then
+    check_status
+    exit 0
+fi
+
+# stop/restart
 if [[ ${stop} == true || ${restart} == true ]]; then
-    blocking_pkill -U $(whoami) -f ${class}
+    message="Offline"
+
+    blocking_pkill --uid "$(whoami)" --full "${class}" \
+        --pidfile "${pidpath}" --signal "${signal}"
+
+    if [[ ${?} -eq 1 ]]; then
+        message="${message} (no instance found)"
+    fi
 
     if [[ ${stop} == true ]]; then
-        print_status "Offline"
+        print_status "${message}"
         exit 0
     fi
 fi
 
+# start
 if [[ ${daemonize} == true ]]; then
-    logdir="${TMPDIR:-/tmp}"
-    if [[ -n ${GALILEO_ROOT} && -w ${GALILEO_ROOT} ]]; then
-        logdir="${GALILEO_ROOT}"
-        statuspath="${GALILEO_ROOT}/${statusfile}"
+    pgrep --pidfile "${pidpath}" &> /dev/null
+    if [[ ${?} -eq 0 ]]; then
+        check_status
+        exit 0
     fi
 
-    logpath="${logdir}/${logfile}"
-
-    java -cp "${GALILEO_HOME}"/lib/\* ${class} &> "${logpath}" &
-    pid=${!}
-
-    sleep 2
-    if [[ -n "${statuspath}" && -e "${statuspath}" ]]; then
-        read status < "${statuspath}"
-        print_status "${status}"
-    else
-        # Do a simple check to see if the daemon died right away.
-        ps ${pid} &> /dev/null
-        if [[ $? -ne 0 ]]; then
-            print_status "FAILED"
-        else
-            print_status "UNKNOWN"
-        fi
-    fi
+    java -classpath "${GALILEO_HOME}"/lib/\* ${class} &> "${logpath}" &
+    echo "${!}" > "${pidpath}"
+    echo "Starting" > "${statuspath}" 2> /dev/null
+    sleep 1 # Sleep a bit, otherwise the status will always be "Starting"
+    check_status
 else
-    java -cp "${GALILEO_HOME}"/lib/\* ${class}
+    java -classpath "${GALILEO_HOME}"/lib/\* ${class}
 fi
