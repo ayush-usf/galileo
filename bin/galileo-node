@@ -3,8 +3,7 @@
 # galileo-node - manages the execution of a Galileo Storage Node.
 ################################################################################
 
-unset daemonize restart statuspath status stop use_color
-daemonize=true
+unset restart statuspath status stop use_color
 signal="SIGTERM"
 
 class="galileo.dht.StorageNode"
@@ -14,7 +13,7 @@ statusfile="status.txt"
 
 print_usage() {
 cat <<EOM
-Usage: $(basename ${0}) [-fo] [command]
+Usage: $(basename ${0}) [-cf] [command]
 
 Commands:
     start (default) - starts a Storage Node instance.
@@ -25,7 +24,6 @@ Commands:
 Options:
     -c colorize output
     -f forceful shutdown (SIGKILL)
-    -o output to terminal (do not daemonize)
 EOM
 }
 
@@ -46,12 +44,10 @@ check_status() {
             return 1
         fi
     else
-        # If the daemon is offline, but a status line is present, then the
-        # daemon has failed.  Otherwise, the daemon is just offline; a clean
-        # shutdown requires the status line to be removed.
-        if [[ -n "${statuspath}" && -e "${statuspath}" ]]; then
-            read status < "${statuspath}"
-            print_status "$(colorize 31 'FAILED:') ${status}"
+        # if the pid file exists but the node is not running, then it must have
+        # failed.
+        if [[ -e "${pidpath}" ]]; then
+            print_status "$(colorize 31 'FAILED')"
             return 1
         else
             print_status "Offline"
@@ -64,11 +60,10 @@ source "$(cd "$(dirname "$0")" && pwd)/galileo-environment"
 source "$(cd "$(dirname "$0")" && pwd)/util/funcs.sh"
 
 # parse options
-while getopts "cfo" flag; do
+while getopts "cf" flag; do
     case ${flag} in
         c) use_color=true ;;
         f) signal="SIGKILL" ;;
-        o) daemonize=false ;;
         ?) print_usage; exit 1 ;;
     esac
 done
@@ -87,13 +82,14 @@ if [[ -n ${1} ]]; then
 fi
 
 # determine paths
-logdir="${TMPDIR:-/tmp}"
+logdir="${TMPDIR:-/tmp/$(whoami)-galileo}"
 # if the root directory is set and writable, use it for logging.
 if [[ -n ${GALILEO_ROOT} && -w ${GALILEO_ROOT} ]]; then
     logdir="${GALILEO_ROOT}"
     statuspath="${GALILEO_ROOT}/${statusfile}"
 fi
 
+mkdir -p "${logdir}" &> /dev/null
 logpath="${logdir}/${logfile}"
 pidpath="${logdir}/${pidfile}"
 
@@ -121,18 +117,17 @@ if [[ ${stop} == true || ${restart} == true ]]; then
 fi
 
 # start
-if [[ ${daemonize} == true ]]; then
-    pgrep --pidfile "${pidpath}" &> /dev/null
-    if [[ ${?} -eq 0 ]]; then
-        check_status
-        exit 0
-    fi
-
-    java -classpath "${GALILEO_HOME}"/lib/\* ${class} &> "${logpath}" &
-    echo "${!}" > "${pidpath}"
-    echo "Starting" > "${statuspath}" 2> /dev/null
-    sleep 1 # Sleep a bit, otherwise the status will always be "Starting"
+pgrep --pidfile "${pidpath}" &> /dev/null
+if [[ ${?} -eq 0 ]]; then
+    # There is already an instance running; print its status and exit.
     check_status
-else
-    java -classpath "${GALILEO_HOME}"/lib/\* ${class}
+    exit 0
 fi
+
+java -classpath "${GALILEO_HOME}"/lib/\* -D"pidFile=${pidpath}" \
+    ${class} &> "${logpath}" &
+
+echo "${!}" > "${pidpath}" 2> /dev/null
+(echo "Starting") 2> /dev/null > "${statuspath}"
+sleep 1
+check_status

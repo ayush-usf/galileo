@@ -25,6 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -326,7 +327,19 @@ public class StorageNode implements MessageListener {
             /* The logging subsystem may have already shut down, so we revert to
              * stdout for our final messages */
             System.out.println("Initiated shutdown.");
+
+            /* Close out the status line (remove it) */
             nodeStatus.close();
+
+            /* Remove the pid file, if it exists. */
+            String pidFile = System.getProperty("pidFile");
+            if (pidFile != null) {
+                File pid = new File(pidFile);
+                if (pid.exists()) {
+                    pid.delete();
+                }
+            }
+
             System.out.println("Goodbye!");
         }
     }

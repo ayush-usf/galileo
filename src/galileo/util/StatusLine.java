@@ -72,7 +72,9 @@ public class StatusLine {
                     + "Falling back to standard out for status messages.");
             useStdout = true;
         } finally {
-            writer.close();
+            if (writer != null) {
+                writer.close();
+            }
             writer = null;
         }
     }
