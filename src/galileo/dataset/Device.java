@@ -25,37 +25,24 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-import galileo.serialization.ByteSerializable;
+import galileo.dataset.feature.StringFeatureData;
 import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
 
 import java.io.IOException;
 
-public class Device implements ByteSerializable {
-    private String name;
+public class Device extends StringFeatureData {
 
     public Device(String name) {
-        this.name = name;
+        super(name);
     }
 
     public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+        return data;
     }
 
     @Deserialize
     public Device(SerializationInputStream in)
     throws IOException {
-        name = new String(in.readString());
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(name);
+        super(in);
     }
 }

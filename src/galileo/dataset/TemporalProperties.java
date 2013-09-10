@@ -25,19 +25,17 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-import java.io.IOException;
 import java.util.Date;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 
-import galileo.serialization.ByteSerializable;
+import galileo.dataset.feature.LongIntervalFeatureData;
 import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
 
-public class TemporalProperties implements ByteSerializable {
+public class TemporalProperties extends LongIntervalFeatureData {
 
-    private Date start;
-    private Date end;
+    private DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
 
     /**
      * Creates TemporalProperties with a simple timestamp (no temporal range).
@@ -45,9 +43,7 @@ public class TemporalProperties implements ByteSerializable {
      * @param timestamp Timestamp for these TemporalProperties
      */
     public TemporalProperties(long timestamp) {
-        Date d = new Date(timestamp);
-        this.start = d;
-        this.end = d;
+        super(timestamp, timestamp);
     }
 
     /**
@@ -59,8 +55,7 @@ public class TemporalProperties implements ByteSerializable {
      */
     public TemporalProperties(long start, long end)
     throws IllegalArgumentException {
-        this.start = new Date(start);
-        this.end   = new Date(end);
+        super(start, end);
 
         verifyRange();
     }
@@ -74,9 +69,12 @@ public class TemporalProperties implements ByteSerializable {
      */
     public TemporalProperties(String start, String end)
     throws ParseException, IllegalArgumentException {
-        DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
-        this.start = formatter.parse(start);
-        this.end   = formatter.parse(end);
+        super(0, 0);
+        Date startDate = formatter.parse(start);
+        Date endDate = formatter.parse(end);
+
+        this.data = startDate.getTime();
+        this.data2 = endDate.getTime();
 
         verifyRange();
     }
@@ -85,24 +83,44 @@ public class TemporalProperties implements ByteSerializable {
      * Ensure the start time comes before the end time for this Temporal range.
      */
     private void verifyRange() throws IllegalArgumentException {
-        if (end.getTime() - start.getTime() <= 0) {
+        if (getEnd() - getStart() <= 0) {
             throw new IllegalArgumentException("Upper bound of temporal range" +
                 " must be larger than the lower bound.");
         }
     }
 
     /**
-     * Retrieves the upper bound of this temporal range (if applicable).
-     */
-    public Date getUpperBound() {
-        return end;
-    }
-
-    /**
      * Retrieves the lower bound of this temporal range (if applicable).
      */
     public Date getLowerBound() {
-        return start;
+        return new Date(getStart());
+    }
+
+    /**
+     * Retrieves the upper bound of this temporal range (if applicable).
+     */
+    public Date getUpperBound() {
+        return new Date(getEnd());
+    }
+
+    /**
+     * Get the starting point of the time interval represented by this
+     * TemporalProperties instance.
+     * 
+     * @return starting point, as a long integer.
+     */
+    public long getStart() {
+        return data;
+    }
+
+    /**
+     * Get the end point of the time interval represented by this
+     * TemporalProperties instance.
+     *
+     * @return the end time point, as a long integer.
+     */
+    public long getEnd() {
+        return data2;
     }
 
     /** 
@@ -113,7 +131,7 @@ public class TemporalProperties implements ByteSerializable {
      * @return true if these TemporalProperties represent a Timestamp.
      */
     public boolean isTimestamp() {
-        if (start.equals(end)) {
+        if (getStart() == getEnd()) {
             return true;
         } else {
             return false;
@@ -123,23 +141,15 @@ public class TemporalProperties implements ByteSerializable {
     @Override
     public String toString() {
         if (isTimestamp()) {
-            return "Timestamp: " + start;
+            return "Timestamp: " + getStart();
         } else {
-            return "Temporal Range: " + start + " -- " + end;
+            return "Temporal Range: " + getStart() + " -- " + getEnd();
         }
     }
 
     @Deserialize
     public TemporalProperties(SerializationInputStream in)
     throws IOException {
-        start = new Date(in.readLong());
-        end = new Date(in.readLong());
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeLong(start.getTime());
-        out.writeLong(end.getTime());
+        super(in);
     }
 }
