@@ -32,7 +32,8 @@
 
             <compilerarg value="-Xlint" />
 
-            <exclude name="galileo/test/**" unless="enable.tests" />
+            <exclude name="galileo/test/**" unless="build.tests" />
+            <exclude name="galileo/samples/**" unless="build.samples" />
         </javac>
     </target>
 
