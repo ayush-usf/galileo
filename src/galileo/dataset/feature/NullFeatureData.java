@@ -68,6 +68,15 @@ extends FeatureData<Integer> implements ByteSerializable {
         return "[null]";
     }
 
+    @Override
+    public int compareTo(FeatureData<?> featureData) {
+        if (featureData.getType() == FeatureType.NULL) {
+            return 0;
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
     @Deserialize
     public NullFeatureData(SerializationInputStream in)
     throws IOException {
