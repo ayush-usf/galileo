@@ -58,8 +58,19 @@ public class HierarchicalGraph<T> {
     private static final Logger logger = Logger.getLogger("galileo");
 
     private Vertex<Feature, T> root = new Vertex<>();
-    private Map<String, Integer> featureOrder = new HashMap<>();
+    private Map<String, Level> levels = new HashMap<>();
     private Queue<String> features = new LinkedList<>();
+
+    private class Level {
+
+        public Level(int order, FeatureType type) {
+            this.order = order;
+            this.type = type;
+        }
+
+        public int order;
+        public FeatureType type;
+    }
 
     public void evaluateQuery(Query q) {
         HierarchicalQueryTracker<T> tracker
@@ -125,7 +136,12 @@ public class HierarchicalGraph<T> {
         return resultSet;
     }
 
-    public void addPath(Path<Feature, T> path) {
+    /**
+     * Adds a new {@link Path} to the Hierarchical Graph.
+     */
+    public void addPath(Path<Feature, T> path)
+    throws FeatureTypeMismatchException {
+        checkFeatureTypes(path);
         addNullFeatures(path);
         reorientPath(path);
         optimizePath(path);
@@ -137,12 +153,38 @@ public class HierarchicalGraph<T> {
     }
 
     /**
+     * This method ensures that the Features in the path being added have the
+     * same FeatureTypes as the current hierarchy.  This ensures that different
+     * FeatureTypes (such as an int and a double) get placed on the same level
+     * in the hierarchy.
+     *
+     * @param path the Path to check for invalid FeatureTypes.
+     *
+     * @throws FeatureTypeMismatchException if an invalid type is found
+     */
+    private void checkFeatureTypes(Path<Feature, T> path)
+    throws FeatureTypeMismatchException {
+        for (Feature feature : path.getLabels()) {
+            Level level = levels.get(feature.getName());
+            if (level != null) {
+                if (level.type != feature.getType()) {
+                    throw new FeatureTypeMismatchException(
+                            "Feature insertion at graph level " + level.order
+                            + " is not possible due to a FeatureType mismatch. "
+                            + "Expected: " + level.type + ", "
+                            + "found: " + feature.getType());
+                }
+            }
+        }
+    }
+
+    /**
      * For missing feature values, add a null feature to a path.  This maintains
      * the graph structure for sparse schemas or cases where a feature reading
      * is not available.
      */
     private void addNullFeatures(Path<Feature, T> path) {
-        Set<String> knownFeatures = new HashSet<>(featureOrder.keySet());
+        Set<String> knownFeatures = new HashSet<>(levels.keySet());
         Set<String> pathFeatures = new HashSet<>();
         for (Feature feature : path.getLabels()) {
             pathFeatures.add(feature.getName());
@@ -199,19 +241,22 @@ public class HierarchicalGraph<T> {
      * @return int representing the list ordering of the Feature
      */
     private int getOrder(Feature feature) {
-        Integer order = featureOrder.get(feature.getName());
-        if (order == null) {
-            order = addNewFeature(feature.getName());
+        int order;
+        Level level = levels.get(feature.getName());
+        if (level != null) {
+            order = level.order;
+        } else {
+            order = addNewFeature(feature);
         }
 
         return order;
     }
 
-    private int addNewFeature(String feature) {
+    private int addNewFeature(Feature feature) {
         logger.info("New feature: " + feature);
-        Integer order = featureOrder.keySet().size();
-        featureOrder.put(feature, order);
-        features.offer(feature);
+        Integer order = levels.keySet().size();
+        levels.put(feature.getName(), new Level(order, feature.getType()));
+        features.offer(feature.getName());
 
         return order;
     }
