@@ -23,67 +23,41 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dataset;
-
-import java.io.IOException;
+package galileo.dataset.feature;
 
 import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
 
-public class Feature implements Comparable<Feature>, ByteSerializable {
+/**
+ * Wrapper for features based on java.lang.Number.
+ *
+ * @author malensek
+ */
+abstract class NumericFeatureData<T extends Number & Comparable<T>>
+extends FeatureData<T> implements ByteSerializable {
 
-    protected String name;
-    protected FeatureType type = FeatureType.FLOAT;
-    protected double value;
+    public NumericFeatureData() { }
 
-    public Feature(String name) {
-        this.name = name;
-    }
-
-    public Feature(String name, double value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public FeatureType getType() {
-        return type;
+    public NumericFeatureData(T data) {
+        super(data);
     }
 
     @Override
-    public int compareTo(Feature f) {
-        Double d1 = new Double(f.getValue());
-        Double d2 = new Double(this.getValue());
-
-        return d2.compareTo(d1);
-    }
-
-    public double getValue() {
-        return value;
+    public int toInt() {
+        return this.data.intValue();
     }
 
     @Override
-    public String toString() {
-        return name + "=" + value;
-    }
-
-    @Deserialize
-    public Feature(SerializationInputStream in)
-    throws IOException {
-        name = new String(in.readString());
-        type = FeatureType.fromInt(in.readInt());
-        value = in.readDouble();
+    public long toLong() {
+        return this.data.longValue();
     }
 
     @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(name);
-        out.writeInt(type.toInt());
-        out.writeDouble(value);
+    public float toFloat() {
+        return this.data.floatValue();
+    }
+
+    @Override
+    public double toDouble() {
+        return this.data.doubleValue();
     }
 }

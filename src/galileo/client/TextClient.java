@@ -41,11 +41,11 @@ import galileo.comm.StorageRequest;
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.Device;
 import galileo.dataset.DeviceSet;
-import galileo.dataset.Feature;
-import galileo.dataset.FeatureSet;
 import galileo.dataset.FileBlock;
 import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
+import galileo.dataset.feature.Feature;
+import galileo.dataset.feature.FeatureSet;
 
 import galileo.event.EventContainer;
 import galileo.event.EventType;

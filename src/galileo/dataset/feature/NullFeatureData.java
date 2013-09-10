@@ -23,8 +23,60 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dataset;
+package galileo.dataset.feature;
 
-public class FeatureValue {
+import java.io.IOException;
 
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+/**
+ * Represents null Feature data (a named feature with no related information).
+ *
+ * @author malensek
+ */
+public class NullFeatureData
+extends FeatureData<Integer> implements ByteSerializable {
+
+    public NullFeatureData() {
+        this.type = FeatureType.NULL;
+    }
+
+    @Override
+    public int toInt() {
+        return 0;
+    }
+
+    @Override
+    public long toLong() {
+        return 0l;
+    }
+
+    @Override
+    public float toFloat() {
+        return 0f;
+    }
+
+    @Override
+    public double toDouble() {
+        return 0d;
+    }
+
+    @Override
+    public String toString() {
+        return "[null]";
+    }
+
+    @Deserialize
+    public NullFeatureData(SerializationInputStream in)
+    throws IOException {
+        this.type = FeatureType.NULL;
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        /* Do nothing */
+    }
 }

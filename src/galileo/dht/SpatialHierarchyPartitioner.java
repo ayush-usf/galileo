@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.Device;
-import galileo.dataset.Feature;
+import galileo.dataset.feature.Feature;
 import galileo.dht.hash.BalancedHashRing;
 import galileo.dht.hash.ConstrainedGeohash;
 import galileo.dht.hash.HashException;
@@ -121,7 +121,7 @@ public class SpatialHierarchyPartitioner extends Partitioner<BlockMetadata> {
         /* Next, the StorageNode */
         String combinedAttrs = metadata.getName();
         for (Feature feature : metadata.getFeatures()) {
-            combinedAttrs += feature.getValue();
+            combinedAttrs += feature.getString();
         }
 
         for (Device device : metadata.getDevices()) {

@@ -23,9 +23,10 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dataset;
+package galileo.dataset.feature;
 
 import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
@@ -33,6 +34,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contains a set of {@link Feature}s.
@@ -40,6 +43,8 @@ import java.util.Map;
  * @author malensek
  */
 public class FeatureSet implements ByteSerializable, Iterable<Feature> {
+
+    private static final Logger logger = Logger.getLogger("galileo");
 
     private Map<String, Feature> features = new HashMap<String, Feature>();
 
@@ -74,7 +79,13 @@ public class FeatureSet implements ByteSerializable, Iterable<Feature> {
     throws IOException {
         int numFeatures = in.readInt();
         for (int i = 0; i < numFeatures; ++i) {
-            Feature feature = new Feature(in);
+            Feature feature = null;
+            try {
+                feature = new Feature(in);
+            } catch (SerializationException e) {
+                logger.log(Level.WARNING, "Error deserializing FeatureSet "
+                        + "element", e);
+            }
             put(feature);
         }
     }

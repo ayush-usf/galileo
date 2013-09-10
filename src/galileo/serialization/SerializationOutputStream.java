@@ -62,6 +62,7 @@ public class SerializationOutputStream extends DataOutputStream {
             ByteArrayOutputStream compressedBytes = new ByteArrayOutputStream();
             GZIPOutputStream gOut = new GZIPOutputStream(compressedBytes) {
                 {
+                    /* 1-9, where 9 = best compression */
                     def.setLevel(compressionLevel);
                 }
             };

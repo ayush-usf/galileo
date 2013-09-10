@@ -23,40 +23,44 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dataset;
+package galileo.dataset.feature;
 
-import java.util.HashMap;
-import java.util.Map;
+import galileo.util.Pair;
 
-public enum FeatureType {
-    NULL (0),
-    INT (1),
-    FLOAT (2);
+/**
+ * Abstract implementation of arbitrary pairs of numeric Feature data
+ * represented as an interval.
+ *
+ * @author malensek
+ */
+abstract class IntervalFeatureData<T extends Number & Comparable<T>>
+extends NumericFeatureData<T> {
 
-    private final int type;
+    protected T data2;
 
-    private FeatureType(int type) {
-        this.type = type;
+    @Override
+    public Pair<Integer, Integer> toIntInterval() {
+        return new Pair<Integer, Integer>(data.intValue(), data2.intValue());
     }
 
-    public int toInt() {
-        return type;
+    @Override
+    public Pair<Long, Long> toLongInterval() {
+        return new Pair<Long, Long>(data.longValue(), data2.longValue());
     }
 
-    static Map<Integer, FeatureType> typeMap = new HashMap<>();
-
-    static {
-        for (FeatureType t : FeatureType.values()) {
-            typeMap.put(t.toInt(), t);
-        }
+    @Override
+    public Pair<Float, Float> toFloatInterval() {
+        return new Pair<Float, Float>(data.floatValue(), data2.floatValue());
     }
 
-    public static FeatureType fromInt(int i) {
-        FeatureType t = typeMap.get(i);
-        if (t == null) {
-            return FeatureType.NULL;
-        }
+    @Override
+    public Pair<Double, Double> toDoubleInterval() {
+        return new Pair<Double, Double>(data.doubleValue(),
+                data2.doubleValue());
+    }
 
-        return t;
+    @Override
+    public String toString() {
+        return "[" + data.toString() + " .. " + data2.toString() + "]";
     }
 }

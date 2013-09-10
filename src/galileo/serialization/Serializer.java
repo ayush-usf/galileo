@@ -30,8 +30,12 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import java.lang.reflect.Constructor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class provides convenience functions to make the Serialization and
@@ -41,6 +45,8 @@ import java.lang.reflect.Constructor;
  * reading or creating objects, do the work, and then close the streams.
  */
 public class Serializer {
+
+    private static final Logger logger = Logger.getLogger("galileo");
 
     /**
      * Dumps a ByteSerializable object to a portable byte array.
@@ -109,10 +115,46 @@ public class Serializer {
                 type.getConstructor(SerializationInputStream.class);
             obj = constructor.newInstance(in);
         } catch (Exception e) {
-            throw new SerializationException("Could not instantiate object " +
-                    "for deserialization.");
+
+            /* We compress the myriad of possible exceptions that could occur
+             * here down to a single exception (SerializationException) to
+             * simplify implementations.  However, if the current log level
+             * permits, we also embed more information in the exception detail
+             * message. */
+
+            if (logger.isLoggable(Level.INFO)) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printer = new PrintWriter(writer, true);
+                e.printStackTrace(printer);
+                String moreInfo = writer.toString();
+                printer.close();
+
+                throw new SerializationException("Could not instantiate object "
+                        + "for deserialization.  Details: "
+                        + System.lineSeparator() + moreInfo);
+            } else {
+                throw new SerializationException("Could not instantiate object "
+                        + "for deserialization");
+            }
         }
 
         return obj;
+    }
+
+    /**
+     * Deserializes and instantiates a ByteSerializable class from a stream.
+     * This method should only be used in cases where the type of the
+     * ByteSerializable class is not known at compile time.
+     *
+     * @param type The type of object to create (deserialize).
+     *             For example, Something.class.
+     *
+     * @param in SerializationInputStream containing a serialized instance of
+     *           the object being loaded.
+     */
+    public static <T extends ByteSerializable> T deserializeFromStream(
+            Class<T> type, SerializationInputStream in)
+    throws IOException, SerializationException {
+        return deserialize(type, in);
     }
 }

@@ -28,7 +28,7 @@ package galileo.graph;
 import java.util.ArrayList;
 import java.util.List;
 
-import galileo.dataset.Feature;
+import galileo.dataset.feature.Feature;
 
 /**
  * Tracks a {@link galileo.query.Query} as it traverses through a graph

@@ -39,9 +39,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import galileo.dataset.Feature;
-import galileo.dataset.FeatureType;
-import galileo.dataset.NullFeature;
+import galileo.dataset.feature.Feature;
+import galileo.dataset.feature.FeatureType;
 
 import galileo.query.Expression;
 import galileo.query.Operation;
@@ -88,7 +87,7 @@ public class HierarchicalGraph<T> {
         if (operations == null) {
             tracker.skipLevel();
 
-            // traverse all neighbors
+            /* Traverse all neighbors */
             for (Vertex<Feature, T> vertex : tracker.getCurrentResults()) {
                 results.addAll(vertex.getAllNeighbors());
             }
@@ -154,7 +153,7 @@ public class HierarchicalGraph<T> {
         /* Create null features for missing values */
         for (String featureName : knownFeatures) {
             Vertex<Feature, T> v = new Vertex<>();
-            v.setLabel(new NullFeature(featureName));
+            v.setLabel(new Feature(featureName));
             path.add(v);
         }
     }
