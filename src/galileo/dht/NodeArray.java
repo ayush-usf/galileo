@@ -33,6 +33,8 @@ import galileo.serialization.SerializationInputStream;
 
 public class NodeArray extends SerializableArray<NodeInfo> {
 
+    static final long serialVersionUID = -7342648468294545935L;
+
     public NodeArray() { }
 
     public NodeArray(SerializationInputStream in)

@@ -27,6 +27,8 @@ package galileo.dht;
 
 public class PartitionException extends Exception {
 
+    static final long serialVersionUID = 6115042791570809703L;
+
     public PartitionException() {
         super();
     }
