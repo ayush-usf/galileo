@@ -31,7 +31,6 @@ for non-standard ssh configurations.
 EOM
 }
 
-passthrough=""
 while getopts "cf" flag; do
     case ${flag} in
         c) colorize="-c" ;;
