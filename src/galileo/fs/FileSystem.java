@@ -30,7 +30,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +48,7 @@ public class FileSystem {
     private static final Logger logger = Logger.getLogger("galileo");
 
     public static final String METADATA_EXTENSION = ".gmeta";
-    public static final String BLOCK_EXTENSION    = ".gblock";
+    public static final String BLOCK_EXTENSION = ".gblock";
 
     private File storageDirectory;
 
