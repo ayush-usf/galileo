@@ -270,7 +270,7 @@ public class StorageNode implements MessageListener {
             publishResponse(preamble);
 
             /* Optionally write out where this query is going */
-            if (logger.getLevel() == Level.INFO) {
+            if (logger.isLoggable(Level.INFO)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Forwarding Query to nodes: ");
                 for (NodeInfo node : queryNodes) {
