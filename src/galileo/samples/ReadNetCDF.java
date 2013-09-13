@@ -18,7 +18,7 @@ public class ReadNetCDF {
             String fileName = f.getName();
             String ext = fileName.substring(fileName.lastIndexOf('.') + 1,
                     fileName.length());
-            if (ext.equals("grb")) {
+            if (ext.equals("grb") || ext.equals("bz2")) {
                 ReadNetCDF.readFile(f.getAbsolutePath());
             }
         }
