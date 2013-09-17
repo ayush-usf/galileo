@@ -108,7 +108,7 @@ public enum FeatureType {
             case INT: return IntegerFeatureData.class;
             case LONG: return LongFeatureData.class;
             case FLOAT: return FloatFeatureData.class;
-            case DOUBLE: return DoubleFeatureData.class;
+            case DOUBLE: return DoubleFeatureData.class; //TODO: fix these:
             case INTERVAL_INT: return null; //data = new IntegerIntervalFeatureData(in);
             case INTERVAL_LONG: return LongIntervalFeatureData.class;
             case INTERVAL_FLOAT: return null; //data = new FloatIntervalFeatureData(in);

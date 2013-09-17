@@ -25,6 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset.feature;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import galileo.serialization.ByteSerializable;
 import galileo.util.Pair;
 
@@ -36,6 +39,8 @@ import galileo.util.Pair;
  */
 abstract class FeatureData<T extends Comparable<T>>
 implements ByteSerializable, Comparable<FeatureData<?>> {
+
+    private static final Logger logger = Logger.getLogger("galileo");
 
     protected T data;
     protected FeatureType type = FeatureType.NULL;
@@ -147,10 +152,29 @@ implements ByteSerializable, Comparable<FeatureData<?>> {
 
     @Override
     public int compareTo(FeatureData<?> featureData) {
-        /* If something goes wrong here, a ClassCastException will be thrown. */
-        @SuppressWarnings("unchecked")
-        int compare = this.data.compareTo((T) featureData.data);
+        /* NULL vs X is handled by the NullFeatureData class.  Here we handle
+         * the opposite case, X vs NULL. */
+        if (featureData.getType() == FeatureType.NULL) {
+            return Integer.MAX_VALUE;
+        }
 
-        return compare;
+        try {
+            /* If something goes wrong here, a ClassCastException will be
+             * thrown. */
+            @SuppressWarnings("unchecked")
+            int compare = this.data.compareTo((T) featureData.data);
+            return compare;
+        } catch (ClassCastException e) {
+            if (logger.isLoggable(Level.WARNING)) {
+                FeatureData<T> a = this;
+                FeatureData<?> b = featureData;
+
+                logger.warning("Illegal comparison between Feature types! "
+                        + "[" + a.getType() + ", " + a.data + "]"
+                        + " cannot be compared to "
+                        + "[" + b.getType() + ", " + b.data + "]");
+            }
+            throw e;
+        }
     }
 }
