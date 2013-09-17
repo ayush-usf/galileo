@@ -32,28 +32,15 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Represents a graph path.  A path contains an arbitrary number of vertices,
- * and can optionally have a value payload for storing items within a graph.
+ * Represents a simple graph path.  A path contains a number of vertices and
+ * edges that are connected to form a chain that traverses through a graph.
  *
  * @author malensek
  */
 public class Path<L extends Comparable<L>, V>
 implements Iterable<Vertex<L, V>> {
 
-    private V value;
     private List<Vertex<L, V>> vertices = new ArrayList<>();
-
-    /**
-     * Create a Path with a value payload an a number of vertices pre-populated.
-     */
-    @SafeVarargs
-    public Path(V value, Vertex<L, V>... vertices) {
-        setValue(value);
-
-        for (Vertex<L, V> vertex : vertices) {
-            this.vertices.add(vertex);
-        }
-    }
 
     /**
      * Create a Path with a number of vertices pre-populated.
@@ -62,6 +49,17 @@ implements Iterable<Vertex<L, V>> {
     public Path(Vertex<L, V>... vertices) {
         for (Vertex<L, V> vertex : vertices) {
             this.vertices.add(vertex);
+        }
+    }
+
+    /**
+     * Creates a path by copying the vertices from an existing path.
+     */
+    public Path(Path<L, V> p) {
+        /* New Vertices must be created if this path will be used anywhere but
+         * its source graph; the type hierarchy is embedded in the vertices. */
+        for (Vertex<L, V> v : p.getVertices()) {
+            this.vertices.add(new Vertex<L, V>(v));
         }
     }
 
@@ -85,6 +83,10 @@ implements Iterable<Vertex<L, V>> {
         return vertices.get(index);
     }
 
+    public List<Vertex<L, V>> getVertices() {
+        return vertices;
+    }
+
     /**
      * Retrieve a list of the {@link Vertex} labels in this Path.
      */
@@ -101,20 +103,6 @@ implements Iterable<Vertex<L, V>> {
         Collections.sort(vertices, c);
     }
 
-    /**
-     * Sets the value payload for this Path.
-     */
-    public void setValue(V value) {
-        this.value = value;
-    }
-
-    /**
-     * Retrieves the value payload for this Path.
-     */
-    public V getValue() {
-        return this.value;
-    }
-
     @Override
     public Iterator<Vertex<L, V>> iterator() {
         return vertices.iterator();
@@ -123,8 +111,11 @@ implements Iterable<Vertex<L, V>> {
     @Override
     public String toString() {
         String str = "";
-        for (Vertex<L, V> vertex : vertices) {
-            str += vertex;
+        for (int i = 0; i < vertices.size(); ++i) {
+            str += vertices.get(i).getLabel();
+            if (i < vertices.size() - 1) {
+                str += " -> ";
+            }
         }
 
         return str;

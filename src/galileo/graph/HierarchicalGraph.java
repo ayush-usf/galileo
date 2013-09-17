@@ -57,10 +57,24 @@ public class HierarchicalGraph<T> {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
+    /** The root vertex. */
     private Vertex<Feature, T> root = new Vertex<>();
+
+    /** Describes each level in the hierarchy. */
     private Map<String, Level> levels = new HashMap<>();
+
+    /**
+     * We maintain a separate Queue with Feature names inserted in
+     * hierarchical order.  While levels.keySet() contains the same information,
+     * there is no contractual obligation for HashMap to return the keyset in
+     * the original insertion order (although in practice, it probably does).
+     */
     private Queue<String> features = new LinkedList<>();
 
+
+    /**
+     * Tracks information about each level in the graph hierarchy.
+     */
     private class Level {
 
         public Level(int order, FeatureType type) {
@@ -70,6 +84,22 @@ public class HierarchicalGraph<T> {
 
         public int order;
         public FeatureType type;
+    }
+
+    public HierarchicalGraph() { }
+
+    /**
+     * Creates a HierarchicalGraph with a set Feature hierarchy.  Features are
+     * entered into the hierarchy in the order they are received.  Feature
+     * values are not inspected by this constructor.
+     *
+     * @param featureOrdering a List of Features that represents how the
+     * hierarchy in the graph should be built.
+     */
+    public HierarchicalGraph(List<Feature> featureOrdering) {
+        for (Feature feature : featureOrdering) {
+            getOrder(feature);
+        }
     }
 
     public void evaluateQuery(Query q) {
@@ -139,15 +169,15 @@ public class HierarchicalGraph<T> {
     /**
      * Adds a new {@link Path} to the Hierarchical Graph.
      */
-    public void addPath(Path<Feature, T> path)
+    public void addPath(Path<Feature, T> path, T payload)
     throws FeatureTypeMismatchException {
         checkFeatureTypes(path);
         addNullFeatures(path);
         reorientPath(path);
         optimizePath(path);
 
-        /* Place the path value (traversal result) at the end of this path. */
-        path.get(path.size() - 1).setValue(path.getValue());
+        /* Place the path payload (traversal result) at the end of this path. */
+        path.get(path.size() - 1).addValue(payload);
 
         root.addPath(path.iterator());
     }
@@ -231,6 +261,21 @@ public class HierarchicalGraph<T> {
     }
 
     /**
+     * Removes all null Features from a path.  This includes any Features that
+     * are the standard Java null, or Features with a NULL FeatureType.
+     *
+     * @param path Path to remove null Features from.
+     */
+    private void removeNullFeatures(Path<Feature, T> path) {
+        for (int i = 0; i < path.size(); ++i) {
+            Feature f = path.get(i).getLabel();
+            if (f == null || f.getType() == FeatureType.NULL) {
+                path.remove(i);
+            }
+        }
+    }
+
+    /**
      * Determines the numeric order of a Feature based on the current
      * orientation of the graph.  For example, humidity features may come first,
      * followed by temperature, etc.  If the feature in question has not yet
@@ -252,13 +297,28 @@ public class HierarchicalGraph<T> {
         return order;
     }
 
+    /**
+     * Update the hierarchy levels and known Feature list with a new Feature.
+     */
     private int addNewFeature(Feature feature) {
-        logger.info("New feature: " + feature);
+        logger.info("New feature: " + feature.getName());
         Integer order = levels.keySet().size();
         levels.put(feature.getName(), new Level(order, feature.getType()));
         features.offer(feature.getName());
 
         return order;
+    }
+
+    public List<Path<Feature, T>> getAllPaths() {
+        List<Path<Feature, T>> paths = root.descendantPaths();
+        for (Path<Feature, T> path : paths) {
+            removeNullFeatures(path);
+        }
+        return paths;
+    }
+
+    public Vertex<Feature, T> getRoot() {
+        return root;
     }
 
     @Override
