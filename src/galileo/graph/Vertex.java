@@ -25,8 +25,11 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -40,7 +43,7 @@ import java.util.TreeMap;
 public class Vertex<L extends Comparable<L>, V> {
 
     protected L label;
-    protected V value;
+    protected Collection<V> values = new HashSet<V>();
     protected TreeMap<L, Vertex<L, V>> edges = new TreeMap<>();
 
     public Vertex() { }
@@ -51,7 +54,16 @@ public class Vertex<L extends Comparable<L>, V> {
 
     public Vertex(L label, V value) {
         this.label = label;
-        setValue(value);
+        this.addValue(value);
+    }
+
+    public Vertex(L label, Collection<V> values) {
+        this.label = label;
+        this.addValues(values);
+    }
+
+    public Vertex(Vertex<L, V> v) {
+        this.label = v.label;
     }
 
     /**
@@ -95,7 +107,7 @@ public class Vertex<L extends Comparable<L>, V> {
     /**
      * Connnects two vertices.  If this vertex is already connected to the
      * provided vertex label, then the already-connected vertex is returned, and
-     * its <code>value</code> is updated.
+     * its value is updated.
      *
      * @param vertex The vertex to connect to.
      *
@@ -108,7 +120,7 @@ public class Vertex<L extends Comparable<L>, V> {
             edges.put(label, vertex);
             return vertex;
         } else {
-            edge.setValue(vertex.getValue());
+            edge.addValues(vertex.getValues());
             return edge;
         }
     }
@@ -132,12 +144,72 @@ public class Vertex<L extends Comparable<L>, V> {
         this.label = label;
     }
 
-    public V getValue() {
-        return value;
+    public Collection<V> getValues() {
+        return values;
     }
 
-    public void setValue(V value) {
-        this.value = value;
+    public void addValue(V value) {
+        this.values.add(value);
+    }
+
+    public void addValues(Collection<V> values) {
+        this.values.addAll(values);
+    }
+
+    /**
+     * Retrieves all {@link Path} instances represented by the children of this
+     * Vertex.
+     *
+     * @return List of Paths that are descendants of this Vertex
+     */
+    public List<Path<L, V>> descendantPaths() {
+        Path<L, V> p = new Path<L, V>();
+        List<Path<L, V>> paths = new ArrayList<>();
+        for (Vertex<L, V> child : this.getAllNeighbors()) {
+            traverseDescendants(child, paths, p);
+        }
+
+        return paths;
+    }
+
+    /**
+     * Traverses through descendant Vertices, finding Path instances.  A Path
+     * leads to one or more payloads stored as Vertex values.  This method is
+     * designed to be used recursively.
+     *
+     * @param vertex Vertex to query descendants
+     * @param paths List of Paths discovered thus far during traversal.  This is
+     * updated as new Path instances are found.
+     * @param currentPath The current Path being inspected by the traversal
+     */
+    protected void traverseDescendants(Vertex<L, V> vertex,
+            List<Path<L, V>> paths, Path<L, V> currentPath) {
+
+        Path<L, V> p = new Path<>(currentPath);
+        p.add(vertex);
+
+        if (vertex.getValues().size() > 0) {
+            /* If the vertex has values, we've found a path endpoint. */
+            paths.add(p);
+        }
+
+        for (Vertex<L, V> child : vertex.getAllNeighbors()) {
+            traverseDescendants(child, paths, p);
+        }
+    }
+
+    /**
+     * Retrieves the number of descendant vertices for this {@link Vertex}.
+     *
+     * @return number of descendants (children)
+     */
+    public long numDescendants() {
+        long total = this.getAllNeighbors().size();
+        for (Vertex<L, V> child : this.getAllNeighbors()) {
+            total += child.numDescendants();
+        }
+
+        return total;
     }
 
     /**
@@ -145,7 +217,11 @@ public class Vertex<L extends Comparable<L>, V> {
      */
     protected String toString(int indent) {
         String ls = System.lineSeparator();
-        String str = "(" + getLabel() + "," + getValue() + ")" + ls;
+        String valueStr = "";
+        for (V value : values) {
+            valueStr += value + ",";
+        }
+        String str = "(" + getLabel() + ", [" + valueStr + "])" + ls;
 
         String space = " ";
         for (int i = 0; i < indent; ++i) {
