@@ -40,6 +40,9 @@ public class DOT {
         writeGraphFooter(ps);
     }
 
+    /**
+     * Writes a vertex's information to a DOT file.
+     */
     private static void writeVertex(Vertex<?, ?> v, PrintStream ps) {
         ps.println("\"" + v.hashCode() + "\""
                 + " [label=\"" + v.getLabel() + "\"];");
@@ -53,15 +56,31 @@ public class DOT {
         }
     }
 
+    /**
+     * Connects two vertices in DOT format (v1 -- v2).
+     *
+     * @param from source vertex.  Generally the hashCode() of the object can be
+     * used as a unique identifier for the vertex.
+     * @param to destination vertex.  In general, use hashCode().
+     */
     private static void connect(int from, int to, PrintStream ps) {
         ps.println("\"" + from + "\" -- \"" + to + "\"");
     }
 
+    /**
+     * Writes graph header information, such as the graph title and settings.
+     *
+     * @param title Graph title
+     */
     private static void writeGraphHeader(String title, PrintStream ps) {
         ps.println("graph " + title + " {");
         ps.println("node [fontname=\"Helvetica\" fontsize=\"20\"]");
     }
 
+    /**
+     * Write any concluding DOT format information.  This includes the closing
+     * brace for the graph.
+     */
     private static void writeGraphFooter(PrintStream ps) {
         ps.println("}");
     }
