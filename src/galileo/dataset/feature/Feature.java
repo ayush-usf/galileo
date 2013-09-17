@@ -43,13 +43,12 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
 
     protected String name;
     protected FeatureData<? extends Comparable<?>> data;
-    protected double value;
 
     /**
      * Constructs a null Feature (no data).
      */
     public Feature(String name) {
-        this.name = name;
+        setName(name);
         this.data = new NullFeatureData();
     }
 
