@@ -213,6 +213,27 @@ public class Vertex<L extends Comparable<L>, V> {
     }
 
     /**
+     * Retrieves the number of descendant edges for this {@link Vertex}.  This
+     * count includes the links between descendants for scan operations.
+     *
+     * @return number of descendant edges.
+     */
+    public long numDescendantEdges() {
+        long total = 0;
+        int numNeighbors = this.getAllNeighbors().size();
+
+        if (numNeighbors > 0) {
+            total = numNeighbors + numNeighbors - 1;
+        }
+
+        for (Vertex<L, V> child : this.getAllNeighbors()) {
+            total += child.numDescendantEdges();
+        }
+
+        return total;
+    }
+
+    /**
      * Pretty-print this vertex (and its children) with a given indent level.
      */
     protected String toString(int indent) {
