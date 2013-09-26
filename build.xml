@@ -40,6 +40,10 @@
     <target name="jar" depends="compile">
         <mkdir dir="${lib}" />
 
+        <manifestclasspath property="jar.classpath" jarfile="${jar.name}">
+            <classpath refid="classpath" />
+        </manifestclasspath>
+
         <jar basedir="${build}" jarfile="${jar.name}">
             <manifest>
                 <attribute name="Built-By"
@@ -50,6 +54,7 @@
                         value="${project.version}" />
                 <attribute name="Specification-URL"
                         value="${project.url}" />
+                <attribute name="Class-Path" value="${jar.classpath}" />
             </manifest>
         </jar>
     </target>
