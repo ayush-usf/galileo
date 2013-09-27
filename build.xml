@@ -13,6 +13,7 @@
     <property name="build" value="classes" />
     <property name="lib" value="lib" />
     <property name="docs" value="docs/api" />
+    <property name="depcache" value="depcache" />
     <property name="jar.name"
             value="${lib}/${ant.project.name}-${project.version}.jar" />
 
@@ -23,6 +24,11 @@
 
     <target name="compile" description="Compile source files">
         <mkdir dir="${build}" />
+
+        <depend srcdir="${src}"
+                destdir="${build}"
+                cache="${depcache}"
+                closure="yes" />
 
         <javac srcdir="${src}"
                 destdir="${build}"
@@ -72,13 +78,17 @@
                 windowtitle="${doctitle}" />
     </target>
 
+    <!-- cleans up everything from the releaseclean task, plus additional files
+      that should not be cleaned up for a release -->
     <target name="clean" depends="releaseclean">
         <delete dir="${docs}" />
         <delete file="${jar.name}" />
     </target>
 
+    <!-- cleans up any files that should not be included in a release zip -->
     <target name="releaseclean">
         <delete dir="${build}" />
+        <delete dir="${depcache}" />
         <delete dir="release" />
         <delete file="${ant.project.name}-${project.version}.zip" />
     </target>
