@@ -1,0 +1,8 @@
+# Eclipse files
+.project
+.classpath
+
+# Local dev files
+classes
+depcache
+build.properties
