@@ -2,33 +2,33 @@
 
 <project name="Galileo" basedir="." default="jar">
     <!-- Build properties -->
-    <property name="project.version" value="0.4" />
-    <property name="project.url" value="http://galileo.cs.colostate.edu" />
+    <property name="project.version" value="0.4"/>
+    <property name="project.url" value="http://galileo.cs.colostate.edu"/>
     <tstamp>
-        <format property="build.date" pattern="MM-dd-yyyy" />
+        <format property="build.date" pattern="MM-dd-yyyy"/>
     </tstamp>
 
     <!-- Directories -->
-    <property name="src" value="src" />
-    <property name="build" value="classes" />
-    <property name="lib" value="lib" />
-    <property name="docs" value="docs/api" />
-    <property name="depcache" value="depcache" />
+    <property name="src" value="src"/>
+    <property name="build" value="classes"/>
+    <property name="lib" value="lib"/>
+    <property name="docs" value="docs/api"/>
+    <property name="depcache" value="depcache"/>
     <property name="jar.name"
-            value="${lib}/${ant.project.name}-${project.version}.jar" />
+            value="${lib}/${ant.project.name}-${project.version}.jar"/>
 
 
     <path id="classpath">
-        <fileset dir="." includes="lib/*.jar" />
+        <fileset dir="." includes="lib/*.jar"/>
     </path>
 
     <target name="compile" description="Compile source files">
-        <mkdir dir="${build}" />
+        <mkdir dir="${build}"/>
 
         <depend srcdir="${src}"
                 destdir="${build}"
                 cache="${depcache}"
-                closure="yes" />
+                closure="yes"/>
 
         <javac srcdir="${src}"
                 destdir="${build}"
@@ -36,61 +36,64 @@
                 debug="on"
                 includeantruntime="false">
 
-            <compilerarg value="-Xlint" />
+            <compilerarg value="-Xlint"/>
 
-            <exclude name="galileo/test/**" unless="build.tests" />
-            <exclude name="galileo/samples/**" unless="build.samples" />
+            <!-- These can be enabled selectively using ant command line options
+              (-Dbuild.tests=true) or you can override these properties by
+              creating a build.properties file for your local environment -->
+            <exclude name="galileo/test/**" unless="build.tests"/>
+            <exclude name="galileo/samples/**" unless="build.samples"/>
         </javac>
     </target>
 
     <target name="jar" depends="compile">
-        <mkdir dir="${lib}" />
+        <mkdir dir="${lib}"/>
 
         <manifestclasspath property="jar.classpath" jarfile="${jar.name}">
-            <classpath refid="classpath" />
+            <classpath refid="classpath"/>
         </manifestclasspath>
 
         <jar basedir="${build}" jarfile="${jar.name}">
             <manifest>
                 <attribute name="Built-By"
-                        value="${user.name}" />
+                        value="${user.name}"/>
                 <attribute name="Specification-Title"
-                        value="${ant.project.name}" />
+                        value="${ant.project.name}"/>
                 <attribute name="Specification-Version"
-                        value="${project.version}" />
+                        value="${project.version}"/>
                 <attribute name="Specification-URL"
-                        value="${project.url}" />
-                <attribute name="Class-Path" value="${jar.classpath}" />
+                        value="${project.url}"/>
+                <attribute name="Class-Path" value="${jar.classpath}"/>
             </manifest>
         </jar>
     </target>
 
     <target name="javadoc" description="Generates javadoc" depends="compile">
-        <mkdir dir="${docs}" />
+        <mkdir dir="${docs}"/>
 
         <property name="doctitle"
-                value="${ant.project.name} ${project.version} Documentation" />
+                value="${ant.project.name} ${project.version} Documentation"/>
 
         <javadoc sourcepath="${src}"
                 destdir="${docs}"
                 classpath="${classpath}"
                 doctitle="${doctitle}"
-                windowtitle="${doctitle}" />
+                windowtitle="${doctitle}"/>
     </target>
 
     <!-- cleans up everything from the releaseclean task, plus additional files
       that should not be cleaned up for a release -->
     <target name="clean" depends="releaseclean">
-        <delete dir="${docs}" />
-        <delete file="${jar.name}" />
+        <delete dir="${docs}"/>
+        <delete file="${jar.name}"/>
     </target>
 
     <!-- cleans up any files that should not be included in a release zip -->
     <target name="releaseclean">
-        <delete dir="${build}" />
-        <delete dir="${depcache}" />
-        <delete dir="release" />
-        <delete file="${ant.project.name}-${project.version}.zip" />
+        <delete dir="${build}"/>
+        <delete dir="${depcache}"/>
+        <delete dir="release"/>
+        <delete file="${ant.project.name}-${project.version}.zip"/>
     </target>
 
     <target name="release" depends="compile,jar,javadoc,releaseclean">
@@ -99,15 +102,15 @@
         <echo>Operating System: ${os.name} ${os.version}</echo>
 
         <property name="reldir"
-            value="release/${ant.project.name}-${project.version}" />
-        <mkdir dir="${reldir}" />
+            value="release/${ant.project.name}-${project.version}"/>
+        <mkdir dir="${reldir}"/>
         <copy todir="${reldir}">
             <!-- ignore hidden files -->
-            <fileset dir="." excludes="**/.*" />
+            <fileset dir="." excludes="**/.*"/>
         </copy>
-        <delete dir="${reldir}/release" />
+        <delete dir="${reldir}/release"/>
         <zip destfile="${ant.project.name}-${project.version}.zip"
-             basedir="release" />
-        <delete dir="release" />
+             basedir="release"/>
+        <delete dir="release"/>
     </target>
 </project>
