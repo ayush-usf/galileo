@@ -12,3 +12,6 @@ following log levels:
 The FINE, FINER, FINEST levels, along with stdout and stderr, should be used for
 internal development purposes only.  stdout and stderr can also be used for
 output in client-side applications.
+
+INFO can be used for debugging in production, otherwise WARNING or higher should
+be logged.
