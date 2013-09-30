@@ -234,6 +234,21 @@ public class Vertex<L extends Comparable<L>, V> {
     }
 
     /**
+     * Removes all the edges from this Vertex, severing any connections with
+     * neighboring vertices.
+     */
+    public void clearEdges() {
+        edges.clear();
+    }
+
+    /**
+     * Clears all values associated with this Vertex.
+     */
+    public void clearValues() {
+        values.clear();
+    }
+
+    /**
      * Pretty-print this vertex (and its children) with a given indent level.
      */
     protected String toString(int indent) {

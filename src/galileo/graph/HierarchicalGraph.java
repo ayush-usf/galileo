@@ -195,6 +195,12 @@ public class HierarchicalGraph<T> {
     private void checkFeatureTypes(Path<Feature, T> path)
     throws FeatureTypeMismatchException {
         for (Feature feature : path.getLabels()) {
+
+            /* If this feature is NULL, then it's effectively a wildcard. */
+            if (feature.getType() == FeatureType.NULL) {
+                continue;
+            }
+
             Level level = levels.get(feature.getName());
             if (level != null) {
                 if (level.type != feature.getType()) {
@@ -309,10 +315,22 @@ public class HierarchicalGraph<T> {
         return order;
     }
 
+    /**
+     * Retrieves the ordering of Feature names in this graph hierarchy.
+     */
+    public Queue<String> getFeatureHierarchy() {
+        return new LinkedList<String>(features);
+    }
+
     public List<Path<Feature, T>> getAllPaths() {
         List<Path<Feature, T>> paths = root.descendantPaths();
         for (Path<Feature, T> path : paths) {
             removeNullFeatures(path);
+
+            /* Remove inter-vertex links */
+            for (Vertex<Feature, T> vertex : path.getVertices()) {
+                vertex.clearEdges();
+            }
         }
         return paths;
     }
