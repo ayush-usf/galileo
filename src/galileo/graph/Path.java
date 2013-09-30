@@ -113,8 +113,13 @@ implements Iterable<Vertex<L, V>> {
         String str = "";
         for (int i = 0; i < vertices.size(); ++i) {
             str += vertices.get(i).getLabel();
+
             if (i < vertices.size() - 1) {
                 str += " -> ";
+            } else {
+                /* Include the path 'payload' */
+                str += " ";
+                str += vertices.get(i).getValues();
             }
         }
 
