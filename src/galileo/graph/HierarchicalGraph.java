@@ -273,11 +273,17 @@ public class HierarchicalGraph<T> {
      * @param path Path to remove null Features from.
      */
     private void removeNullFeatures(Path<Feature, T> path) {
-        for (int i = 0; i < path.size(); ++i) {
-            Feature f = path.get(i).getLabel();
+        List<Vertex<Feature, T>> removals = new ArrayList<>();
+
+        for (Vertex<Feature, T> v : path) {
+            Feature f = v.getLabel();
             if (f == null || f.getType() == FeatureType.NULL) {
-                path.remove(i);
+                removals.add(v);
             }
+        }
+
+        for (Vertex<Feature, T> v : removals) {
+            path.remove(v);
         }
     }
 

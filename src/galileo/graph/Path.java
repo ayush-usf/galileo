@@ -79,6 +79,10 @@ implements Iterable<Vertex<L, V>> {
         vertices.remove(index);
     }
 
+    public boolean remove(Vertex<L, V> vertex) {
+        return vertices.remove(vertex);
+    }
+
     public Vertex<L, V> get(int index) {
         return vertices.get(index);
     }
