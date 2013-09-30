@@ -25,13 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.serialization;
 
+import galileo.util.StackTraceToString;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import java.lang.reflect.Constructor;
 import java.util.logging.Level;
@@ -115,23 +115,16 @@ public class Serializer {
                 type.getConstructor(SerializationInputStream.class);
             obj = constructor.newInstance(in);
         } catch (Exception e) {
-
             /* We compress the myriad of possible exceptions that could occur
              * here down to a single exception (SerializationException) to
              * simplify implementations.  However, if the current log level
              * permits, we also embed more information in the exception detail
              * message. */
-
             if (logger.isLoggable(Level.INFO)) {
-                StringWriter writer = new StringWriter();
-                PrintWriter printer = new PrintWriter(writer, true);
-                e.printStackTrace(printer);
-                String moreInfo = writer.toString();
-                printer.close();
-
                 throw new SerializationException("Could not instantiate object "
                         + "for deserialization.  Details: "
-                        + System.lineSeparator() + moreInfo);
+                        + System.lineSeparator()
+                        + StackTraceToString.convert(e));
             } else {
                 throw new SerializationException("Could not instantiate object "
                         + "for deserialization");
