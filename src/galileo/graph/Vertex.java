@@ -253,11 +253,7 @@ public class Vertex<L extends Comparable<L>, V> {
      */
     protected String toString(int indent) {
         String ls = System.lineSeparator();
-        String valueStr = "";
-        for (V value : values) {
-            valueStr += value + ",";
-        }
-        String str = "(" + getLabel() + ", [" + valueStr + "])" + ls;
+        String str = "(" + getLabel() + " " + values + ")" + ls;
 
         String space = " ";
         for (int i = 0; i < indent; ++i) {
