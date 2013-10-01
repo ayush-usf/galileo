@@ -85,11 +85,37 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
+     * Constructs an interval Feature with bounds specified as int values.
+     */
+    public Feature(String name, int value1, int value2) {
+        setName(name);
+        this.data = new IntegerIntervalFeatureData(value1, value2);
+    }
+
+    /**
      * Constructs an interval Feature with bounds specified as long values.
      */
     public Feature(String name, long value1, long value2) {
         setName(name);
         this.data = new LongIntervalFeatureData(value1, value2);
+    }
+
+    /**
+     * Constructs an interval Feature with bounds specified as floating point
+     * values.
+     */
+    public Feature(String name, float value1, float value2) {
+        setName(name);
+        this.data = new FloatIntervalFeatureData(value1, value2);
+    }
+
+    /**
+     * Constructs an interval Feature with bounds specified as double-precision
+     * floating point values.
+     */
+    public Feature(String name, double value1, double value2) {
+        setName(name);
+        this.data = new DoubleIntervalFeatureData(value1, value2);
     }
 
     /**
@@ -137,6 +163,37 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
      */
     public String getString() {
         return data.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 773;
+        int result = 1;
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Feature other = (Feature) obj;
+        if (this.name.equals(other.name) && this.data.equals(other.data)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
