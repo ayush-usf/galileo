@@ -186,10 +186,11 @@ public class Vertex<L extends Comparable<L>, V> {
             List<Path<L, V>> paths, Path<L, V> currentPath) {
 
         Path<L, V> p = new Path<>(currentPath);
-        p.add(vertex);
+        p.add(new Vertex<>(vertex));
 
         if (vertex.getValues().size() > 0) {
             /* If the vertex has values, we've found a path endpoint. */
+            p.setPayload(vertex.getValues());
             paths.add(p);
         }
 

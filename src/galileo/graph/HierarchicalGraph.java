@@ -46,6 +46,7 @@ import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Operator;
 import galileo.query.Query;
+import galileo.util.Pair;
 
 /**
  * A type-aware hierarchical graph implementation with each type occupying a
@@ -90,15 +91,14 @@ public class HierarchicalGraph<T> {
 
     /**
      * Creates a HierarchicalGraph with a set Feature hierarchy.  Features are
-     * entered into the hierarchy in the order they are received.  Feature
-     * values are not inspected by this constructor.
+     * entered into the hierarchy in the order they are received.
      *
-     * @param featureOrdering a List of Features that represents how the
-     * hierarchy in the graph should be built.
+     * @param hierarchy Graph hierarchy represented as a
+     * {@link FeatureHierarchy}.
      */
-    public HierarchicalGraph(List<Feature> featureOrdering) {
-        for (Feature feature : featureOrdering) {
-            getOrder(feature);
+    public HierarchicalGraph(FeatureHierarchy hierarchy) {
+        for (Pair<String, FeatureType> feature : hierarchy) {
+            getOrder(feature.a, feature.b);
         }
     }
 
@@ -169,7 +169,7 @@ public class HierarchicalGraph<T> {
     /**
      * Adds a new {@link Path} to the Hierarchical Graph.
      */
-    public void addPath(Path<Feature, T> path, T payload)
+    public void addPath(Path<Feature, T> path)
     throws FeatureTypeMismatchException {
         checkFeatureTypes(path);
         addNullFeatures(path);
@@ -177,7 +177,7 @@ public class HierarchicalGraph<T> {
         optimizePath(path);
 
         /* Place the path payload (traversal result) at the end of this path. */
-        path.get(path.size() - 1).addValue(payload);
+        path.get(path.size() - 1).addValues(path.getPayload());
 
         root.addPath(path.iterator());
     }
@@ -297,26 +297,30 @@ public class HierarchicalGraph<T> {
      *
      * @return int representing the list ordering of the Feature
      */
-    private int getOrder(Feature feature) {
+    private int getOrder(String name, FeatureType type) {
         int order;
-        Level level = levels.get(feature.getName());
+        Level level = levels.get(name);
         if (level != null) {
             order = level.order;
         } else {
-            order = addNewFeature(feature);
+            order = addNewFeature(name, type);
         }
 
         return order;
     }
 
+    private int getOrder(Feature feature) {
+        return getOrder(feature.getName(), feature.getType());
+    }
+
     /**
      * Update the hierarchy levels and known Feature list with a new Feature.
      */
-    private int addNewFeature(Feature feature) {
-        logger.info("New feature: " + feature.getName());
+    private int addNewFeature(String name, FeatureType type) {
+        logger.info("New feature: " + name);
         Integer order = levels.keySet().size();
-        levels.put(feature.getName(), new Level(order, feature.getType()));
-        features.offer(feature.getName());
+        levels.put(name, new Level(order, type));
+        features.offer(name);
 
         return order;
     }
@@ -324,19 +328,24 @@ public class HierarchicalGraph<T> {
     /**
      * Retrieves the ordering of Feature names in this graph hierarchy.
      */
-    public Queue<String> getFeatureHierarchy() {
-        return new LinkedList<String>(features);
+    public FeatureHierarchy getFeatureHierarchy() {
+        FeatureHierarchy hierarchy = new FeatureHierarchy();
+        for (String feature : features) {
+            try {
+                hierarchy.addFeature(feature, levels.get(feature).type);
+            } catch (GraphException e) {
+                /* If a GraphException is thrown here, something is seriously
+                 * wrong. */
+                logger.severe("NULL FeatureType found in graph hierarchy!");
+            }
+        }
+        return hierarchy;
     }
 
     public List<Path<Feature, T>> getAllPaths() {
         List<Path<Feature, T>> paths = root.descendantPaths();
         for (Path<Feature, T> path : paths) {
             removeNullFeatures(path);
-
-            /* Remove inter-vertex links */
-            for (Vertex<Feature, T> vertex : path.getVertices()) {
-                vertex.clearEdges();
-            }
         }
         return paths;
     }

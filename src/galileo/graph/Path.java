@@ -26,8 +26,10 @@ software, even if advised of the possibility of such damage.
 package galileo.graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,6 +43,7 @@ public class Path<L extends Comparable<L>, V>
 implements Iterable<Vertex<L, V>> {
 
     private List<Vertex<L, V>> vertices = new ArrayList<>();
+    protected Collection<V> payload = new HashSet<V>();
 
     /**
      * Create a Path with a number of vertices pre-populated.
@@ -50,6 +53,24 @@ implements Iterable<Vertex<L, V>> {
         for (Vertex<L, V> vertex : vertices) {
             this.vertices.add(vertex);
         }
+    }
+
+    /**
+     * Create a Path with a single payload and number of vertices pre-populated.
+     */
+    @SafeVarargs
+    public Path(V payload, Vertex<L, V>... vertices) {
+        this(vertices);
+        addPayload(payload);
+    }
+
+    /**
+     * Create a Path with payload(s) and number of vertices pre-populated.
+     */
+    @SafeVarargs
+    public Path(Collection<V> payload, Vertex<L, V>... vertices) {
+        this(vertices);
+        setPayload(payload);
     }
 
     /**
@@ -91,6 +112,21 @@ implements Iterable<Vertex<L, V>> {
         return vertices;
     }
 
+    public Collection<V> getPayload() {
+        return payload;
+    }
+
+    public void setPayload(Collection<V> payload) {
+        this.payload.clear();
+        for (V v : payload) {
+            this.payload.add(v);
+        }
+    }
+
+    public void addPayload(V payload) {
+        this.payload.add(payload);
+    }
+
     /**
      * Retrieve a list of the {@link Vertex} labels in this Path.
      */
@@ -122,8 +158,7 @@ implements Iterable<Vertex<L, V>> {
                 str += " -> ";
             } else {
                 /* Include the path 'payload' */
-                str += " ";
-                str += vertices.get(i).getValues();
+                str += " " + payload.toString();
             }
         }
 
