@@ -29,6 +29,11 @@ import java.util.Collection;
 
 import galileo.dataset.feature.Feature;
 
+/**
+ * Contains a graph {@link Path} composed of Features.
+ *
+ * @author malensek
+ */
 public class FeaturePath<V> extends Path<Feature, V> {
 
     public FeaturePath(Feature... features) {
