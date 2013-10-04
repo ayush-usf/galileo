@@ -67,6 +67,30 @@ public class Welford {
                 1.707825127659933, rs.std(), EPSILON);
      }
 
+    @Test
+    public void presetValues4() {
+        double d[] = { 1.0, 2.0, 4.0 };
+        RunningStatistics rs = new RunningStatistics(d);
+        assertEquals("mean of vals: " + stringify(d),
+                2.3333333333333333, rs.mean(), EPSILON);
+        assertEquals("var of vals: " + stringify(d),
+                1.5555555555555555, rs.var(), EPSILON);
+        assertEquals("std of vals: " + stringify(d),
+                1.247219128924647, rs.std(), EPSILON);
+    }
+
+    @Test
+    public void presetValues5() {
+        double d[] = { 1.0 };
+        RunningStatistics rs = new RunningStatistics(d);
+        assertEquals("mean of vals: " + stringify(d),
+                1.0, rs.mean(), EPSILON);
+        assertEquals("var of vals: " + stringify(d),
+                0.0, rs.var(), EPSILON);
+        assertEquals("std of vals: " + stringify(d),
+                0.0, rs.std(), EPSILON);
+    }
+
     /**
      * Test sample stats instead of population stats (ddof = 1).
      */
