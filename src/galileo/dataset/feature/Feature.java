@@ -165,6 +165,14 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
         return data.toString();
     }
 
+    public boolean greater(Feature f) {
+        return this.compareTo(f) > 0;
+    }
+
+    public boolean less(Feature f) {
+        return this.compareTo(f) < 0;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 773;
@@ -199,6 +207,10 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     @Override
     public int compareTo(Feature otherFeature) {
         return this.data.compareTo(otherFeature.data);
+    }
+
+    public String dataToString() {
+        return "" + data;
     }
 
     @Override
