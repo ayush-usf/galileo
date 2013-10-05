@@ -36,9 +36,7 @@ import galileo.util.StackTraceToString;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class MetadataGraph implements ByteSerializable {
 
@@ -53,7 +51,7 @@ public class MetadataGraph implements ByteSerializable {
     }
 
     public void addPath(Path<Feature, String> path)
-    throws FeatureTypeMismatchException {
+    throws FeatureTypeMismatchException, GraphException {
         graph.addPath(path);
     }
 
@@ -66,11 +64,11 @@ public class MetadataGraph implements ByteSerializable {
      * @param hierarchy the new FeatureHierarchy this graph should take on.
      */
     public void reorient(FeatureHierarchy hierarchy)
-    throws FeatureTypeMismatchException {
+    throws FeatureTypeMismatchException, GraphException {
         List<Path<Feature, String>> paths = graph.getAllPaths();
         graph = new HierarchicalGraph<>(hierarchy);
         for(Path<Feature, String> path : paths) {
-            graph.addPath(path);
+            addPath(path);
         }
     }
 

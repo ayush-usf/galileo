@@ -170,11 +170,16 @@ public class HierarchicalGraph<T> {
      * Adds a new {@link Path} to the Hierarchical Graph.
      */
     public void addPath(Path<Feature, T> path)
-    throws FeatureTypeMismatchException {
+    throws FeatureTypeMismatchException, GraphException {
         checkFeatureTypes(path);
         addNullFeatures(path);
         reorientPath(path);
         optimizePath(path);
+
+        /* Ensure the path contains a payload. */
+        if (path.getPayload().size() == 0) {
+            throw new GraphException("Attempted to add Path with no payload!");
+        }
 
         /* Place the path payload (traversal result) at the end of this path. */
         path.get(path.size() - 1).addValues(path.getPayload());
