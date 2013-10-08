@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.query;
 
+import galileo.dataset.feature.Feature;
+
 /**
  * Representation of a query expression.  For example: x != 3.6.  Contains an
  * operator, and an associated value.
@@ -34,18 +36,28 @@ package galileo.query;
 public class Expression {
 
     public Operator operator;
-    public double value;
+    public Feature value;
 
     public Expression() { }
 
-    public Expression(Operator operator, double value) {
+    public Expression(Operator operator, Feature value) {
         this.operator = operator;
         this.value = value;
     }
 
-    public Expression(String operator, double value) {
+    public Expression(String operator, Feature value) {
         this.operator = Operator.fromString(operator);
         this.value = value;
+    }
+
+    public Expression(Operator operator, double value) {
+        this.operator = operator;
+        this.value = new Feature(value);
+    }
+
+    public Expression(String operator, double value) {
+        this.operator = Operator.fromString(operator);
+        this.value = new Feature(value);
     }
 
     @Override
