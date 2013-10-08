@@ -117,10 +117,7 @@ implements Iterable<Vertex<L, V>> {
     }
 
     public void setPayload(Collection<V> payload) {
-        this.payload.clear();
-        for (V v : payload) {
-            this.payload.add(v);
-        }
+        this.payload = payload;
     }
 
     public void addPayload(V payload) {

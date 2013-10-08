@@ -213,7 +213,8 @@ public class HierarchicalGraph<T> {
                             "Feature insertion at graph level " + level.order
                             + " is not possible due to a FeatureType mismatch. "
                             + "Expected: " + level.type + ", "
-                            + "found: " + feature.getType());
+                            + "found: " + feature.getType() + "; "
+                            + "Feature: <" + feature + ">");
                 }
             }
         }
@@ -225,16 +226,13 @@ public class HierarchicalGraph<T> {
      * is not available.
      */
     private void addNullFeatures(Path<Feature, T> path) {
-        Set<String> knownFeatures = new HashSet<>(levels.keySet());
-        Set<String> pathFeatures = new HashSet<>();
+        Set<String> unknownFeatures = new HashSet<>(levels.keySet());
         for (Feature feature : path.getLabels()) {
-            pathFeatures.add(feature.getName());
+            unknownFeatures.remove(feature.getName());
         }
 
-        knownFeatures.removeAll(pathFeatures);
-
         /* Create null features for missing values */
-        for (String featureName : knownFeatures) {
+        for (String featureName : unknownFeatures) {
             Vertex<Feature, T> v = new Vertex<>();
             v.setLabel(new Feature(featureName));
             path.add(v);
@@ -322,7 +320,7 @@ public class HierarchicalGraph<T> {
      * Update the hierarchy levels and known Feature list with a new Feature.
      */
     private int addNewFeature(String name, FeatureType type) {
-        logger.info("New feature: " + name);
+        logger.info("New feature: " + name + ", type: " + type);
         Integer order = levels.keySet().size();
         levels.put(name, new Level(order, type));
         features.offer(name);
