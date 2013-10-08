@@ -45,6 +45,13 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     protected FeatureData<? extends Comparable<?>> data;
 
     /**
+     * Constructs a nameless, null Feature (no data).
+     */
+    public Feature() {
+        this("");
+    }
+
+    /**
      * Constructs a null Feature (no data).
      */
     public Feature(String name) {
@@ -61,11 +68,25 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
+     * Constructs a nameless integer Feature.
+     */
+    public Feature(int value) {
+        this("", value);
+    }
+
+    /**
      * Constructs a long Feature.
      */
     public Feature(String name, long value) {
         setName(name);
         this.data = new LongFeatureData(value);
+    }
+
+    /**
+     * Constructs a nameless long Feature.
+     */
+    public Feature(long value) {
+        this("", value);
     }
 
     /**
@@ -77,11 +98,25 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
+     * Constructs a nameless floating point Feature.
+     */
+    public Feature(float value) {
+        this("", value);
+    }
+
+    /**
      * Constructs a double-precision floating point Feature.
      */
     public Feature(String name, double value) {
         setName(name);
         this.data = new DoubleFeatureData(value);
+    }
+
+    /**
+     * Constructs a nameless double-precision floating point Feature.
+     */
+    public Feature(double value) {
+        this("", value);
     }
 
     /**
@@ -93,11 +128,26 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
+     * Constructs a nameless interval Feature with bounds specified as int
+     * values.
+     */
+    public Feature(int value1, int value2) {
+        this("", value1, value2);
+    }
+
+    /**
      * Constructs an interval Feature with bounds specified as long values.
      */
     public Feature(String name, long value1, long value2) {
         setName(name);
         this.data = new LongIntervalFeatureData(value1, value2);
+    }
+
+    /**
+     * Constructs an interval Feature with bounds specified as long values.
+     */
+    public Feature(long value1, long value2) {
+        this("", value1, value2);
     }
 
     /**
@@ -110,12 +160,28 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
+     * Constructs a nameless interval Feature with bounds specified as floating
+     * point values.
+     */
+    public Feature(float value1, float value2) {
+        this("", value1, value2);
+    }
+
+    /**
      * Constructs an interval Feature with bounds specified as double-precision
      * floating point values.
      */
     public Feature(String name, double value1, double value2) {
         setName(name);
         this.data = new DoubleIntervalFeatureData(value1, value2);
+    }
+
+    /**
+     * Constructs a nameless interval Feature with bounds specified as
+     * double-precision floating point values.
+     */
+    public Feature(double value1, double value2) {
+        this("", value1, value2);
     }
 
     /**
@@ -215,6 +281,10 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
 
     @Override
     public String toString() {
+        if (name.equals("")) {
+            return "(unnamed feature)=" + data;
+        }
+
         return name + "=" + data;
     }
 
