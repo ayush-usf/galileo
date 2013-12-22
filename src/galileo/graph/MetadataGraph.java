@@ -27,6 +27,7 @@ package galileo.graph;
 
 import galileo.dataset.feature.Feature;
 import galileo.dataset.feature.FeatureType;
+import galileo.query.Query;
 import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
@@ -70,6 +71,10 @@ public class MetadataGraph implements ByteSerializable {
         for(Path<Feature, String> path : paths) {
             addPath(path);
         }
+    }
+
+    public void evaluateQuery(Query query) {
+        graph.evaluateQuery(query);
     }
 
     public long numVertices() {

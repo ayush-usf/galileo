@@ -46,6 +46,7 @@ import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Operator;
 import galileo.query.Query;
+import galileo.serialization.Serializer;
 import galileo.util.Pair;
 
 /**
@@ -64,6 +65,7 @@ public class HierarchicalGraph<T> {
     /** Describes each level in the hierarchy. */
     private Map<String, Level> levels = new HashMap<>();
 
+        public static byte[] s = null;
     /**
      * We maintain a separate Queue with Feature names inserted in
      * hierarchical order.  While levels.keySet() contains the same information,
@@ -102,21 +104,27 @@ public class HierarchicalGraph<T> {
         }
     }
 
-    public void evaluateQuery(Query q) {
+    public void evaluateQuery(Query query) {
         HierarchicalQueryTracker<T> tracker
             = new HierarchicalQueryTracker<>(root);
 
         for (String feature : features) {
-            List<Operation> operations = q.getOperations(feature);
+            List<Operation> operations = query.getOperations(feature);
             List<Vertex<Feature, T>> results
                 = evaluateOperations(operations, tracker);
             tracker.addResults(results);
         }
-        System.out.println(tracker);
+        //System.out.println(tracker);
 
-        System.out.println("Results: --- ");
+        //System.out.println("Results: --- ");
+        System.out.println("num=" + tracker.getQueryResults().size());
         for (Vertex<Feature, T> result : tracker.getQueryResults()) {
-            System.out.println(result);
+            try {
+            s = Serializer.serialize(result.getLabel());
+            } catch (Exception e) { }
+        }
+        if (s != null && s[0] == 3) {
+            
         }
     }
 
@@ -156,7 +164,7 @@ public class HierarchicalGraph<T> {
         for (Expression expression : expressions) {
             if (expression.operator == Operator.EQUAL) {
                 Vertex<Feature, T> neighbor
-                    = vertex.getNeighbor(new Feature("", expression.value));
+                    = vertex.getNeighbor(expression.value);
                 Set<Vertex<Feature, T>> neighborSet = new HashSet<>();
                 neighborSet.add(neighbor);
                 resultSet.retainAll(neighborSet);
