@@ -42,8 +42,8 @@
             <!-- These can be enabled selectively using ant command line options
               (-Dbuild.tests=true) or you can override these properties by
               creating a build.properties file for your local environment -->
-            <exclude name="galileo/test/**" unless="build.tests"/>
-            <exclude name="galileo/samples/**" unless="build.samples"/>
+            <exclude name="galileo/test/**" unless="${build.tests}"/>
+            <exclude name="galileo/samples/**" unless="${build.samples}"/>
         </javac>
     </target>
 
