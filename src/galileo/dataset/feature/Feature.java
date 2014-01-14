@@ -27,6 +27,8 @@ package galileo.dataset.feature;
 
 import java.io.IOException;
 
+import java.lang.reflect.Constructor;
+
 import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
@@ -192,6 +194,45 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
         this.data = new StringFeatureData(value);
     }
 
+    public Feature(Object value) {
+        this("", value);
+    }
+
+    public Feature(String name, Object value) {
+        setName(name);
+        FeatureType type = FeatureType.fromPrimitiveType(value);
+        if (type == null) {
+            throw new IllegalArgumentException("Cannot construct a Feature "
+                    + "from this Java type.");
+        }
+
+        switch (type) {
+            case INT:
+                this.data = new IntegerFeatureData((int) value);
+                break;
+
+            case LONG:
+                this.data = new LongFeatureData((long) value);
+                break;
+
+            case FLOAT:
+                this.data = new FloatFeatureData((float) value);
+                break;
+
+            case DOUBLE:
+                this.data = new DoubleFeatureData((double) value);
+                break;
+
+            case STRING:
+                this.data = new StringFeatureData((String) value);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Could not instantiate "
+                        + "FeatureData");
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -282,7 +323,11 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     @Override
     public String toString() {
         if (name.equals("")) {
-            return "(unnamed feature)=" + data;
+            if (data.getType() == FeatureType.NULL) {
+                return "[null]";
+            } else {
+                return "(unnamed feature)=" + data;
+            }
         }
 
         return name + "=" + data;
