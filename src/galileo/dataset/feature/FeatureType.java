@@ -92,7 +92,8 @@ public enum FeatureType {
      *
      * @param type The basic Java type to inspect
      *
-     * @return Corresponding FeatureType for the Java type.
+     * @return Corresponding FeatureType for the Java type, or null if no
+     * FeatureType exists.
      */
     public static <T> FeatureType fromPrimitiveType(T type) {
         return primitiveMap.get(type.getClass());
