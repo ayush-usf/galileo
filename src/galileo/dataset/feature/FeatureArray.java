@@ -1,6 +1,29 @@
-package galileo.dataset.feature;
+/*
+Copyright (c) 2013, Colorado State University
+All rights reserved.
 
-import galileo.util.Counter;
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+This software is provided by the copyright holders and contributors "as is" and
+any express or implied warranties, including, but not limited to, the implied
+warranties of merchantability and fitness for a particular purpose are
+disclaimed. In no event shall the copyright holder or contributors be liable for
+any direct, indirect, incidental, special, exemplary, or consequential damages
+(including, but not limited to, procurement of substitute goods or services;
+loss of use, data, or profits; or business interruption) however caused and on
+any theory of liability, whether in contract, strict liability, or tort
+(including negligence or otherwise) arising in any way out of the use of this
+software, even if advised of the possibility of such damage.
+*/
+
+package galileo.dataset.feature;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -71,6 +94,13 @@ public class FeatureArray {
         constructBackingStore(dimensions);
     }
 
+    /**
+     * Creates a flat (1D) array that will be used to store Feature values for
+     * the given dimensions.
+     *
+     * @param dimensions The dimensions of the array; for example, (10, 30)
+     * would produce a 2D array of size 10x30.
+     */
     private void constructBackingStore(int... dimensions) {
         this.dimensions = dimensions;
 
@@ -103,17 +133,33 @@ public class FeatureArray {
      * @param features Java array containing feature values
      */
     public FeatureArray(String name, Object features) {
+        this.named = true;
+        this.name = name;
+        this.typed = true;
+
         int[] dimensions = getMaxDimensions(features);
         constructBackingStore(dimensions);
-        System.out.println("dims=" + this.getSize());
         convertNativeArray(features);
     }
 
+    /**
+     * Converts a ND native array to a FeatureArray.
+     *
+     * @param array multidimensional native array to convert.
+     */
     private void convertNativeArray(Object array) {
         AtomicInteger counter = new AtomicInteger();
         convertNativeArray(counter, array);
     }
 
+    /**
+     * Recursive method for converting a native array to a FeatureArray.  This
+     * method scans through the native array, creating Feature instances and
+     * populating the FeatureArray as it goes.
+     *
+     * @param counter used to track the 1D array indices as they are populated
+     * @param array multidimensional native array to convert
+     */
     private void convertNativeArray(AtomicInteger counter, Object array) {
         try {
             Array.getLength(array);
@@ -122,8 +168,14 @@ public class FeatureArray {
             int index = counter.getAndIncrement();
             Feature feature;
             try {
-                feature = new Feature(array);
+                feature = Feature.fromNativeType(array);
+
+                if (this.type == null) {
+                    this.type = feature.getType();
+                }
             } catch (NullPointerException npe) {
+                /* A null pointer here means that there was nothing in the array
+                 * that was passed in, so we convert it to a NullFeature. */
                 feature = new Feature();
             }
             features.set(index, feature);
@@ -136,6 +188,15 @@ public class FeatureArray {
         }
     }
 
+    /**
+     * Determines the largest dimensions of a multidimensional Java array --
+     * this is useful because Java arrays can be jagged, whereas Galileo arrays
+     * are not.
+     *
+     * @param features Multidimensional java array of features
+     *
+     * @return Maximum dimensions of the array passed in
+     */
     private int[] getMaxDimensions(Object features) {
         List<Integer> maxes = new ArrayList<>();
         getMaxDimensions(0, maxes, features);
@@ -147,6 +208,15 @@ public class FeatureArray {
         return dimensions;
     }
 
+    /**
+     * Recursive method to scan for the largest dimensions in the array.  Since
+     * Java arrays can be jagged, each element's size must be checked.
+     *
+     * @param level Current dimension being scanned (0 = first dim of array)
+     * @param maxes The largest sized array seen so far, for each level.  This
+     * is updated as the scan takes place.
+     * @param features Feature arrays to scan
+     */
     private void getMaxDimensions(
             int level, List<Integer> maxes, Object features) {
         int length;
@@ -191,6 +261,9 @@ public class FeatureArray {
         return index;
     }
 
+    /**
+     * Ensures that the provided indices are not out of bounds.
+     */
     private void checkIndexBounds(int... indices) {
         for (int i = 0; i < dimensions.length; ++i) {
             if (indices[i] >= dimensions[i]) {
@@ -199,30 +272,60 @@ public class FeatureArray {
         }
     }
 
+    /**
+     * Retrieves the Feature at the provided indices.
+     */
     public Feature get(int... indices) {
         int index = getIndex(indices);
-        System.out.println(index);
-        return features.get(index);
+        Feature feature = features.get(index);
+        if (this.named == false) {
+            return feature;
+        } else {
+            return new Feature(this.name, feature);
+        }
     }
 
+    /**
+     * Sets the value of the Feature at the provided indices.
+     */
     public void set(Feature feature, int... indices) {
+        if (this.typed) {
+            if (feature.getType() != this.type) {
+                throw new IllegalArgumentException("FeatureType mismatch. "
+                        + "Array Type: " + this.type + "; "
+                        + "Feature Type: " + feature.getType());
+            }
+        }
         int index = getIndex(indices);
         features.set(index, feature);
     }
 
+    /**
+     * Clears the Feature at the provided indices.  This would be the same as
+     * setting the array element to a NullFeatureData instance.
+     */
     public void erase(int... indices) {
         int index = getIndex(indices);
         features.set(index, new Feature());
     }
 
+    /**
+     * Retrieves the rank (dimensionality) of this array.
+     */
     public int getRank() {
         return dimensions.length;
     }
 
+    /**
+     * Gets the size of the dimensions in this array.
+     */
     public int[] getDimensions() {
         return dimensions;
     }
 
+    /**
+     * Retrieves the overall size of the (flattened) array.
+     */
     public int getSize() {
         return features.size();
     }
