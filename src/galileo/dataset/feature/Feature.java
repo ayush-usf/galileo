@@ -192,39 +192,54 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
         this.data = new StringFeatureData(value);
     }
 
-    public Feature(Object value) {
-        this("", value);
+    /**
+     * Creates a shallow copy of a Feature.
+     */
+    public Feature(Feature feature) {
+        this(feature.name, feature);
     }
 
-    public Feature(String name, Object value) {
+    /**
+     * Creates a shallow copy of a Feature with the provided name.
+     */
+    public Feature(String name, Feature feature) {
         setName(name);
-        FeatureType type = FeatureType.fromPrimitiveType(value);
+        this.data = feature.data;
+    }
+
+    /**
+     * Converts a native Object to a nameless Feature.  Useful if the Object
+     * type is not known in advance.
+     *
+     * @param o Object to convert to a Feature
+     */
+    public static Feature fromNativeType(Object o) {
+        return fromNativeType("", o);
+    }
+
+    /**
+     * Converts a native Object to a Feature if the Object type is not known in
+     * advance.  This is done by determining if the provided object is an
+     * instance of a valid Feature type, and then casting the Object to the
+     * type.  In general, this method should only be used in special cases where
+     * an item's type is not known already.
+     *
+     * @param name Name of the resulting Feature
+     * @param o Object to convert to a Feature
+     */
+    public static Feature fromNativeType(String name, Object o) {
+        FeatureType type = FeatureType.fromPrimitiveType(o);
         if (type == null) {
             throw new IllegalArgumentException("Cannot construct a Feature "
-                    + "from this Java type.");
+                    + "from this type.");
         }
 
         switch (type) {
-            case INT:
-                this.data = new IntegerFeatureData((int) value);
-                break;
-
-            case LONG:
-                this.data = new LongFeatureData((long) value);
-                break;
-
-            case FLOAT:
-                this.data = new FloatFeatureData((float) value);
-                break;
-
-            case DOUBLE:
-                this.data = new DoubleFeatureData((double) value);
-                break;
-
-            case STRING:
-                this.data = new StringFeatureData((String) value);
-                break;
-
+            case INT: return new Feature(name, (int) o);
+            case LONG: return new Feature(name, (long) o);
+            case FLOAT: return new Feature(name, (float) o);
+            case DOUBLE: return new Feature(name, (double) o);
+            case STRING: return new Feature(name, (String) o);
             default:
                 throw new IllegalArgumentException("Could not instantiate "
                         + "FeatureData");
