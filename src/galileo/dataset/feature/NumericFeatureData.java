@@ -60,4 +60,9 @@ extends FeatureData<T> implements ByteSerializable {
     public double toDouble() {
         return this.data.doubleValue();
     }
+
+    @Override
+    public byte[] toBytes() {
+        return new byte[] { this.data.byteValue() };
+    }
 }

@@ -68,6 +68,11 @@ extends FeatureData<String> implements ByteSerializable {
         return this.data;
     }
 
+    @Override
+    public byte[] toBytes() {
+        return this.data.getBytes();
+    }
+
     @Deserialize
     public StringFeatureData(SerializationInputStream in)
     throws IOException {

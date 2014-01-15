@@ -142,6 +142,11 @@ implements ByteSerializable, Comparable<FeatureData<?>> {
     }
 
     /**
+     * Retrieves the binary byte array representation of this FeatureData.
+     */
+    public abstract byte[] toBytes();
+
+    /**
      * Return this FeatureData's type.
      *
      * @return the FeatureType for this FeatureData.

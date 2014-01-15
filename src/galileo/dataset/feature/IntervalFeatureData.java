@@ -60,6 +60,11 @@ extends NumericFeatureData<T> {
     }
 
     @Override
+    public byte[] toBytes() {
+        return new byte[] { data.byteValue(), data2.byteValue() };
+    }
+
+    @Override
     public String toString() {
         return "[" + data.toString() + " .. " + data2.toString() + "]";
     }
