@@ -27,8 +27,6 @@ package galileo.dataset.feature;
 
 import java.io.IOException;
 
-import java.lang.reflect.Constructor;
-
 import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
