@@ -65,7 +65,8 @@ extends FeatureData<Integer> implements ByteSerializable {
 
     @Override
     public String toString() {
-        return "[null]";
+        return null;
+    }
 
     @Override
     public byte[] toBytes() {
