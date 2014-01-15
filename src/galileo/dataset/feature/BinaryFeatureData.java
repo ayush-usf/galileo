@@ -41,6 +41,10 @@ import galileo.serialization.SerializationOutputStream;
 public class BinaryFeatureData
 extends FeatureData<ByteArray> implements ByteSerializable {
 
+    public BinaryFeatureData(ByteArray data) {
+        super(data);
+    }
+
     public BinaryFeatureData(byte[] data) {
         super(new ByteArray(data));
     }
