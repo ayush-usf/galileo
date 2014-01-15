@@ -193,6 +193,22 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
+     * Constructs a nameless Feature that contains raw binary information
+     * (byte array).
+     */
+    public Feature(byte[] bytes) {
+        this("", bytes);
+    }
+
+    /**
+     * Constructs a Feature that contains raw binary information (byte array).
+     */
+    public Feature(String name, byte[] bytes) {
+        setName(name);
+        this.data = new BinaryFeatureData(bytes);
+    }
+
+    /**
      * Creates a shallow copy of a Feature.
      */
     public Feature(Feature feature) {
