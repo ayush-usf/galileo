@@ -31,6 +31,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Manages a multidimensional array of {@link Feature} instances.
+ *
+ * @author malensek
+ */
 public class FeatureArray {
 
     private int[] dimensions;
@@ -307,6 +312,22 @@ public class FeatureArray {
     public void erase(int... indices) {
         int index = getIndex(indices);
         features.set(index, new Feature());
+    }
+
+    public boolean isNamed() {
+        return this.named;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public boolean isTyped() {
+        return this.typed;
+    }
+
+    public FeatureType getType() {
+        return this.type;
     }
 
     /**
