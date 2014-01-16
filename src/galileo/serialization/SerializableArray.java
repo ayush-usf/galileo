@@ -36,7 +36,9 @@ public abstract class SerializableArray<T extends ByteSerializable>
 extends ArrayList<T> implements ByteSerializable {
 /* Wow, that was a mouthful. */
 
-    @Override
+    private static final long serialVersionUID = 3821982297670342178L;
+
+	@Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
         out.writeInt(size());
