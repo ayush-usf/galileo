@@ -26,7 +26,6 @@ software, even if advised of the possibility of such damage.
 package galileo.dataset.feature;
 
 import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
@@ -54,5 +53,29 @@ public class FeatureArraySet {
 
     public FeatureArray get(String name) {
         return arrays.get(name);
+    }
+
+    @Override
+    public Iterator<FeatureArray> iterator() {
+        return arrays.values().iterator();
+    }
+
+    @Deserialize
+    public FeatureArraySet(SerializationInputStream in)
+    throws IOException {
+        int numArrays = in.readInt();
+        for (int i = 0; i < numArrays; ++i) {
+            FeatureArray array = new FeatureArray(in);
+            put(array);
+        }
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeInt(arrays.size());
+        for (FeatureArray array : arrays.values()) {
+            out.writeSerializable(array);
+        }
     }
 }
