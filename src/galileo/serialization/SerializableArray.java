@@ -38,7 +38,7 @@ extends ArrayList<T> implements ByteSerializable {
 
     private static final long serialVersionUID = 3821982297670342178L;
 
-	@Override
+    @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
         out.writeInt(size());
