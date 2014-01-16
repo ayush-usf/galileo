@@ -38,7 +38,8 @@ public enum FeatureType {
     INTERVAL_LONG (6),
     INTERVAL_FLOAT (7),
     INTERVAL_DOUBLE (8),
-    STRING (9);
+    STRING (9),
+    BINARY (10);
 
     private final int type;
 
@@ -83,6 +84,7 @@ public enum FeatureType {
         primitiveMap.put(Float.class, FLOAT);
         primitiveMap.put(Double.class, DOUBLE);
         primitiveMap.put(String.class, STRING);
+        primitiveMap.put(Byte[].class, BINARY);
     }
 
     /**
@@ -115,8 +117,8 @@ public enum FeatureType {
             case INTERVAL_FLOAT: return FloatIntervalFeatureData.class;
             case INTERVAL_DOUBLE: return DoubleIntervalFeatureData.class;
             case STRING: return StringFeatureData.class;
+            case BINARY: return BinaryFeatureData.class;
             default: return null;
         }
-
     }
 }
