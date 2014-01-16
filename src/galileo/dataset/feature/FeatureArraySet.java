@@ -33,15 +33,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Maps array names (Strings) to their respective FeatureArrays.
  *
  * @author malensek
  */
-public class FeatureArraySet {
+public class FeatureArraySet
+implements ByteSerializable, Iterable<FeatureArray> {
 
     private Map<String, FeatureArray> arrays = new HashMap<>();
 
