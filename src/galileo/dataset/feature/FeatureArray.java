@@ -25,18 +25,28 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset.feature;
 
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationException;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages a multidimensional array of {@link Feature} instances.
  *
  * @author malensek
  */
-public class FeatureArray {
+public class FeatureArray implements ByteSerializable {
+
+    private static final Logger logger = Logger.getLogger("galileo");
 
     private int[] dimensions;
     private int[] offsets;
@@ -119,8 +129,13 @@ public class FeatureArray {
         }
         Feature nullFeature = new Feature();
         features = new ArrayList<>(Collections.nCopies(size, nullFeature));
+        calculateOffsets(dimensions);
+    }
 
-        /* Determine array offsets */
+    /**
+     * Determines array offsets given the specified dimensions.
+     */
+    private void calculateOffsets(int... dimensions) {
         offsets = new int[dimensions.length];
         for (int i = 0; i < dimensions.length; ++i) {
             offsets[i] = 1;
@@ -349,5 +364,64 @@ public class FeatureArray {
      */
     public int getSize() {
         return features.size();
+    }
+
+    @Deserialize
+    public FeatureArray(SerializationInputStream in)
+    throws IOException {
+        this.named = in.readBoolean();
+        if (this.named) {
+            this.name = in.readString();
+        }
+
+        this.typed = in.readBoolean();
+        if (this.typed) {
+            this.type = FeatureType.fromInt(in.readInt());
+        }
+
+        int rank = in.readInt();
+        dimensions = new int[rank];
+        for (int i = 0; i < rank; ++i) {
+            dimensions[i] = in.readInt();
+        }
+        calculateOffsets(dimensions);
+
+        int numFeatures = in.readInt();
+        features = new ArrayList<>(numFeatures);
+        Feature nullFeature = new Feature();
+        for (int i = 0; i < numFeatures; ++i) {
+            Feature feature = nullFeature;
+            try {
+                feature = new Feature(in);
+            } catch (SerializationException e) {
+                logger.log(Level.WARNING, "Error deserializing FeatureArray "
+                        + "element", e);
+            }
+            features.add(feature);
+        }
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeBoolean(this.named);
+        if (named) {
+            out.writeString(this.name);
+        }
+
+        out.writeBoolean(this.typed);
+        if (typed) {
+            out.writeInt(this.type.toInt());
+        }
+
+        out.writeInt(getRank());
+        for (int dim : dimensions) {
+            out.writeInt(dim);
+        }
+
+        out.writeInt(features.size());
+        for (Feature feature : features) {
+            out.writeSerializable(feature);
+        }
     }
 }
