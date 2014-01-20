@@ -46,7 +46,7 @@ public class ArrayTest {
      * source.
      */
     @Test
-    public void testSerialization1()
+    public void testJavaIntArray()
     throws Exception {
 
         final int h = 100;
@@ -90,7 +90,7 @@ public class ArrayTest {
      * Tests serialization with floats
      */
     @Test
-    public void testSerialization2()
+    public void testJavaFloatArray()
     throws Exception {
 
         final int h = 10;
@@ -140,7 +140,7 @@ public class ArrayTest {
      * This test also does not include a type or name for the data.
      */
     @Test
-    public void testSerialization3()
+    public void testNativeFeatureArray()
     throws Exception {
 
         final int h = 50;
@@ -183,7 +183,7 @@ public class ArrayTest {
      * Tests a big 1D array
      */
     @Test
-    public void testSerialization4()
+    public void test1DSerialization()
     throws Exception {
 
         final int h = 50000;
@@ -211,4 +211,65 @@ public class ArrayTest {
             assertEquals("Value", f.get(i), f2.get(i));
         }
     }
+
+    /**
+     * Tests a 6D array.
+     */
+    @Test
+    public void testManyDimensionArray()
+    throws Exception {
+
+        final int h = 5;
+        final int w = 10;
+        final int d = 5;
+        final int x = 3;
+        final int y = 8;
+        final int z = 2;
+
+        Random rand = new Random();
+        FeatureArray f = new FeatureArray(h, w, d, x, y, z);
+        for (int i = 0; i < h; ++i) {
+            for (int j = 0; j < w; ++j) {
+                for (int k = 0; k < d; ++k) {
+                    for (int l = 0; l < x; ++l) {
+                        for (int m = 0; m < y; ++m) {
+                            for (int n = 0; n < z; ++n) {
+                                f.set(new Feature(rand.nextLong()),
+                                        i, j, k, l, m, n);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int rank = f.getRank();
+        int size = f.getSize();
+        FeatureType type = f.getType();
+        String name = f.getName();
+
+        byte[] fabytes = Serializer.serialize(f);
+        FeatureArray f2 = Serializer.deserialize(FeatureArray.class, fabytes);
+
+        assertEquals("Rank", rank, f2.getRank());
+        assertEquals("Size", size, f2.getSize());
+        assertEquals("Type", type, f2.getType());
+        assertEquals("Name", name, f2.getName());
+
+        for (int i = 0; i < h; ++i) {
+            for (int j = 0; j < w; ++j) {
+                for (int k = 0; k < d; ++k) {
+                    for (int l = 0; l < x; ++l) {
+                        for (int m = 0; m < y; ++m) {
+                            for (int n = 0; n < z; ++n) {
+                                assertEquals("Value", f.get(i, j, k, l, m, n),
+                                        f2.get(i, j, k, l, m, n));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
