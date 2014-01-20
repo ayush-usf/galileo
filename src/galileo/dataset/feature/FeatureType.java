@@ -85,6 +85,7 @@ public enum FeatureType {
         primitiveMap.put(Double.class, DOUBLE);
         primitiveMap.put(String.class, STRING);
         primitiveMap.put(Byte[].class, BINARY);
+        primitiveMap.put(ByteArray.class, BINARY);
     }
 
     /**
