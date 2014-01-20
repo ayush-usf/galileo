@@ -35,17 +35,17 @@ import java.util.Map;
  * @author malensek
  */
 public enum FeatureType {
-    NULL (0),
-    INT (1),
-    LONG (2),
-    FLOAT (3),
-    DOUBLE (4),
-    INTERVAL_INT (5),
-    INTERVAL_LONG (6),
-    INTERVAL_FLOAT (7),
-    INTERVAL_DOUBLE (8),
-    STRING (9),
-    BINARY (10);
+    NULL(0),
+    INT(1),
+    LONG(2),
+    FLOAT(3),
+    DOUBLE(4),
+    INTERVAL_INT(5),
+    INTERVAL_LONG(6),
+    INTERVAL_FLOAT(7),
+    INTERVAL_DOUBLE(8),
+    STRING(9),
+    BINARY(10);
 
     private final int type;
 
@@ -55,6 +55,14 @@ public enum FeatureType {
 
     public int toInt() {
         return type;
+    }
+
+    public boolean isInterval() {
+        if (type >= 5 && type <= 8) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     static Map<Integer, FeatureType> typeMap = new HashMap<>();
