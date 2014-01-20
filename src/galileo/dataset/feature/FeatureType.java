@@ -89,9 +89,9 @@ public enum FeatureType {
     }
 
     /**
-     * Basic Feature types based on Java classes (/primitives) can be
-     * ascertained by inspecting their generic parameters.  Other FeatureTypes,
-     * such as intervals, can't be discovered by this method.
+     * Basic Feature types based on Java classes can be ascertained by
+     * inspecting their generic parameters.  Other FeatureTypes, such as
+     * intervals, can't be discovered by this method.
      *
      * @param type The basic Java type to inspect
      *
