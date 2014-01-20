@@ -68,6 +68,11 @@ public class Serialization {
     }
 
     @Test
+    public void testByte() throws Exception {
+        testSerialization(new Feature("test", new byte[] { 1, 2, 3 }));
+    }
+
+    @Test
     public void testIntegerInterval() throws Exception {
         testSerialization(new Feature("interval", 11, 27));
     }
