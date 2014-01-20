@@ -25,7 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.serialization;
 
-import galileo.serialization.ByteSerializable.Deserialize;
 import galileo.util.StackTraceToString;
 
 import java.io.BufferedInputStream;
@@ -109,15 +108,6 @@ public class Serializer {
         try {
             Constructor<T> constructor =
                 type.getConstructor(SerializationInputStream.class);
-
-            /* Ensure the Constructor is annotated with @Deserialize.  This
-             * check verifies that the constructor in question should be
-             * used for the purposes of deserialization. */
-            if (constructor.getAnnotation(Deserialize.class) == null) {
-                throw new SerializationException("Deserialize-annotated "
-                        + "constructor not found!");
-            }
-
             obj = constructor.newInstance(in);
         } catch (Exception e) {
             /* We compress the myriad of possible exceptions that could occur
