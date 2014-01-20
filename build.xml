@@ -47,6 +47,13 @@
         </javac>
     </target>
 
+    <target name="testcompile">
+        <echo>Compiling with build.tests=true</echo>
+        <antcall target="compile">
+            <param name="build.tests" value="true"/>
+        </antcall>
+    </target>
+
     <target name="jar" depends="compile">
         <mkdir dir="${lib}"/>
 
@@ -80,6 +87,14 @@
                 classpath="${classpath}"
                 doctitle="${doctitle}"
                 windowtitle="${doctitle}"/>
+    </target>
+
+    <target name="test" depends="testcompile,jar">
+        <junit printsummary="yes" fork="yes" haltonfailure="yes">
+            <classpath refid="classpath"/>
+            <formatter type="plain" usefile="false"/>
+            <test name="galileo.test.dataset.feature.TestSuite"/>
+        </junit>
     </target>
 
     <!-- cleans up everything from the releaseclean task, plus additional files
