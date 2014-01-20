@@ -117,6 +117,14 @@ public class Casts {
         assertEquals("to float", 12.3, f4.getFloat(), EPSILON);
     }
 
+    @Test
+    public void testByte() {
+        Feature f = new Feature("test", new byte[] { 1, 2, 3 });
+        assertEquals("FeatureType", f.getType(), FeatureType.BINARY);
+
+        //TODO cast tests
+    }
+
     public static void testEquality(Feature feature, long l, double d) {
         assertEquals("As Integer", (int) l, feature.getInt());
         assertEquals("As Float", (float) d, feature.getFloat(), EPSILON);
