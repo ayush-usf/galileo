@@ -1,6 +1,7 @@
 # Eclipse files
 .project
 .classpath
+.build
 
 # Local dev files
 classes
