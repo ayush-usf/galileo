@@ -274,6 +274,14 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
         return data.getType();
     }
 
+    public boolean isInterval() {
+        return this.data.getType().isInterval();
+    }
+
+    public boolean isRawBytes() {
+        return this.data.getType() == FeatureType.BINARY;
+    }
+
     public int getInt() {
         return data.toInt();
     }
@@ -288,6 +296,37 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
 
     public double getDouble() {
         return data.toDouble();
+    }
+
+    /**
+     * If this Feature contains an interval, this method retrieves the general
+     * {@link IntervalFeatureData} container.
+     *
+     * @throws ClassCastException if the underlying FeatureData is not an
+     * interval.
+     */
+    public IntervalFeatureData<?> getInterval() {
+        return (IntervalFeatureData<?>) this.data;
+    }
+
+    /**
+     * If this Feature contains raw bytes, this method retrieves them as a
+     * native Java byte array.
+     *
+     * @throws ClassCastException if the underlying FeatureData is not
+     * BinaryFeatureData
+     */
+    public byte[] getRawBytes() {
+        return ((BinaryFeatureData) this.data).toBytes();
+    }
+
+    /**
+     * Retrieves the raw data container that holds this Feature data.  The raw
+     * {@link FeatureData} can be used directly or casted to a subclass to
+     * obtain specific functionality.
+     */
+    public FeatureData<?> getDataContainer() {
+        return this.data;
     }
 
     /**
