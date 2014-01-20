@@ -33,10 +33,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 import java.lang.reflect.Constructor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class provides convenience functions to make the Serialization and
@@ -46,8 +43,6 @@ import java.util.logging.Logger;
  * reading or creating objects, do the work, and then close the streams.
  */
 public class Serializer {
-
-    private static final Logger logger = Logger.getLogger("galileo");
 
     /**
      * Dumps a ByteSerializable object to a portable byte array.
@@ -130,15 +125,10 @@ public class Serializer {
              * simplify implementations.  However, if the current log level
              * permits, we also embed more information in the exception detail
              * message. */
-            if (logger.isLoggable(Level.INFO)) {
-                throw new SerializationException("Could not instantiate object "
-                        + "for deserialization.  Details: "
-                        + System.lineSeparator()
-                        + StackTraceToString.convert(e));
-            } else {
-                throw new SerializationException("Could not instantiate object "
-                        + "for deserialization");
-            }
+            throw new SerializationException("Could not instantiate object "
+                    + "for deserialization.  Details: "
+                    + System.lineSeparator()
+                    + StackTraceToString.convert(e));
         }
 
         return obj;
