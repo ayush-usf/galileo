@@ -28,6 +28,12 @@ package galileo.dataset.feature;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Enumerates the various {@link Feature} types supposed by Galileo's native
+ * data format.
+ *
+ * @author malensek
+ */
 public enum FeatureType {
     NULL (0),
     INT (1),
