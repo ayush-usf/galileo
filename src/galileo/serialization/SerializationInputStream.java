@@ -25,11 +25,16 @@ software, even if advised of the possibility of such damage.
 
 package galileo.serialization;
 
+import galileo.dataset.SimpleMap;
+import galileo.serialization.ByteSerializable.Deserialize;
+import galileo.util.StackTraceToString;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 
 public class SerializationInputStream extends DataInputStream {
@@ -73,6 +78,27 @@ public class SerializationInputStream extends DataInputStream {
             return outStream.toByteArray();
         } else {
             return readField();
+        }
+    }
+
+    public <T extends ByteSerializable> void readSerializableCollection(
+            Class<T> type, Collection<ByteSerializable> collection)
+    throws IOException, SerializationException {
+
+        int size = readInt();
+        for (int i = 0; i < size; ++i) {
+            T obj = Serializer.deserializeFromStream(type, this);
+            collection.add(obj);
+        }
+    }
+
+    public <T extends ByteSerializable> void readSimpleMap(Class<T> type,
+            SimpleMap<?, T> map)
+    throws IOException, SerializationException {
+        int size = readInt();
+        for (int i = 0; i < size; ++i) {
+            T obj = Serializer.deserializeFromStream(type, this);
+            map.put(obj);
         }
     }
 }

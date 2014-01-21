@@ -25,11 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.serialization;
 
+import galileo.dataset.SimpleMap;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
+import java.util.Collection;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
@@ -74,6 +76,23 @@ public class SerializationOutputStream extends DataOutputStream {
             writeField(compressedArray);
         } else {
             writeField(field);
+        }
+    }
+
+    public void writeSerializableCollection(
+            Collection<? extends ByteSerializable> object)
+    throws IOException {
+        writeInt(object.size());
+        for (ByteSerializable item : object) {
+            writeSerializable(item);
+        }
+    }
+
+    public void writeSimpleMap(SimpleMap<?, ? extends ByteSerializable> map)
+    throws IOException {
+        writeInt(map.size());
+        for (ByteSerializable item : map.values()) {
+            writeSerializable(item);
         }
     }
 
