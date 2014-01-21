@@ -25,6 +25,46 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dataset;
 
-public class Block {
+import java.io.IOException;
 
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+public class Block implements ByteSerializable {
+
+    private Metadata metadata;
+    private byte[] data;
+
+    public Block(byte[] data) {
+        this.metadata = new Metadata();
+        this.data = data;
+    }
+
+    public Block(Metadata metadata, byte[] data) {
+        this.metadata = metadata;
+        this.data = data;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    @Deserialize
+    public Block(SerializationInputStream in)
+    throws IOException {
+        this.metadata = new Metadata(in);
+        data = in.readField();
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeSerializable(metadata);
+        out.writeField(data);
+    }
 }
