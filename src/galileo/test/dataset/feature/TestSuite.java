@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+    ArraySet.class,
     ArrayTest.class,
     Casts.class,
     Serialization.class,
