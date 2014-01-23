@@ -2,13 +2,15 @@ package galileo.dataset;
 
 import java.util.Collection;
 
+import galileo.serialization.ByteSerializable;
+
 /**
  * Defines a very basic map that consists of Key, Value pairs wherein the Key
  * can be ascertained by the Value directly.
  *
  * @author malensek
  */
-public interface SimpleMap<K, V> {
+public interface SimpleMap<K, V extends ByteSerializable> {
 
     /**
      * Places an item in this data structure.
