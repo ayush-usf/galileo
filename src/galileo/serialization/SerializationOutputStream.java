@@ -43,18 +43,41 @@ public class SerializationOutputStream extends DataOutputStream {
         super(out);
     }
 
+    /**
+     * Writes a String to the output stream.  The field is prefixed with the
+     * String length.  null Strings are not allowed here; use an empty String
+     * instead.
+     *
+     * @param field The String to write to the output stream
+     */
     public void writeString(String field)
     throws IOException {
         byte[] strBytes = field.getBytes();
         writeField(strBytes);
     }
 
+    /**
+     * Writes a byte array (byte field) to the output stream.  When serialized,
+     * the array will be prefixed with its length.
+     *
+     * @param field The byte array to write to the output stream
+     */
     public void writeField(byte[] field)
     throws IOException {
         writeInt(field.length);
         write(field);
     }
 
+    /**
+     * Writes a field that can be compressed.  This method is similar to
+     * writeField(), but has an additional boolean flag that tells the
+     * serialization framework whether or not the data is compressed.  This is
+     * helpful in situations where compression might be toggled on or off by the
+     * user at run time or during configuration.
+     *
+     * @param field The byte array to write to the stream
+     * @param compress Whether the byte field should be compressed or not.
+     */
     public void writeCompressableField(byte[] field, boolean compress)
     throws IOException {
 
@@ -96,12 +119,31 @@ public class SerializationOutputStream extends DataOutputStream {
         }
     }
 
+    /**
+     * Writes a {@link ByteSerializable} object to this output stream.  This
+     * method is equivalent to simply calling object.serialize() directly, but
+     * fits into the normal serialization "flow" a bit better because it matches
+     * the other methods in this class.
+     *
+     * @param object ByteSerializable object to serialize.
+     */
     public void writeSerializable(ByteSerializable object)
     throws IOException {
         object.serialize(this);
     }
 
+    /**
+     * Sets the compression level (1-9) when writing serializable fields using
+     * gzip.
+     *
+     * @param compressionLevel compression level this output stream will use
+     * when writing compressible fields.
+     */
     public void setCompressionLevel(int compressionLevel) {
+        if (compressionLevel < 1 || compressionLevel > 9) {
+            throw new IllegalArgumentException("gzip compression level must be "
+                    + "between 1 and 9.");
+        }
         this.compressionLevel = compressionLevel;
     }
 }

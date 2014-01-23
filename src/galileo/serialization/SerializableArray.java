@@ -32,6 +32,12 @@ import java.util.ArrayList;
 import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationOutputStream;
 
+/**
+ * This class implements the serialize() method and can be extended to create
+ * easily serializble ArrayLists.
+ *
+ * @author malensek
+ */
 public abstract class SerializableArray<T extends ByteSerializable>
 extends ArrayList<T> implements ByteSerializable {
 /* Wow, that was a mouthful. */
