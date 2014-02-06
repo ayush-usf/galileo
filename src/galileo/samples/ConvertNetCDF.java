@@ -57,6 +57,16 @@ import ucar.unidata.geoloc.LatLonPoint;
  * Converts NetCDF files from the NOAA NAM project to Galileo Metadata.  A file
  * containing a single grid is converted to many files resprenting single
  * points.  This process can be fairly memory-intensive.
+ * <p>
+ * Files from the NAM can be downloaded from:
+ *      http://nomads.ncdc.noaa.gov/data.php?name=access
+ * <p>
+ * The idea of this conversion process is to read all 2D variables from the GRIB
+ * files with the NetCDF library and convert them to the Galileo format ---
+ * namely, a {@link Block} instance that contains {@link Metadata} for its
+ * "data" field, along with a separate {@link Metadata} instance for indexing
+ * purposes.  So in other words, the Blocks produced by this class contain
+ * Metadata, with Metadata about Metadata (or is that MetaMetadata?).
  *
  * @author malensek
  */
