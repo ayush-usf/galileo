@@ -126,6 +126,30 @@ public class Metadata implements ByteSerializable {
         return this.temporalProperties != null;
     }
 
+    @Override
+    public String toString() {
+        String nl = System.lineSeparator();
+        String str = "Name: '" + name + "'" + nl
+            + "Contains Temporal Data: " + hasTemporalProperties() + nl;
+        if (hasTemporalProperties()) {
+            str += "Temporal Data Block:" + nl
+            + temporalProperties.toString() + nl;
+        }
+
+        str += "Contains Spatial Data: " + hasSpatialProperties() + nl;
+        if (hasSpatialProperties()) {
+            str += "Spatial Data Block:" + nl
+            + spatialProperties.toString() + nl;
+        }
+
+        str += "Number of Attributes: " + attributes.size() + nl;
+        for (Feature f : attributes) {
+            str += f.toString() + nl;
+        }
+
+        str += "Number of ND Feature Arrays: " + features.size() + nl;
+
+        return str;
     }
 
     @Deserialize
