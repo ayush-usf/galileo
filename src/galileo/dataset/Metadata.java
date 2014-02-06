@@ -111,7 +111,7 @@ public class Metadata implements ByteSerializable {
     }
 
     public boolean hasSpatialProperties() {
-        return this.spatialProperties == null;
+        return this.spatialProperties != null;
     }
 
     public void setTemporalProperties(TemporalProperties temporalProperties) {
@@ -123,7 +123,9 @@ public class Metadata implements ByteSerializable {
     }
 
     public boolean hasTemporalProperties() {
-        return this.temporalProperties == null;
+        return this.temporalProperties != null;
+    }
+
     }
 
     @Deserialize
