@@ -25,13 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.samples;
 
+import galileo.dataset.Block;
 import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
 import galileo.dataset.feature.Feature;
 import galileo.serialization.Serializer;
-
 import galileo.util.FileNames;
 import galileo.util.GeoHash;
 import galileo.util.Pair;
@@ -73,8 +73,11 @@ public class ConvertNetCDF {
                 Map<String, Metadata> metaMap
                         = ConvertNetCDF.readFile(f.getAbsolutePath());
 
-                /* Don't cache more than 500 MB: */
-                DiskCache.cleanCache(524288000, null);
+                /* Don't cache more than 1 GB: */
+                DiskCache.cleanCache(1073741824, null);
+
+                /* Now that we have geographically-partitioned files, let's pick
+                 * some attributes to store as indexable metadata. */
 
                 /* Write converted files to disk */
                 System.out.print("Writing converted files");
@@ -82,36 +85,76 @@ public class ConvertNetCDF {
                 int increment = metaMap.keySet().size() / 50;
                 for (String g : metaMap.keySet()) {
                     Metadata meta = metaMap.get(g);
-                    Coordinates coords
-                        = meta.getSpatialProperties().getCoordinates();
-                    String location = GeoHash.encode(
-                            coords.getLatitude(), coords.getLongitude(), 10);
 
-                    String outputDir = args[1];
-                    String outputName = nameParts.a + "-" + location;
-                    String subDir = location.substring(0, 2) + "/"
-                        + location.substring(2, 5);
-                    File sub = new File(outputDir + "/" + subDir);
-                    if (!sub.exists()) {
-                        if (!sub.mkdirs()) {
+                    /* Create the directory for this file */
+                    String storageDir = getStorageDir(args[1], meta);
+                    File destDir = new File(storageDir);
+                    if (!destDir.exists()) {
+                        if (!destDir.mkdirs()) {
                             throw new IOException(
-                                    "Failed to create directory " + subDir);
+                                    "Failed to create directory " + destDir);
                         }
                     }
 
-                    FileOutputStream fOut = new FileOutputStream(outputDir
-                            + "/" + subDir + "/" + outputName + ".gmeta");
-                    fOut.write(Serializer.serialize(meta));
+                    /* Create a file Block to store all the metadata in, and
+                     * generate a subset for indexing purposes. */
+                    Metadata m = new Metadata(nameParts.a);
+                    addIndexField("visibility", meta, m);
+                    addIndexField("pressure", meta, m);
+                    addIndexField("total_precipitation", meta, m);
+                    addIndexField("precipitable_water", meta, m);
+                    addIndexField("temperature_surface", meta, m);
+                    addIndexField("total_cloud_cover", meta, m);
+                    addIndexField("snow_depth", meta, m);
+                    m.setTemporalProperties(meta.getTemporalProperties());
+                    m.setSpatialProperties(meta.getSpatialProperties());
+                    Block block = new Block(m, Serializer.serialize(meta));
+
+                    /* Write out the file */
+                    String outputName = nameParts.a + ".gblock";
+                    FileOutputStream fOut = new FileOutputStream(storageDir
+                            + "/" + outputName);
+                    fOut.write(Serializer.serialize(block));
                     fOut.close();
 
                     if (++processed % increment == 0) {
                         System.out.print('.');
                     }
                 }
-
+                System.out.println();
             }
-
         }
+    }
+
+    /**
+     * Takes a Metadata instance being used as Block content, and extracts the
+     * given Feature for indexing purposes.
+     */
+    private static void addIndexField(String featureName, Metadata baseMeta,
+            Metadata indexMeta) {
+        Feature f = baseMeta.getAttribute(featureName);
+        if (f != null) {
+            indexMeta.putAttribute(f);
+        }
+    }
+
+    /**
+     * Determines the storage directory for a file, using its spatial
+     * properties run through the Geohash algorithm.
+     *
+     * The resulting format is xx/xxx, which is specific to the NOAA NAM
+     * dataset, because this will place each unique grid point in its own
+     * directory.
+     */
+    private static String getStorageDir(String outputDir, Metadata meta) {
+        Coordinates coords
+            = meta.getSpatialProperties().getCoordinates();
+        String location = GeoHash.encode(
+                coords.getLatitude(), coords.getLongitude(), 10);
+
+        String subDir = location.substring(0, 2) + "/"
+            + location.substring(2, 5);
+        return outputDir + "/" + subDir;
     }
 
     /**
@@ -151,7 +194,7 @@ public class ConvertNetCDF {
                     metaMap.put(hash, meta);
                 }
 
-                String featureName = v.getFullName();
+                String featureName = v.getFullName().toLowerCase();
                 float featureValue = values.getFloat(i * w + j);
                 Feature feature = new Feature(featureName, featureValue);
                 meta.putAttribute(feature);
@@ -185,7 +228,7 @@ public class ConvertNetCDF {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(baseDate);
         calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + offset);
-        System.out.println("Time: " + calendar.getTime());
+        System.out.println("Time of collection: " + calendar.getTime());
 
         /* We'll keep a mapping of geolocations -> Galileo Metadata */
         Map<String, Metadata> metaMap = new HashMap<>();
