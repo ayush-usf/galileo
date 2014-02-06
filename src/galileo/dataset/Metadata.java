@@ -32,6 +32,7 @@ import galileo.dataset.feature.FeatureArray;
 import galileo.dataset.feature.FeatureArraySet;
 import galileo.dataset.feature.FeatureSet;
 import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
@@ -115,11 +116,41 @@ public class Metadata implements ByteSerializable {
 
     @Deserialize
     public Metadata(SerializationInputStream in)
-    throws IOException {
+    throws IOException, SerializationException {
+        name = in.readString();
+
+        boolean temporal = in.readBoolean();
+        if (temporal) {
+            temporalProperties = new TemporalProperties(in);
+        }
+
+        boolean spatial = in.readBoolean();
+        if (spatial) {
+            spatialProperties = new SpatialProperties(in);
+        }
+
+        attributes = new FeatureSet(in);
+        features = new FeatureArraySet(in);
+        runtimeMetadata = new RuntimeMetadata(in);
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
+        out.writeString(name);
+
+        out.writeBoolean(hasTemporalProperties());
+        if (hasTemporalProperties()) {
+            out.writeSerializable(temporalProperties);
+        }
+
+        out.writeBoolean(hasSpatialProperties());
+        if (hasSpatialProperties()) {
+            out.writeSerializable(spatialProperties);
+        }
+
+        out.writeSerializable(attributes);
+        out.writeSerializable(features);
+        out.writeSerializable(runtimeMetadata);
     }
 }
