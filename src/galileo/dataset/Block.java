@@ -28,6 +28,7 @@ package galileo.dataset;
 import java.io.IOException;
 
 import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
@@ -56,7 +57,7 @@ public class Block implements ByteSerializable {
 
     @Deserialize
     public Block(SerializationInputStream in)
-    throws IOException {
+    throws IOException, SerializationException {
         this.metadata = new Metadata(in);
         data = in.readField();
     }
