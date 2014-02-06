@@ -50,6 +50,10 @@ public class Metadata implements ByteSerializable {
      */
     private FeatureArraySet features = new FeatureArraySet();
 
+    private SpatialProperties spatialProperties = null;
+
+    private TemporalProperties temporalProperties = null;
+
     /**
      * Maintains metadata information that is only valid at system run time.
      */
@@ -83,6 +87,30 @@ public class Metadata implements ByteSerializable {
 
     public FeatureArraySet getFeatures() {
         return features;
+    }
+
+    public void setSpatialProperties(SpatialProperties spatialProperties) {
+        this.spatialProperties = spatialProperties;
+    }
+
+    public SpatialProperties getSpatialProperties() {
+        return this.spatialProperties;
+    }
+
+    public boolean hasSpatialProperties() {
+        return this.spatialProperties == null;
+    }
+
+    public void setTemporalProperties(TemporalProperties temporalProperties) {
+        this.temporalProperties = temporalProperties;
+    }
+
+    public TemporalProperties getTemporalProperties() {
+        return this.temporalProperties;
+    }
+
+    public boolean hasTemporalProperties() {
+        return this.temporalProperties == null;
     }
 
     @Deserialize
