@@ -51,8 +51,14 @@ public class Metadata implements ByteSerializable {
      */
     private FeatureArraySet features = new FeatureArraySet();
 
+    /**
+     * Spatial information associated with this Metadata
+     */
     private SpatialProperties spatialProperties = null;
 
+    /**
+     * Temporal information associated with this Metadata
+     */
     private TemporalProperties temporalProperties = null;
 
     /**
@@ -60,8 +66,14 @@ public class Metadata implements ByteSerializable {
      */
     private RuntimeMetadata runtimeMetadata = new RuntimeMetadata();
 
+    /**
+     * Creates an unnamed Metadata instance
+     */
     public Metadata() { }
 
+    /**
+     * Creates a named Metadata instance.
+     */
     public Metadata(String name) {
         this.name = name;
     }
