@@ -63,6 +63,10 @@ public class FeatureSet implements ByteSerializable, Iterable<Feature> {
         return features.values().iterator();
     }
 
+    public int size() {
+        return features.size();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
