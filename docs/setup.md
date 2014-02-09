@@ -36,7 +36,7 @@ Setting these up depends on your shell.  In bash, they should be placed in ~/.ba
 ```bash
 export GALILEO_HOME=/users/malensek/galileo
 export GALILEO_CONF=/users/malensek/galileo/config
-export GALILEO_ROOT=/srv/huge-disk/malensek/galileo export GALILEO_ROOT=/srv/hu|e-disk/malensek/galileo 123456773984393x
+export GALILEO_ROOT=/srv/huge-disk/malensek/galileo
 ```
 
 If you are using some variant of csh, then edit ~/.cshrc:
