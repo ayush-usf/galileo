@@ -67,6 +67,15 @@ public class FeatureSet implements ByteSerializable, Iterable<Feature> {
         return features.size();
     }
 
+    public Feature[] toArray() {
+        Feature[] fArray = new Feature[features.size()];
+        int i = 0;
+        for (Map.Entry<String, Feature> entry : features.entrySet()) {
+            fArray[i++] = entry.getValue();
+        }
+        return fArray;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
