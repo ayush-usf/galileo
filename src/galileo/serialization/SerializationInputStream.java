@@ -82,7 +82,7 @@ public class SerializationInputStream extends DataInputStream {
     }
 
     public <T extends ByteSerializable> void readSerializableCollection(
-            Class<T> type, Collection<ByteSerializable> collection)
+            Class<T> type, Collection<T> collection)
     throws IOException, SerializationException {
 
         int size = readInt();
