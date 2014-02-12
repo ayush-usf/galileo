@@ -111,12 +111,8 @@ public class HierarchicalGraph<T> {
 
         List<Path<Feature, T>> paths = new ArrayList<>();
         for (Path<Feature, T> path : tracker.getQueryResults()) {
-            try {
-                removeNullFeatures(path);
-                paths.add(path);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            removeNullFeatures(path);
+            paths.add(path);
         }
         return paths;
     }
