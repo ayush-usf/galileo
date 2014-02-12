@@ -31,6 +31,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
@@ -139,5 +142,71 @@ public class Serializer {
             Class<T> type, SerializationInputStream in)
     throws IOException, SerializationException {
         return deserialize(type, in);
+    }
+
+    /**
+     * Dumps a ByteSerializable object to a portable byte array and stores it on
+     * disk.
+     *
+     * @param obj The ByteSerializable object to serialize.
+     * @param file File to write the ByteSerializable object to.
+     */
+    public static void persist(ByteSerializable obj, File file)
+    throws IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+        byte[] objBytes = serialize(obj);
+        fos.write(objBytes);
+        fos.close();
+    }
+
+    /**
+     * Dumps a ByteSerializable object to a portable byte array and stores it on
+     * disk.
+     *
+     * @param obj The ByteSerializable object to serialize.
+     * @param fileName path the object should be written to.
+     */
+    public static void persist(ByteSerializable obj, String fileName)
+    throws IOException {
+        persist(obj, new File(fileName));
+    }
+
+    /**
+     * Loads a ByteSerializable object's binary form from disk and
+     * then instantiates a new object using the SerializationInputStream
+     * constructor.
+     *
+     * @param type The type of object to create (deserialize).
+     *             For example, Something.class.
+     *
+     * @param inFile File containing a serialized instance of the object being
+     *               loaded.
+     */
+    public static <T extends ByteSerializable> T restore(Class<T> type,
+            File inFile)
+    throws IOException, SerializationException {
+        FileInputStream fin = new FileInputStream(inFile);
+        byte[] objBytes = new byte[(int) inFile.length()];
+        fin.read(objBytes);
+        fin.close();
+        T obj = deserialize(type, objBytes);
+        return obj;
+    }
+
+    /**
+     * Loads a ByteSerializable object's binary form from disk and
+     * then instantiates a new object using the SerializationInputStream
+     * constructor.
+     *
+     * @param type The type of object to create (deserialize).
+     *             For example, Something.class.
+     *
+     * @param fileName path the object should be read from.
+     */
+    public static <T extends ByteSerializable> T restore(Class<T> type,
+            String fileName)
+    throws IOException, SerializationException {
+        File inFile = new File(fileName);
+        return restore(type, inFile);
     }
 }
