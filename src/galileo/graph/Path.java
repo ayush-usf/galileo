@@ -108,6 +108,10 @@ implements Iterable<Vertex<L, V>> {
         return vertices.get(index);
     }
 
+    public Vertex<L, V> getTail() {
+        return vertices.get(vertices.size() - 1);
+    }
+
     public List<Vertex<L, V>> getVertices() {
         return vertices;
     }
@@ -122,6 +126,10 @@ implements Iterable<Vertex<L, V>> {
 
     public void addPayload(V payload) {
         this.payload.add(payload);
+    }
+
+    public boolean hasPayload() {
+        return payload.size() > 0;
     }
 
     /**
