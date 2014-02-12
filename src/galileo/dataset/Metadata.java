@@ -78,6 +78,10 @@ public class Metadata implements ByteSerializable {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void putAttribute(Feature feature) {
         attributes.put(feature);
     }
