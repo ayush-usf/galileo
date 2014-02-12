@@ -108,17 +108,7 @@ public class ConvertNetCDF {
 
                     /* Create a file Block to store all the metadata in, and
                      * generate a subset for indexing purposes. */
-                    Metadata m = new Metadata(nameParts.a);
-                    addIndexField("visibility", meta, m);
-                    addIndexField("pressure", meta, m);
-                    addIndexField("total_precipitation", meta, m);
-                    addIndexField("precipitable_water", meta, m);
-                    addIndexField("temperature_surface", meta, m);
-                    addIndexField("total_cloud_cover", meta, m);
-                    addIndexField("snow_depth", meta, m);
-                    m.setTemporalProperties(meta.getTemporalProperties());
-                    m.setSpatialProperties(meta.getSpatialProperties());
-                    Block block = new Block(m, Serializer.serialize(meta));
+                    Block block = createBlock(nameParts.a, meta);
 
                     /* Write out the file */
                     String outputName = nameParts.a + ".gblock";
@@ -134,6 +124,25 @@ public class ConvertNetCDF {
                 System.out.println();
             }
         }
+    }
+
+    /**
+     * Creates a block/metadata pair subset for indexing.
+     */
+    public static Block createBlock(String name, Metadata meta)
+    throws IOException {
+        Metadata m = new Metadata(name);
+        addIndexField("visibility", meta, m);
+        addIndexField("pressure", meta, m);
+        addIndexField("total_precipitation", meta, m);
+        addIndexField("precipitable_water", meta, m);
+        addIndexField("temperature_surface", meta, m);
+        addIndexField("total_cloud_cover", meta, m);
+        addIndexField("snow_depth", meta, m);
+        m.setTemporalProperties(meta.getTemporalProperties());
+        m.setSpatialProperties(meta.getSpatialProperties());
+        Block block = new Block(m, Serializer.serialize(meta));
+        return block;
     }
 
     /**
