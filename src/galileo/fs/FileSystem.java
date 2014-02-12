@@ -29,17 +29,16 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import galileo.dataset.Block;
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.FileBlock;
 import galileo.dataset.MetaArray;
 import galileo.graph.LogicalGraph;
 import galileo.graph.LogicalGraphNode;
 import galileo.graph.PhysicalGraph;
-
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 
@@ -50,7 +49,8 @@ public class FileSystem {
     public static final String METADATA_EXTENSION = ".gmeta";
     public static final String BLOCK_EXTENSION = ".gblock";
 
-    private File storageDirectory;
+    protected File storageDirectory;
+    private boolean readOnly;
 
     private Journal journal;
 
@@ -60,7 +60,13 @@ public class FileSystem {
     /** On-disk representation of the Galileo filesystem.   */
     private PhysicalGraph physicalGraph;
 
-    public FileSystem(String storageRoot)
+    public FileSystem() { }
+
+    public long getFreeSpace() {
+        return storageDirectory.getFreeSpace();
+    }
+
+    protected void initialize(String storageRoot)
     throws FileSystemException, IOException {
         logger.info("Initializing Galileo File System.");
         logger.info("Storage directory: " + storageRoot);
@@ -77,7 +83,7 @@ public class FileSystem {
             }
         }
 
-        logger.info("Free space: " + storageDirectory.getFreeSpace());
+        logger.info("Free space: " + getFreeSpace());
 
         /* Verify permissions. */
         boolean read, write, execute;
@@ -99,18 +105,23 @@ public class FileSystem {
                     "is not Executable.");
         }
 
-        boolean readOnly = false;
+        readOnly = false;
         if (!write) {
             logger.warning("Storage directory is read-only.  Starting " +
                     "file system in read-only mode.");
             readOnly = true;
         }
+    }
+
+    public FileSystem(String storageRoot)
+    throws FileSystemException, IOException {
+        initialize(storageRoot);
 
         journal = Journal.getInstance();
         journal.setJournalPath(storageRoot + "/journal");
 
         logicalGraph  = new LogicalGraph();
-        physicalGraph = new PhysicalGraph(storageDirectory, readOnly);
+        physicalGraph = new PhysicalGraph(storageDirectory);
     }
 
     public void recoverMetadata() {
@@ -234,9 +245,9 @@ public class FileSystem {
     /**
      * Reports whether the Galileo filesystem is read-only.
      *
-     * @return <code>true</code> if the filesystem is read-only.
+     * @return true if the filesystem is read-only.
      */
     public boolean isReadOnly() {
-        return physicalGraph.isReadOnly();
+        return readOnly;
     }
 }
