@@ -26,6 +26,8 @@ software, even if advised of the possibility of such damage.
 package galileo.graph;
 
 import java.util.ArrayList;
+
+import java.util.Collection;
 import java.util.List;
 
 import galileo.dataset.feature.Feature;
@@ -38,59 +40,78 @@ import galileo.dataset.feature.Feature;
  */
 public class HierarchicalQueryTracker<T> {
 
-    private List<List<Vertex<Feature, T>>> results = new ArrayList<>();
-    private int skip = 0;
-    private int farthestDepth = 0;
+    public List<List<Path<Feature, T>>> results = new ArrayList<>();
+    private int farthestEvaluatedExpression = 0;
+    private int currentLevel = 0;
 
-    public HierarchicalQueryTracker(Vertex<Feature, T> root) {
-        List<Vertex<Feature, T>> l = new ArrayList<>(1);
-        l.add(root);
-        results.add(l);
+    private Path<Feature, T> rootPath;
+
+    public HierarchicalQueryTracker(Vertex<Feature, T> root, int numFeatures) {
+        int size = numFeatures + 1;
+        results = new ArrayList<>(size);
+        for (int i = 0; i < size; ++i) {
+            results.add(new ArrayList<Path<Feature, T>>());
+        }
+
+        rootPath = new Path<Feature, T>(root);
+        List<Path<Feature, T>> l = new ArrayList<>(1);
+        l.add(rootPath);
+        results.get(0).add(rootPath);
     }
 
-    public void addResults(List<Vertex<Feature, T>> results) {
-        this.results.add(results);
-    }
+    public void addResults(Path<Feature, T> previousPath,
+            Collection<Vertex<Feature, T>> results) {
 
-    public int getCurrentLevel() {
-        return results.size();
-    }
+        for (Vertex<Feature, T> vertex : results) {
+            Path<Feature, T> path = new Path<>(previousPath);
+            path.add(vertex);
 
-    public List<Vertex<Feature, T>> getCurrentResults() {
-        return results.get(getCurrentLevel() - 1);
-    }
+            /* Copy over the payload */
+            if (vertex.getValues().size() > 0) {
+                path.setPayload(vertex.getValues());
+            }
 
-    public void skipLevel() {
-        if (getCurrentLevel() == skip) {
-            skip++;
+            this.results.get(getCurrentLevel()).add(path);
         }
     }
 
-    public void addLevel() {
-        farthestDepth = getCurrentLevel();
+    public void nextLevel() {
+        ++currentLevel;
     }
 
-    public List<Vertex<Feature, T>> getQueryResults() {
+    /**
+     * Retrieves the current level being processed.
+     */
+    public int getCurrentLevel() {
+        return currentLevel;
+    }
 
-        return results.get(farthestDepth);
+    /**
+     * Retrieves the results that are currently being processed. In other words,
+     * get the results from the last level in the hierarchy.
+     */
+    public List<Path<Feature, T>> getCurrentResults() {
+        return results.get(getCurrentLevel() - 1);
+    }
+
+    public void markEvaluated() {
+        farthestEvaluatedExpression = getCurrentLevel();
+    }
+
+    public List<Path<Feature, T>> getQueryResults() {
+        List<Path<Feature, T>> paths = new ArrayList<>();
+        for (int i = farthestEvaluatedExpression; i < results.size(); ++i) {
+            for (Path<Feature, T> path : results.get(i)) {
+                if (path.hasPayload()) {
+                    paths.add(path);
+                }
+            }
+        }
+        return paths;
     }
 
     @Override
     public String toString() {
-        String s = "";
-        int level = skip;
-
-        for (int i = skip; i < results.size(); ++i) {
-            s += "Level: " + level + System.lineSeparator();
-            level++;
-
-            for (Vertex<Feature, T> result : results.get(i)) {
-                s += result.getLabel() + System.lineSeparator();
-            }
-        }
-
-        System.out.println(skip);
-        System.out.println(farthestDepth);
-        return s;
+        return "";
     }
 }

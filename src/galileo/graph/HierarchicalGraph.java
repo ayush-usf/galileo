@@ -46,7 +46,6 @@ import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Operator;
 import galileo.query.Query;
-import galileo.serialization.Serializer;
 import galileo.util.Pair;
 
 /**
@@ -65,7 +64,6 @@ public class HierarchicalGraph<T> {
     /** Describes each level in the hierarchy. */
     private Map<String, Level> levels = new HashMap<>();
 
-        public static byte[] s = null;
     /**
      * We maintain a separate Queue with Feature names inserted in
      * hierarchical order.  While levels.keySet() contains the same information,
@@ -73,7 +71,6 @@ public class HierarchicalGraph<T> {
      * the original insertion order (although in practice, it probably does).
      */
     private Queue<String> features = new LinkedList<>();
-
 
     /**
      * Tracks information about each level in the graph hierarchy.
@@ -104,55 +101,55 @@ public class HierarchicalGraph<T> {
         }
     }
 
-    public void evaluateQuery(Query query) {
+    public List<Path<Feature, T>> evaluateQuery(Query query) {
         HierarchicalQueryTracker<T> tracker
-            = new HierarchicalQueryTracker<>(root);
+            = new HierarchicalQueryTracker<>(root, features.size());
 
-        for (String feature : features) {
-            List<Operation> operations = query.getOperations(feature);
-            List<Vertex<Feature, T>> results
-                = evaluateOperations(operations, tracker);
-            tracker.addResults(results);
+        for (Operation operation : query.getOperations()) {
+            evaluateOperation(operation, tracker);
         }
-        //System.out.println(tracker);
 
-        //System.out.println("Results: --- ");
-        System.out.println("num=" + tracker.getQueryResults().size());
-        for (Vertex<Feature, T> result : tracker.getQueryResults()) {
+        List<Path<Feature, T>> paths = new ArrayList<>();
+        for (Path<Feature, T> path : tracker.getQueryResults()) {
             try {
-            s = Serializer.serialize(result.getLabel());
-            } catch (Exception e) { }
+                removeNullFeatures(path);
+                paths.add(path);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        if (s != null && s[0] == 3) {
-            
-        }
+        return paths;
     }
 
-    public List<Vertex<Feature, T>> evaluateOperations(
-            List<Operation> operations, HierarchicalQueryTracker<T> tracker) {
+    public void evaluateOperation(Operation operation,
+            HierarchicalQueryTracker<T> tracker) {
 
-        List<Vertex<Feature, T>> results = new ArrayList<>();
 
-        if (operations == null) {
-            tracker.skipLevel();
+        for (String feature : features) {
+            tracker.nextLevel();
 
-            /* Traverse all neighbors */
-            for (Vertex<Feature, T> vertex : tracker.getCurrentResults()) {
-                results.addAll(vertex.getAllNeighbors());
-            }
-        } else {
-            tracker.addLevel();
+            /* Find all expressions related to the current Feature (operand) */
+            List<Expression> expressions = operation.getOperand(feature);
 
-            for (Operation op : operations) {
-                for (Vertex<Feature, T> vertex : tracker.getCurrentResults()) {
+            if (expressions == null) {
+                /* No expressions deal with the current feature.  Traverse all
+                 * neighbors. */
+                for (Path<Feature, T> path : tracker.getCurrentResults()) {
+                    Vertex<Feature, T> vertex = path.getTail();
+                    tracker.addResults(path, vertex.getAllNeighbors());
+                }
+            } else {
+                /* Note that we are evaluating an Expression at this level */
+                tracker.markEvaluated();
+
+                for (Path<Feature, T> path : tracker.getCurrentResults()) {
+                    Vertex<Feature, T> vertex = path.getTail();
                     Collection<Vertex<Feature, T>> resultCollection
-                        = evaluateExpressions(op.getExpressions(), vertex);
-                    results.addAll(resultCollection);
+                        = evaluateExpressions(expressions, vertex);
+                    tracker.addResults(path, resultCollection);
                 }
             }
         }
-
-        return results;
     }
 
     private Collection<Vertex<Feature, T>> evaluateExpressions(
@@ -162,9 +159,9 @@ public class HierarchicalGraph<T> {
             = new HashSet<>(vertex.getAllNeighbors());
 
         for (Expression expression : expressions) {
-            if (expression.operator == Operator.EQUAL) {
+            if (expression.getOperator() == Operator.EQUAL) {
                 Vertex<Feature, T> neighbor
-                    = vertex.getNeighbor(expression.value);
+                    = vertex.getNeighbor(expression.getValue());
                 Set<Vertex<Feature, T>> neighborSet = new HashSet<>();
                 neighborSet.add(neighbor);
                 resultSet.retainAll(neighborSet);
@@ -179,6 +176,10 @@ public class HierarchicalGraph<T> {
      */
     public void addPath(Path<Feature, T> path)
     throws FeatureTypeMismatchException, GraphException {
+        if (path.size() == 0) {
+            throw new GraphException("Attempted to add empty path!");
+        }
+
         checkFeatureTypes(path);
         addNullFeatures(path);
         reorientPath(path);
@@ -252,6 +253,12 @@ public class HierarchicalGraph<T> {
      * hierarchy.
      */
     private void reorientPath(Path<Feature, T> path) {
+        if (path.size() == 1) {
+            /* This doesn't need to be sorted... */
+            getOrder(path.get(0).getLabel());
+            return;
+        }
+
         path.sort(new Comparator<Vertex<Feature, T>>() {
             public int compare(Vertex<Feature, T> a, Vertex<Feature, T> b) {
                 int o2 = getOrder(b.getLabel());
