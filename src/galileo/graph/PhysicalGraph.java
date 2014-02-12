@@ -37,7 +37,7 @@ import java.util.UUID;
 
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.FileBlock;
-
+import galileo.fs.FileSystem;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 import galileo.util.GeoHash;
@@ -47,19 +47,10 @@ import galileo.util.GeoHash;
  * built on disk via a hierarchical tree of directories.
  */
 public class PhysicalGraph {
-    public static final String METADATA_EXTENSION = ".gmeta";
-    public static final String BLOCK_EXTENSION    = ".gblock";
-
     private File storageDirectory;
-    private boolean readOnly = false;
 
     public PhysicalGraph(File storageDirectory) {
         this.storageDirectory = storageDirectory;
-    }
-
-    public PhysicalGraph(File storageDirectory, boolean readOnly) {
-        this.storageDirectory = storageDirectory;
-        this.readOnly = readOnly;
     }
 
     /**
@@ -103,7 +94,7 @@ public class PhysicalGraph {
             }
 
             String fileName = file.getAbsolutePath();
-            if (fileName.endsWith(METADATA_EXTENSION)) {
+            if (fileName.endsWith(FileSystem.METADATA_EXTENSION)) {
                 fileList.add(fileName);
             }
         }
@@ -117,9 +108,6 @@ public class PhysicalGraph {
      *
      * @return
      *     String path to the block's location on disk.
-     *
-     * @throws StorageNodeException
-     *     If there are problems storing the bytes
      */
     public String storeBlock(FileBlock block, byte[] blockBytes)
     throws IOException {
@@ -139,14 +127,14 @@ public class PhysicalGraph {
 
         /* Write the block content first */
         FileOutputStream blockOutStream
-            = new FileOutputStream(blockPath + BLOCK_EXTENSION);
+            = new FileOutputStream(blockPath + FileSystem.BLOCK_EXTENSION);
         byte[] blockData = block.getData();
         blockOutStream.write(blockData);
         blockOutStream.close();
 
         /* Write the metadata separately. */
         FileOutputStream metaOutStream
-            = new FileOutputStream(blockPath + METADATA_EXTENSION);
+            = new FileOutputStream(blockPath + FileSystem.METADATA_EXTENSION);
         byte[] metadata = Serializer.serialize(block.getMetadata());
         metaOutStream.write(metadata);
         metaOutStream.close();
@@ -165,8 +153,8 @@ public class PhysicalGraph {
      */
     public FileBlock loadBlock(String blockPath)
     throws FileNotFoundException, IOException, SerializationException {
-        File metaFile = new File(blockPath + METADATA_EXTENSION);
-        File dataFile = new File(blockPath + BLOCK_EXTENSION);
+        File metaFile = new File(blockPath + FileSystem.METADATA_EXTENSION);
+        File dataFile = new File(blockPath + FileSystem.BLOCK_EXTENSION);
 
         byte[] metaBytes = new byte[(int) metaFile.length()];
         byte[] dataBytes = new byte[(int) dataFile.length()];
@@ -225,14 +213,5 @@ public class PhysicalGraph {
                 metadata.getSpatialProperties().getSpatialRange(), 2);
 
         return directory;
-    }
-
-    /**
-     * Determines whether the Galileo filesystem is read-only.
-     *
-     * @return <code>true</code> if the filesystem is read-only.
-     */
-    public boolean isReadOnly() {
-        return readOnly;
     }
 }
