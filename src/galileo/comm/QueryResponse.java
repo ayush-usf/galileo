@@ -27,11 +27,10 @@ package galileo.comm;
 
 import java.io.IOException;
 
-import galileo.dataset.MetaArray;
-
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
-
+import galileo.graph.GraphException;
+import galileo.graph.MetadataGraph;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
@@ -39,9 +38,9 @@ import galileo.serialization.SerializationOutputStream;
 public class QueryResponse implements GalileoEvent {
 
     private String id;
-    private MetaArray metadata;
+    private MetadataGraph metadata;
 
-    public QueryResponse(String id, MetaArray metadata) {
+    public QueryResponse(String id, MetadataGraph metadata) {
         this.id = id;
         this.metadata = metadata;
     }
@@ -50,7 +49,7 @@ public class QueryResponse implements GalileoEvent {
         return id;
     }
 
-    public MetaArray getMetadata() {
+    public MetadataGraph getMetadata() {
         return metadata;
     }
 
@@ -60,9 +59,9 @@ public class QueryResponse implements GalileoEvent {
     }
 
     public QueryResponse(SerializationInputStream in)
-    throws IOException, SerializationException {
+    throws IOException, SerializationException, GraphException {
         id = in.readString();
-        metadata = new MetaArray(in);
+        metadata = new MetadataGraph(in);
     }
 
     @Override
