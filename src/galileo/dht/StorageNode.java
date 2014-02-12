@@ -48,6 +48,7 @@ import galileo.event.EventType;
 import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
 import galileo.fs.GeospatialFileSystem;
+import galileo.graph.MetadataGraph;
 import galileo.logging.GalileoFormatter;
 import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
@@ -291,11 +292,11 @@ public class StorageNode implements MessageListener {
         public void handleEvent() throws Exception {
             QueryEvent query = deserializeEvent(QueryEvent.class);
 
-//            MetaArray results = fs.query(query.getQuery());
-//            logger.info("Got " + results.size() + "results");
-//            QueryResponse response
-//                = new QueryResponse(query.getQueryId(), results);
-//            publishResponse(response);
+            MetadataGraph results = fs.query(query.getQuery());
+            logger.info("Got " + results.numVertices() + "results");
+            QueryResponse response
+                = new QueryResponse(query.getQueryId(), results);
+            publishResponse(response);
         }
     }
 
@@ -323,6 +324,7 @@ public class StorageNode implements MessageListener {
             /* The logging subsystem may have already shut down, so we revert to
              * stdout for our final messages */
             System.out.println("Initiated shutdown.");
+            fs.shutdown();
 
             /* Close out the status line (remove it) */
             nodeStatus.close();
