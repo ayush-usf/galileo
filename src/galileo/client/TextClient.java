@@ -92,16 +92,7 @@ public class TextClient implements MessageListener {
                 QueryResponse response = Serializer.deserialize(
                         QueryResponse.class, container.getEventPayload());
 
-                if (response.getMetadata().size() == 0) {
-                    System.out.println("Query returned no results.");
-                }
-
-                for (BlockMetadata meta : response.getMetadata()) {
-                    SpatialProperties spatialProperties
-                        = meta.getSpatialProperties();
-                    System.out.println(
-                            spatialProperties.getCoordinates().getLatitude());
-                }
+                System.out.println(response.getMetadata());
             }
 
             if (container.getEventType() == EventType.DISCONNECT) {
