@@ -29,7 +29,8 @@ import java.io.IOException;
 
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
-
+import galileo.query.Query;
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
@@ -38,21 +39,16 @@ import galileo.serialization.SerializationOutputStream;
  *
  * @author malensek
  */
-public class Query implements GalileoEvent {
+public class QueryEvent implements GalileoEvent {
     private String id;
-    private String query;
+    private Query query;
 
-    public Query(String id, String query) {
+    public QueryEvent(String id, Query query) {
         this.id = id;
         this.query = query;
     }
 
-    /**
-     * Returns the query String this Query represents.
-     *
-     * @return query String
-     */
-    public String getQueryString() {
+    public Query getQuery() {
         return query;
     }
 
@@ -66,16 +62,16 @@ public class Query implements GalileoEvent {
     }
 
     @Deserialize
-    public Query(SerializationInputStream in)
-    throws IOException {
+    public QueryEvent(SerializationInputStream in)
+    throws IOException, SerializationException {
         id = in.readString();
-        query = in.readString();
+        query = new Query(in);
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
         out.writeString(id);
-        out.writeString(query);
+        out.writeSerializable(query);
     }
 }

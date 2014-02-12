@@ -28,16 +28,13 @@ package galileo.client;
 import java.io.IOException;
 
 import java.net.UnknownHostException;
-
 import java.util.Calendar;
 import java.util.Random;
 
 import galileo.comm.Disconnection;
-import galileo.comm.Query;
 import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
-
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.Device;
 import galileo.dataset.DeviceSet;
@@ -46,17 +43,14 @@ import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
 import galileo.dataset.feature.Feature;
 import galileo.dataset.feature.FeatureSet;
-
 import galileo.event.EventContainer;
 import galileo.event.EventType;
-
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
-
+import galileo.query.Query;
 import galileo.serialization.Serializer;
-
 import galileo.util.GeoHash;
 
 public class TextClient implements MessageListener {
@@ -128,10 +122,10 @@ public class TextClient implements MessageListener {
         publisher.publish(destination, store);
     }
 
-    public void query(NetworkDestination destination, String queryString)
+    public void query(NetworkDestination destination, Query query)
     throws IOException {
-        QueryRequest query = new QueryRequest(queryString);
-        publisher.publish(destination, query);
+        QueryRequest queryReq = new QueryRequest(query);
+        publisher.publish(destination, queryReq);
     }
 
     public static int randomInt(int start, int end) {
@@ -225,6 +219,5 @@ public class TextClient implements MessageListener {
         FileBlock block = client.generateData();
         client.store(server, block);
 
-        client.query(server, "2013/9/25");
     }
 }

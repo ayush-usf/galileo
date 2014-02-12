@@ -31,39 +31,31 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import galileo.comm.Query;
+import galileo.comm.QueryEvent;
 import galileo.comm.QueryPreamble;
 import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
 import galileo.comm.StorageRequest;
-
 import galileo.config.SystemConfig;
-
 import galileo.dataset.BlockMetadata;
 import galileo.dataset.FileBlock;
 import galileo.dataset.MetaArray;
-
 import galileo.dht.hash.HashException;
 import galileo.dht.hash.HashTopologyException;
-
 import galileo.event.EventContainer;
 import galileo.event.EventType;
-
 import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
-
+import galileo.fs.GeospatialFileSystem;
 import galileo.logging.GalileoFormatter;
-
 import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
 import galileo.net.HostIdentifier;
 import galileo.net.MessageListener;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
-
 import galileo.serialization.Serializer;
-
 import galileo.util.StatusLine;
 import galileo.util.Version;
 
@@ -87,7 +79,7 @@ public class StorageNode implements MessageListener {
     private ServerMessageRouter messageRouter;
     private ClientConnectionPool connectionPool;
     private Scheduler scheduler;
-    private FileSystem fs;
+    private GeospatialFileSystem fs;
 
     private Partitioner<BlockMetadata> partitioner;
 
@@ -128,7 +120,7 @@ public class StorageNode implements MessageListener {
         /* Set up the FileSystem. */
         nodeStatus.set("Initializing file system");
         try {
-            fs = new FileSystem(SystemConfig.getRootDir());
+            fs = new GeospatialFileSystem(SystemConfig.getRootDir());
             fs.recoverMetadata();
         } catch (FileSystemException e) {
             nodeStatus.set("File system initialization failure");
@@ -283,8 +275,8 @@ public class StorageNode implements MessageListener {
                 logger.info(sb.toString());
             }
 
-            Query query = new Query(tracker.getIdString(sessionId),
-                    request.getQueryString());
+            QueryEvent query = new QueryEvent(tracker.getIdString(sessionId),
+                    request.getQuery());
             for (NodeInfo node : queryNodes) {
                 publishEvent(query, node);
             }
@@ -297,13 +289,13 @@ public class StorageNode implements MessageListener {
     private class queryHandler extends EventHandler {
         @Override
         public void handleEvent() throws Exception {
-            Query query = deserializeEvent(Query.class);
+            QueryEvent query = deserializeEvent(QueryEvent.class);
 
-            MetaArray results = fs.query(query.getQueryString());
-            logger.info("Got " + results.size() + "results");
-            QueryResponse response
-                = new QueryResponse(query.getQueryId(), results);
-            publishResponse(response);
+//            MetaArray results = fs.query(query.getQuery());
+//            logger.info("Got " + results.size() + "results");
+//            QueryResponse response
+//                = new QueryResponse(query.getQueryId(), results);
+//            publishResponse(response);
         }
     }
 
