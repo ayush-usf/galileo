@@ -25,52 +25,57 @@ software, even if advised of the possibility of such damage.
 
 package galileo.query;
 
+import galileo.serialization.ByteSerializable;
+
+import galileo.serialization.SerializationException;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Encapsulates a Galileo query.
  *
  * @author malensek
  */
-public class Query {
+public class Query implements ByteSerializable {
 
-    private Map<String, List<Operation>> operations = new HashMap<>();
+    private List<Operation> operations = new ArrayList<>();
 
     public Query() { }
 
     public void addOperation(Operation op) {
-        String operand = op.getOperandName();
-        List<Operation> opList = operations.get(operand);
-        if (opList == null) {
-            List<Operation> newOpList = new ArrayList<>();
-            newOpList.add(op);
-            operations.put(operand, newOpList);
-        } else {
-            opList.add(op);
-        }
+        operations.add(op);
     }
 
-    public Set<String> getOperands() {
-        return operations.keySet();
-    }
-
-    public List<Operation> getOperations(String operand) {
-        return operations.get(operand);
+    public List<Operation> getOperations() {
+        return operations;
     }
 
     @Override
     public String toString() {
         String str = "";
-        for (List<Operation> opList : operations.values()) {
-            for (Operation op : opList) {
-                str += op + System.lineSeparator();
+        for (int i = 0; i < operations.size(); ++i) {
+            str += operations.get(i);
+
+            if (i < operations.size() - 1) {
+                str += " || ";
             }
         }
-
         return str;
+    }
+
+    @Deserialize
+    public Query(SerializationInputStream in)
+    throws IOException, SerializationException {
+        in.readSerializableCollection(Operation.class, operations);
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeSerializableCollection(operations);
     }
 }

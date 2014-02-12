@@ -25,8 +25,17 @@ software, even if advised of the possibility of such damage.
 
 package galileo.query;
 
+import galileo.serialization.ByteSerializable;
+
+import galileo.serialization.SerializationException;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Encapsulates a query operation.  This involves an operand, and multiple
@@ -35,40 +44,47 @@ import java.util.List;
  *
  * @author malensek
  */
-public class Operation {
+public class Operation implements ByteSerializable {
 
-    private String operandName;
+    private Map<String, List<Expression>> expressionMap
+        = new HashMap<>();
+
     private List<Expression> expressions = new ArrayList<>();
 
-    public Operation(String operandName, Expression expression) {
-        this.operandName = operandName;
-        addExpressions(expression);
-    }
-
-    public Operation(String operandName, Expression... expressions) {
-        this.operandName = operandName;
+    public Operation(Expression... expressions) {
         addExpressions(expressions);
     }
 
     public void addExpressions(Expression... expressions) {
         for (Expression expression : expressions) {
             this.expressions.add(expression);
+
+            String operand = expression.getOperand();
+
+            List<Expression> list = expressionMap.get(operand);
+            if (list == null) {
+                List<Expression> newList = new ArrayList<>();
+                expressionMap.put(operand, newList);
+                list = newList;
+            }
+
+            list.add(expression);
         }
+    }
+
+    public List<Expression> getOperand(String operand) {
+        return expressionMap.get(operand);
     }
 
     public List<Expression> getExpressions() {
         return expressions;
     }
 
-    public String getOperandName() {
-        return operandName;
-    }
-
     @Override
     public String toString() {
         String str = "";
         for (int i = 0; i < expressions.size(); ++i) {
-            str += operandName + " " + expressions.get(i);
+            str += expressions.get(i);
 
             if (i < expressions.size() - 1) {
                 str += " && ";
@@ -76,5 +92,21 @@ public class Operation {
         }
 
         return "(" + str + ")";
+    }
+
+    @Deserialize
+    public Operation(SerializationInputStream in)
+    throws IOException, SerializationException {
+        int numExpressions = in.readInt();
+        for (int i = 0; i < numExpressions; ++i) {
+            Expression exp = new Expression(in);
+            addExpressions(exp);
+        }
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeSerializableCollection(expressions);
     }
 }

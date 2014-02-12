@@ -25,7 +25,13 @@ software, even if advised of the possibility of such damage.
 
 package galileo.query;
 
+import java.io.IOException;
+
 import galileo.dataset.feature.Feature;
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationException;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
 
 /**
  * Representation of a query expression.  For example: x != 3.6.  Contains an
@@ -33,12 +39,10 @@ import galileo.dataset.feature.Feature;
  *
  * @author malensek
  */
-public class Expression {
+public class Expression implements ByteSerializable {
 
-    public Operator operator;
-    public Feature value;
-
-    public Expression() { }
+    private Operator operator;
+    private Feature value;
 
     public Expression(Operator operator, Feature value) {
         this.operator = operator;
@@ -50,18 +54,46 @@ public class Expression {
         this.value = value;
     }
 
+    //TODO remove (deprecated)
     public Expression(Operator operator, double value) {
         this.operator = operator;
         this.value = new Feature(value);
     }
 
+    //TODO remove (deprecated)
     public Expression(String operator, double value) {
         this.operator = Operator.fromString(operator);
         this.value = new Feature(value);
     }
 
+    public Feature getValue() {
+        return value;
+    }
+
+    public Operator getOperator() {
+        return operator;
+    }
+
+    public String getOperand() {
+        return value.getName();
+    }
+
     @Override
     public String toString() {
-        return operator + " " + value;
+        return value.getName() + " " + operator + " " + value.getString();
+    }
+
+    @Deserialize
+    public Expression(SerializationInputStream in)
+    throws IOException, SerializationException {
+        operator = Operator.fromInt(in.readInt());
+        value = new Feature(in);
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeInt(operator.toInt());
+        out.writeSerializable(value);
     }
 }
