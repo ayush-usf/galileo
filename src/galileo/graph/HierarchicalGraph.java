@@ -109,10 +109,9 @@ public class HierarchicalGraph<T> {
             evaluateOperation(operation, tracker);
         }
 
-        List<Path<Feature, T>> paths = new ArrayList<>();
-        for (Path<Feature, T> path : tracker.getQueryResults()) {
+        List<Path<Feature, T>> paths = tracker.getQueryResults();
+        for (Path<Feature, T> path : paths) {
             removeNullFeatures(path);
-            paths.add(path);
         }
         return paths;
     }
