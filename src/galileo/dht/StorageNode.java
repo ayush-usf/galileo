@@ -159,10 +159,14 @@ public class StorageNode implements MessageListener {
 
     private void configurePartitioner()
     throws HashException, HashTopologyException, PartitionException {
-        String[] geohashes = { "c2", "c8", "cb", "f0", "f2",
-                               "9r", "9x", "9z", "dp", "dr",
-                               "9q", "9w", "9y", "dn", "dq",
-                               "9m", "9t", "9v", "dj" };
+        String[] geohashes = { "8g", "8u", "8v", "8x", "8y", "8z", "94", "95",
+                "96", "97", "9d", "9e", "9g", "9h", "9j", "9k", "9m", "9n",
+                "9p", "9q", "9r", "9s", "9t", "9u", "9v", "9w", "9x", "9y",
+                "9z", "b8", "b9", "bb", "bc", "bf", "c0", "c1", "c2", "c3",
+                "c4", "c6", "c8", "c9", "cb", "cc", "cd", "cf", "d4", "d5",
+                "d6", "d7", "dd", "de", "dh", "dj", "dk", "dm", "dn", "dp",
+                "dq", "dr", "ds", "dt", "dw", "dx", "dz", "f0", "f1", "f2",
+                "f3", "f4", "f6", "f8", "f9", "fb", "fc", "fd", "ff" };
 
         partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
     }
