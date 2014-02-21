@@ -1,9 +1,21 @@
-public class StoreNetCDF {
+package galileo.samples;
+
+import java.io.IOException;
+
+import java.net.UnknownHostException;
+
+import galileo.client.EventPublisher;
+import galileo.net.ClientMessageRouter;
+import galileo.net.GalileoMessage;
+import galileo.net.MessageListener;
+import galileo.net.NetworkDestination;
+
+public class StoreNetCDF implements MessageListener {
 
     private ClientMessageRouter messageRouter;
     private EventPublisher publisher;
 
-    public TextClient() throws IOException {
+    public StoreNetCDF() throws IOException {
         messageRouter = new ClientMessageRouter();
         publisher = new EventPublisher(messageRouter);
 
@@ -17,6 +29,15 @@ public class StoreNetCDF {
 
     public void disconnect() {
         messageRouter.shutdown();
+    }
+
+    @Override
+    public void onMessage(GalileoMessage message) {
+        if (message == null) {
+            /* Connection was terminated */
+            messageRouter.shutdown();
+            return;
+        }
     }
 
     public static void main(String[] args) {
