@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -84,6 +85,16 @@ public class Vertex<L extends Comparable<L>, V> {
      */
     public Vertex<L, V> getNeighbor(L label) {
         return edges.get(label);
+    }
+
+    public NavigableMap<L, Vertex<L, V>> getNeighborsLessThan(
+            L label, boolean inclusive) {
+        return edges.headMap(label, inclusive);
+    }
+
+    public NavigableMap<L, Vertex<L, V>> getNeighborsGreaterThan(
+            L label, boolean inclusive) {
+        return edges.tailMap(label, inclusive);
     }
 
     /**
