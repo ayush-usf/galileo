@@ -26,10 +26,9 @@ software, even if advised of the possibility of such damage.
 package galileo.test.dht.partitioning;
 
 import static org.junit.Assert.*;
-
-import galileo.dataset.BlockMetadata;
 import galileo.dataset.Device;
 import galileo.dataset.DeviceSet;
+import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
 import galileo.dataset.feature.Feature;
@@ -56,7 +55,6 @@ public class SpatialHierarchy {
         "9r", "9x", "9z", "dp", "dr",
         "9q", "9w", "9y", "dn", "dq",
         "9m", "9t", "9v", "dj" };
-
 
     public SpatialHierarchy()
     throws HashException, HashTopologyException, PartitionException {
@@ -94,7 +92,10 @@ public class SpatialHierarchy {
         DeviceSet ds = new DeviceSet();
 
 
-        BlockMetadata meta = new BlockMetadata(tp, sp, fs, ds);
+        Metadata meta = new Metadata();
+        meta.setTemporalProperties(tp);
+        meta.setSpatialProperties(sp);
+        meta.setAttributes(fs);
 
         assertEquals("block1", "lattice-1:5555",
                 partitioner.locateData(meta).toString());
@@ -116,7 +117,7 @@ public class SpatialHierarchy {
                 partitioner.locateData(meta).toString());
 
         sp = new SpatialProperties(29.55f, -111.19f);
-        meta = new BlockMetadata(tp, sp, fs, ds);
+        meta.setSpatialProperties(sp);
         assertEquals("block2", "lattice-2:5555",
                 partitioner.locateData(meta).toString());
     }
@@ -129,16 +130,13 @@ public class SpatialHierarchy {
         FeatureSet fs = new FeatureSet();
         fs.put(new Feature("test1", 36.2));
 
-        DeviceSet ds = new DeviceSet();
-
-        BlockMetadata meta = new BlockMetadata(tp, sp, fs, ds);
+        Metadata meta = new Metadata();
+        meta.setTemporalProperties(tp);
+        meta.setSpatialProperties(sp);
+        meta.setAttributes(fs);
 
         /* Note how the relative positions should be the same in this group! */
         assertEquals("block1", "lattice-8:5555",
-                partitioner.locateData(meta).toString());
-
-        ds.put(new Device("testdev"));
-        assertEquals("block2", "lattice-10:5555",
                 partitioner.locateData(meta).toString());
 
         fs.put(new Feature("temperature", 32.3));
@@ -146,8 +144,6 @@ public class SpatialHierarchy {
         assertEquals("block2", "lattice-11:5555",
                 partitioner.locateData(meta).toString());
 
-        ds.put(new Device("my_gps"));
-        ds.put(new Device("radar"));
         fs.put(new Feature("wind_velocity", 55.2));
         fs.put(new Feature("featureificness", 100));
         assertEquals("block2", "lattice-9:5555",
@@ -163,12 +159,12 @@ public class SpatialHierarchy {
         FeatureSet fs = new FeatureSet();
         fs.put(new Feature("test1", 36.2));
 
-        DeviceSet ds = new DeviceSet();
-
-        BlockMetadata meta = new BlockMetadata(tp, sp, fs, ds);
+        Metadata meta = new Metadata();
+        meta.setTemporalProperties(tp);
+        meta.setSpatialProperties(sp);
+        meta.setAttributes(fs);
 
         /* Note how the relative positions should be the same in this group! */
-
         assertEquals("block1", "lattice-8:5555",
                 partitioner.locateData(meta).toString());
     }
