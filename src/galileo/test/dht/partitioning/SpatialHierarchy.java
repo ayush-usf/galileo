@@ -26,8 +26,6 @@ software, even if advised of the possibility of such damage.
 package galileo.test.dht.partitioning;
 
 import static org.junit.Assert.*;
-import galileo.dataset.Device;
-import galileo.dataset.DeviceSet;
 import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
@@ -44,7 +42,8 @@ import galileo.dht.hash.HashTopologyException;
 import org.junit.Test;
 
 /**
- * Tests the {@link SpatialHierarchyPartitioner}.
+ * Tests the {@link SpatialHierarchyPartitioner}.  This test uses a hardcoded
+ * set of locations to verify that partitioning functionality has not regressed.
  */
 public class SpatialHierarchy {
 
@@ -89,9 +88,6 @@ public class SpatialHierarchy {
         FeatureSet fs = new FeatureSet();
         fs.put(new Feature("test1", 36.2));
 
-        DeviceSet ds = new DeviceSet();
-
-
         Metadata meta = new Metadata();
         meta.setTemporalProperties(tp);
         meta.setSpatialProperties(sp);
@@ -100,25 +96,23 @@ public class SpatialHierarchy {
         assertEquals("block1", "lattice-1:5555",
                 partitioner.locateData(meta).toString());
 
-        ds.put(new Device("testdev"));
-        assertEquals("block2", "lattice-3:5555",
+        fs.put(new Feature("snow_depth", 18.2));
+        assertEquals("block2", "lattice-1:5555",
                 partitioner.locateData(meta).toString());
 
         fs.put(new Feature("temperature", 32.3));
         fs.put(new Feature("humidity", 33.3));
-        assertEquals("block2", "lattice-4:5555",
+        assertEquals("block3", "lattice-1:5555",
                 partitioner.locateData(meta).toString());
 
-        ds.put(new Device("my_gps"));
-        ds.put(new Device("radar"));
         fs.put(new Feature("wind_velocity", 55.2));
         fs.put(new Feature("featureificness", 100));
-        assertEquals("block2", "lattice-2:5555",
+        assertEquals("block4", "lattice-4:5555",
                 partitioner.locateData(meta).toString());
 
         sp = new SpatialProperties(29.55f, -111.19f);
         meta.setSpatialProperties(sp);
-        assertEquals("block2", "lattice-2:5555",
+        assertEquals("block5", "lattice-4:5555",
                 partitioner.locateData(meta).toString());
     }
 
@@ -141,12 +135,12 @@ public class SpatialHierarchy {
 
         fs.put(new Feature("temperature", 32.3));
         fs.put(new Feature("humidity", 33.3));
-        assertEquals("block2", "lattice-11:5555",
+        assertEquals("block2", "lattice-8:5555",
                 partitioner.locateData(meta).toString());
 
         fs.put(new Feature("wind_velocity", 55.2));
         fs.put(new Feature("featureificness", 100));
-        assertEquals("block2", "lattice-9:5555",
+        assertEquals("block3", "lattice-11:5555",
                 partitioner.locateData(meta).toString());
     }
 
