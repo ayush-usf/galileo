@@ -25,7 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package galileo.dht.hash;
 
-import galileo.dataset.BlockMetadata;
+import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
 import galileo.util.GeoHash;
 
@@ -40,7 +40,7 @@ import java.util.Random;
  *
  * @author malensek
  */
-public class ConstrainedGeohash implements HashFunction<BlockMetadata> {
+public class ConstrainedGeohash implements HashFunction<Metadata> {
 
     private Random random = new Random();
 
@@ -68,7 +68,7 @@ public class ConstrainedGeohash implements HashFunction<BlockMetadata> {
     }
 
     @Override
-    public BigInteger hash(BlockMetadata data)
+    public BigInteger hash(Metadata data)
     throws HashException {
         String hash = null;
         SpatialProperties spatialProps = data.getSpatialProperties();

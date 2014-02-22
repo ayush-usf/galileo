@@ -27,26 +27,26 @@ package galileo.comm;
 
 import java.io.IOException;
 
-import galileo.dataset.FileBlock;
-
+import galileo.dataset.Block;
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
-
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
 /**
- * Represents a client request for storage at a DHT {@link galileo.dht.StorageNode}.
+ * Represents a client request for storage at a DHT
+ * {@link galileo.dht.StorageNode}.
  */
 public class StorageRequest implements GalileoEvent {
 
-    private FileBlock block;
+    private Block block;
 
-    public StorageRequest(FileBlock block) {
+    public StorageRequest(Block block) {
         this.block = block;
     }
 
-    public FileBlock getBlock() {
+    public Block getBlock() {
         return block;
     }
 
@@ -57,8 +57,8 @@ public class StorageRequest implements GalileoEvent {
 
     @Deserialize
     public StorageRequest(SerializationInputStream in)
-    throws IOException {
-        block = new FileBlock(in);
+    throws IOException, SerializationException {
+        block = new Block(in);
     }
 
     @Override

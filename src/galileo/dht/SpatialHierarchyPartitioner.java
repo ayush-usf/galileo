@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import galileo.dataset.BlockMetadata;
-import galileo.dataset.Device;
+import galileo.dataset.Metadata;
 import galileo.dataset.feature.Feature;
 import galileo.dht.hash.BalancedHashRing;
 import galileo.dht.hash.ConstrainedGeohash;
@@ -46,12 +45,12 @@ import galileo.dht.hash.SHA1;
  *
  * @author malensek
  */
-public class SpatialHierarchyPartitioner extends Partitioner<BlockMetadata> {
+public class SpatialHierarchyPartitioner extends Partitioner<Metadata> {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
     private ConstrainedGeohash groupHash;
-    private BalancedHashRing<BlockMetadata> groupHashRing;
+    private BalancedHashRing<Metadata> groupHashRing;
     private Map<BigInteger, GroupInfo> groupPositions = new HashMap<>();
 
     private SHA1 nodeHash = new SHA1();
@@ -113,19 +112,15 @@ public class SpatialHierarchyPartitioner extends Partitioner<BlockMetadata> {
     }
 
     @Override
-    public NodeInfo locateData(BlockMetadata metadata)
+    public NodeInfo locateData(Metadata metadata)
     throws HashException, PartitionException {
         /* First, determine the group that should hold this file */
         BigInteger group = groupHashRing.locate(metadata);
 
         /* Next, the StorageNode */
         String combinedAttrs = metadata.getName();
-        for (Feature feature : metadata.getFeatures()) {
+        for (Feature feature : metadata.getAttributes()) {
             combinedAttrs += feature.getString();
-        }
-
-        for (Device device : metadata.getDevices()) {
-            combinedAttrs += device.getName();
         }
 
         HashRing<byte[]> nodeHash = nodeHashRings.get(group);

@@ -38,18 +38,15 @@ import galileo.comm.QueryResponse;
 import galileo.comm.StorageEvent;
 import galileo.comm.StorageRequest;
 import galileo.config.SystemConfig;
-import galileo.dataset.BlockMetadata;
-import galileo.dataset.FileBlock;
-import galileo.dataset.MetaArray;
+import galileo.dataset.Block;
+import galileo.dataset.Metadata;
 import galileo.dht.hash.HashException;
 import galileo.dht.hash.HashTopologyException;
 import galileo.event.EventContainer;
 import galileo.event.EventType;
-import galileo.fs.FileSystem;
 import galileo.fs.FileSystemException;
 import galileo.fs.GeospatialFileSystem;
 import galileo.graph.MetadataGraph;
-import galileo.logging.GalileoFormatter;
 import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
 import galileo.net.HostIdentifier;
@@ -82,7 +79,7 @@ public class StorageNode implements MessageListener {
     private Scheduler scheduler;
     private GeospatialFileSystem fs;
 
-    private Partitioner<BlockMetadata> partitioner;
+    private Partitioner<Metadata> partitioner;
 
     private ConcurrentHashMap<String, QueryTracker> queryTrackers
         = new ConcurrentHashMap<>();
@@ -220,8 +217,8 @@ public class StorageNode implements MessageListener {
             StorageRequest request = deserializeEvent(StorageRequest.class);
 
             /* Determine where this block goes. */
-            FileBlock file = request.getBlock();
-            BlockMetadata metadata = file.getMetadata();
+            Block file = request.getBlock();
+            Metadata metadata = file.getMetadata();
             NodeInfo node = partitioner.locateData(metadata);
 
             logger.log(Level.INFO, "Storage destination: {0}", node);
