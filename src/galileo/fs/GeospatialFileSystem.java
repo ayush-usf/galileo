@@ -4,8 +4,8 @@ package galileo.fs;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import galileo.dataset.Block;
 import galileo.dataset.Metadata;
@@ -18,11 +18,9 @@ import galileo.util.StackTraceToString;
 
 public class GeospatialFileSystem extends FileSystem {
 
+    private static final Logger logger = Logger.getLogger("galileo");
+
     private static final String metadataStore = "metadata.graph";
-
-    private static final Log logger =
-        LogFactory.getLog(GeospatialFileSystem.class);
-
 
     public MetadataGraph metadataGraph;
 
@@ -76,7 +74,7 @@ public class GeospatialFileSystem extends FileSystem {
             Serializer.persist(metadataGraph,
                     storageDirectory + "/" + metadataStore);
         } catch (IOException e) {
-            logger.error("Error writing persistent index file", e);
+            logger.log(Level.SEVERE, "Error writing persistent index file", e);
         }
     }
 }
