@@ -82,6 +82,10 @@ public class Metadata implements ByteSerializable {
         return name;
     }
 
+    /**
+     * Places a single feature into this Metadata instance's attribute
+     * FeatureSet.
+     */
     public void putAttribute(Feature feature) {
         attributes.put(feature);
     }
@@ -94,12 +98,34 @@ public class Metadata implements ByteSerializable {
         return attributes;
     }
 
+    /**
+     * Sets this Metadata container's attribute FeatureSet.  This will eliminate
+     * any previously-added attributes.
+     *
+     * @param attributes {@link FeatureSet} containing attributes that should be
+     * associated with this Metadata instance.
+     */
+    public void setAttributes(FeatureSet attributes) {
+        this.attributes = attributes;
+    }
+
     public void putFeature(FeatureArray feature) {
         features.put(feature);
     }
 
     public FeatureArray getFeature(String featureName) {
         return features.get(featureName);
+    }
+
+    /**
+     * Sets this Metadata container's set of Feature arrays.  This will
+     * eliminate any previously-added Feature arrays.
+     *
+     * @param features {@link FeatureArraySet} containing features that should
+     * be associated with this Metadata instance.
+     */
+    public void setFeatures(FeatureArraySet features) {
+        this.features = features;
     }
 
     public FeatureArraySet getFeatures() {
