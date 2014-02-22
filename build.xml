@@ -94,6 +94,7 @@
             <classpath refid="classpath"/>
             <formatter type="plain" usefile="false"/>
             <test name="galileo.test.dataset.feature.TestSuite"/>
+            <test name="galileo.test.dht.partitioning.TestSuite"/>
         </junit>
     </target>
 
