@@ -35,10 +35,8 @@ import galileo.comm.Disconnection;
 import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
-import galileo.dataset.BlockMetadata;
-import galileo.dataset.Device;
-import galileo.dataset.DeviceSet;
-import galileo.dataset.FileBlock;
+import galileo.dataset.Block;
+import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
 import galileo.dataset.feature.Feature;
@@ -107,7 +105,7 @@ public class TextClient implements MessageListener {
         }
     }
 
-    public void store(NetworkDestination destination, FileBlock fb)
+    public void store(NetworkDestination destination, Block fb)
     throws Exception {
         StorageRequest store = new StorageRequest(fb);
         publisher.publish(destination, store);
@@ -127,7 +125,7 @@ public class TextClient implements MessageListener {
         return randomGenerator.nextFloat();
     }
 
-    private FileBlock generateData() {
+    private Block generateData() {
         /* First, a temporal range for this data "sample" */
         Calendar calendar = Calendar.getInstance();
         int year, month, day;
@@ -173,19 +171,17 @@ public class TextClient implements MessageListener {
             features.put(new Feature(featureName, randomFloat() * 100));
         }
 
-        Device d = new Device("my-gps");
-        DeviceSet devices = new DeviceSet();
-        devices.put(d);
-
-        BlockMetadata metadata = new BlockMetadata(
-                temporalProperties, spatialProperties, features, devices);
+        Metadata metadata = new Metadata();
+        metadata.setTemporalProperties(temporalProperties);
+        metadata.setSpatialProperties(spatialProperties);
+        metadata.setAttributes(features);
 
         /* Now let's make some "data" to associate with our metadata. */
         Random r = new Random(System.nanoTime());
         byte[] blockData = new byte[8000];
         r.nextBytes(blockData);
 
-        FileBlock b = new FileBlock(blockData, metadata);
+        Block b = new Block(metadata, blockData);
 
         return b;
     }
@@ -207,7 +203,7 @@ public class TextClient implements MessageListener {
         //NetworkDestination server3 = client.connect("lattice-22", 5555);
         System.out.println("sending");
 
-        FileBlock block = client.generateData();
+        Block block = client.generateData();
         client.store(server, block);
 
     }
