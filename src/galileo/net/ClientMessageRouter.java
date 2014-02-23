@@ -45,6 +45,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
+/**
+ * Provides client-side message routing capabilities. This includes connecting
+ * to a remote server, and transmitting messages in non-blocking mode.
+ *
+ * @author malensek
+ */
 public class ClientMessageRouter extends MessageRouter {
 
     protected Map<SocketChannel, NetworkDestination> connections
