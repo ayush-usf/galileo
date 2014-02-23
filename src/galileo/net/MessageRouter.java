@@ -296,10 +296,18 @@ public abstract class MessageRouter implements Runnable {
         SocketChannel channel = (SocketChannel) key.channel();
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
-        Queue<ByteBuffer> pendingWriteQueue = tracker.getPendingWriteQueue();
+        BlockingQueue<ByteBuffer> pendingWriteQueue
+            = tracker.getPendingWriteQueue();
 
         if (!pendingWriteQueue.isEmpty()) {
-            pendingWriteQueue.offer(payload);
+            try {
+                pendingWriteQueue.put(payload);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Sender thread interrupted");
+            }
+            key.interestOps(SelectionKey.OP_WRITE);
+            selector.wakeup();
             return;
         }
 
@@ -311,7 +319,12 @@ public abstract class MessageRouter implements Runnable {
                 /* If the write operation failed to write any bytes, register it
                  * with the Selector so it can be handled during the next
                  * selection phase. */
-                tracker.getPendingWriteQueue().offer(payload);
+                try {
+                    pendingWriteQueue.put(payload);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Sender thread interrupted");
+                }
                 key.interestOps(SelectionKey.OP_WRITE);
                 selector.wakeup();
 
@@ -331,7 +344,8 @@ public abstract class MessageRouter implements Runnable {
     private void write(SelectionKey key) {
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         SocketChannel channel = (SocketChannel) key.channel();
-        Queue<ByteBuffer> pendingWrites = tracker.getPendingWriteQueue();
+        BlockingQueue<ByteBuffer> pendingWrites
+            = tracker.getPendingWriteQueue();
 
         key.interestOps(SelectionKey.OP_READ);
 

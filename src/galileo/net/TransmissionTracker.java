@@ -26,11 +26,9 @@ software, even if advised of the possibility of such damage.
 package galileo.net;
 
 import java.nio.ByteBuffer;
-
 import java.nio.channels.SelectionKey;
-
 import java.util.Queue;
-
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -43,7 +41,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TransmissionTracker {
 
     /** Contains a list of pending write operations for this client. */
-    private Queue<ByteBuffer> pendingWrites = new LinkedBlockingQueue<>(100);
+    private BlockingQueue<ByteBuffer> pendingWrites;
 
     /** Read pointer for the message size prefix */
     public int prefixPointer;
@@ -80,7 +78,7 @@ public class TransmissionTracker {
         expectedBytes = 0;
     }
 
-    public Queue<ByteBuffer> getPendingWriteQueue() {
+    public BlockingQueue<ByteBuffer> getPendingWriteQueue() {
         return pendingWrites;
     }
 
