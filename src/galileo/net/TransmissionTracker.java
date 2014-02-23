@@ -58,7 +58,9 @@ public class TransmissionTracker {
     /** The size of the complete payload in bytes */
     public int expectedBytes;
 
-    public TransmissionTracker() { }
+    public TransmissionTracker(int writeQueueSize) {
+        pendingWrites = new LinkedBlockingQueue<>(writeQueueSize);
+    }
 
     /**
      * Allocates a buffer for the incoming payload once the message size prefix

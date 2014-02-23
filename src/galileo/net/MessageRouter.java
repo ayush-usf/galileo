@@ -28,21 +28,18 @@ package galileo.net;
 import java.io.IOException;
 
 import java.net.Socket;
-
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
-
+import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +53,23 @@ import galileo.serialization.Serializer;
  */
 public abstract class MessageRouter implements Runnable {
 
+    /** The default read buffer size is 8 MB. */
+    public static final int DEFAULT_READ_BUFFER_SIZE = 8388608;
+
+    /** The default write queue allows 100 items to be inserted before it
+     * starts blocking.  This prevents situations where the MessageRouter is
+     * overwhelmed by an extreme number of write requests, exhausting available
+     * resources. */
+    public static final int DEFAULT_WRITE_QUEUE_SIZE = 100;
+
+    /** System property that overrides the read buffer size. */
+    public static final String READ_BUFFER_PROPERTY
+        = "galileo.net.MessageRouter.readBufferSize";
+
+    /** System property that overrides the write queue maximum size. */
+    public static final String WRITE_QUEUE_PROPERTY
+        = "galileo.net.MessageRouter.writeQueueSize";
+
     protected static final Logger logger = Logger.getLogger("galileo");
 
     protected boolean online;
@@ -64,10 +78,31 @@ public abstract class MessageRouter implements Runnable {
 
     protected Selector selector;
 
-    private static final int BUFFER_SIZE = 8 * 1024;
-    private ByteBuffer readBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+    protected int readBufferSize;
+    protected int writeQueueSize;
+    private ByteBuffer readBuffer;
 
-    public MessageRouter() { }
+    public MessageRouter() {
+        this(DEFAULT_READ_BUFFER_SIZE, DEFAULT_WRITE_QUEUE_SIZE);
+    }
+
+    public MessageRouter(int readBufferSize, int maxWriteQueueSize) {
+        String readSz = System.getProperty(READ_BUFFER_PROPERTY);
+        if (readSz == null) {
+            this.readBufferSize = readBufferSize;
+        } else {
+            this.readBufferSize = Integer.parseInt(readSz);
+        }
+
+        String queueSz = System.getProperty(WRITE_QUEUE_PROPERTY);
+        if (queueSz == null) {
+            this.writeQueueSize = maxWriteQueueSize;
+        } else {
+            this.writeQueueSize = Integer.parseInt(queueSz);
+        }
+
+        readBuffer = ByteBuffer.allocateDirect(this.readBufferSize);
+    }
 
     /**
      * As long as the MessageRouter is online, monitor connection operations
@@ -139,7 +174,7 @@ public abstract class MessageRouter implements Runnable {
     throws IOException {
         ServerSocketChannel servSocket = (ServerSocketChannel) key.channel();
         SocketChannel channel = servSocket.accept();
-        TransmissionTracker tracker = new TransmissionTracker();
+        TransmissionTracker tracker = new TransmissionTracker(writeQueueSize);
         logger.info("Accepted connection: " + getClientString(channel));
         channel.configureBlocking(false);
         channel.register(selector, SelectionKey.OP_READ, tracker);

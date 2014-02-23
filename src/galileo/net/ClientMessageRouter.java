@@ -65,6 +65,18 @@ public class ClientMessageRouter extends MessageRouter {
 
     public ClientMessageRouter()
     throws IOException {
+        super();
+        initializeSelector();
+    }
+
+    public ClientMessageRouter(int readBufferSize, int maxWriteQueueSize)
+    throws IOException {
+        super(readBufferSize, maxWriteQueueSize);
+        initializeSelector();
+    }
+
+    private void initializeSelector()
+    throws IOException {
         this.selector = Selector.open();
         this.online = true;
         Thread selectorThread = new Thread(this);
@@ -119,7 +131,9 @@ public class ClientMessageRouter extends MessageRouter {
         pendingRegistrations.drainTo(registrations);
 
         for (SocketChannel channel : registrations) {
-            TransmissionTracker tracker = new TransmissionTracker();
+            TransmissionTracker tracker
+                = new TransmissionTracker(writeQueueSize);
+
             channel.register(selector, SelectionKey.OP_CONNECT, tracker);
         }
     }
@@ -186,6 +200,7 @@ public class ClientMessageRouter extends MessageRouter {
                 try {
                     key = waitingKeys.get(channel).take();
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     throw new IOException("Sender thread interrupted.");
                 }
 
