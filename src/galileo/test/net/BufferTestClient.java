@@ -63,10 +63,10 @@ public class BufferTestClient {
 
     public static void main(String[] args) throws Exception {
         String hostname = args[0];
-        int port = Integer.parseInt(args[1]);
-        int messages = Integer.parseInt(args[2]);
+        int messages = Integer.parseInt(args[1]);
 
-        NetworkDestination netDest = new NetworkDestination(hostname, port);
+        NetworkDestination netDest = new NetworkDestination(
+                hostname, BufferTestServer.PORT);
         BufferTestClient btc = new BufferTestClient(netDest);
 
         btc.test(messages);
