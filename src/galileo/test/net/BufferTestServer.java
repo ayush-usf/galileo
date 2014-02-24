@@ -34,7 +34,7 @@ import galileo.net.ServerMessageRouter;
 
 public class BufferTestServer implements MessageListener {
 
-    private static final int PORT = 5050;
+    protected static final int PORT = 5050;
 
     private int counter;
     private ServerMessageRouter messageRouter;
