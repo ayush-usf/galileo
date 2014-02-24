@@ -50,6 +50,10 @@ public class BufferTestClient {
         messageRouter.connectTo(netDest.getHostname(), netDest.getPort());
     }
 
+    public void disconnect() {
+        messageRouter.shutdown();
+    }
+
     public void test(int messages)
     throws Exception {
         for (int i = 0; i < messages; ++i) {
@@ -71,5 +75,6 @@ public class BufferTestClient {
 
         btc.test(messages);
         System.out.println("Test complete");
+        btc.disconnect();
     }
 }
