@@ -29,9 +29,8 @@ import galileo.client.EventPublisher;
 import galileo.comm.Disconnection;
 
 import java.io.IOException;
-
 import java.net.InetSocketAddress;
-
+import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -44,6 +43,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides client-side message routing capabilities. This includes connecting
@@ -52,6 +52,8 @@ import java.util.logging.Level;
  * @author malensek
  */
 public class ClientMessageRouter extends MessageRouter {
+
+    protected static final Logger logger = Logger.getLogger("galileo");
 
     protected Map<SocketChannel, NetworkDestination> connections
         = new HashMap<>();
@@ -157,17 +159,90 @@ public class ClientMessageRouter extends MessageRouter {
     }
 
     /**
-     * Shuts down the message processor and disconnects from the server(s).
+     * Forcibly shuts down the message processor and disconnects from any
+     * connected server(s).  If pending writes have been queued, they will be
+     * discarded.
+     */
+    public void forceShutdown() {
+        shutdown(true);
+    }
+
+    /**
+     * Shuts down the message processor and disconnects from the server(s).  If
+     * pending writes have been queued, this method will block until the queue
+     * is empty.
      */
     public void shutdown() {
+        shutdown(false);
+    }
+
+    /**
+     * Shuts down the message processor and disconnects from the server(s).
+     *
+     * @param forcible Whether or not to forcibly shut down (discard queued
+     * messages).
+     */
+    private void shutdown(boolean forcible) {
+        this.shuttingDown = true;
+
         for (SocketChannel channel : connectedHosts.values()) {
             SelectionKey key = channel.keyFor(this.selector);
+
+            /* If this is not a forcible shutdown, then we need to check each
+             * TransmissionTracker's pending write queue, and make sure the
+             * items in the queues get sent before shutdown happens. */
+            if (forcible == false) {
+                TransmissionTracker tracker = TransmissionTracker.fromKey(key);
+                safeShutdown(tracker);
+            }
+
             if (key != null) {
                 disconnect(key);
             }
         }
         this.online = false;
         selector.wakeup();
+    }
+
+    /**
+     * This method checks a given TransmissionTracker's write queue for pending
+     * writes, and then does a series of sleep-checks until the queue is empty.
+     *
+     * @param tracker TransmissionTracker to monitor for pending writes.
+     */
+    private void safeShutdown(TransmissionTracker tracker) {
+        final int initialWait = 1000;
+        final int longestWait = 5000;
+
+        BlockingQueue<ByteBuffer> pendingWrites
+            = tracker.getPendingWriteQueue();
+
+        int wait = initialWait;
+        int size = pendingWrites.size();
+        if (pendingWrites.isEmpty() == false) {
+            do {
+                try {
+                    Thread.sleep(wait);
+                } catch (InterruptedException e) {
+                    logger.log(Level.WARNING, "Received interrupt "
+                            + "during safe shutdown.", e);
+                }
+
+                if (pendingWrites.isEmpty() == false) {
+                    /* Still not empty; we'll log something now. */
+                    logger.info("Waiting to shut down; " + pendingWrites.size()
+                            + " items remaining in write queue.");
+
+                    /* If the queue didn't get any smaller, increase the amount
+                     * of time we'll wait before polling. */
+                    if (pendingWrites.size() >= size && wait < longestWait) {
+                        wait += initialWait;
+                    }
+                    size = pendingWrites.size();
+                }
+
+            } while (pendingWrites.isEmpty() == false);
+        }
     }
 
     /**

@@ -53,6 +53,8 @@ import galileo.serialization.Serializer;
  */
 public abstract class MessageRouter implements Runnable {
 
+    protected static final Logger logger = Logger.getLogger("galileo");
+
     /** The default read buffer size is 8 MB. */
     public static final int DEFAULT_READ_BUFFER_SIZE = 8388608;
 
@@ -70,9 +72,8 @@ public abstract class MessageRouter implements Runnable {
     public static final String WRITE_QUEUE_PROPERTY
         = "galileo.net.MessageRouter.writeQueueSize";
 
-    protected static final Logger logger = Logger.getLogger("galileo");
-
     protected boolean online;
+    protected boolean shuttingDown;
 
     private List<MessageListener> listeners = new ArrayList<>();
 
@@ -328,6 +329,10 @@ public abstract class MessageRouter implements Runnable {
      */
     public void sendMessage(SelectionKey key, GalileoMessage message)
     throws IOException {
+        if (this.isOnline() == false || this.isShuttingDown() == true) {
+            throw new IOException("Router is not online; cannot send.");
+        }
+
         SocketChannel channel = (SocketChannel) key.channel();
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
@@ -467,6 +472,15 @@ public abstract class MessageRouter implements Runnable {
      */
     public boolean isOnline() {
         return this.online;
+    }
+
+    /**
+     * Determines whether or not this MessageRouter is currently going through
+     * the shutdown process.  When shutting down, the MessageRouter will not
+     * accept connections or send messages.
+     */
+    public boolean isShuttingDown() {
+        return this.shuttingDown;
     }
 
     /**
