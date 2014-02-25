@@ -73,7 +73,6 @@ public abstract class MessageRouter implements Runnable {
         = "galileo.net.MessageRouter.writeQueueSize";
 
     protected boolean online;
-    protected boolean shuttingDown;
 
     private List<MessageListener> listeners = new ArrayList<>();
 
@@ -329,7 +328,7 @@ public abstract class MessageRouter implements Runnable {
      */
     public void sendMessage(SelectionKey key, GalileoMessage message)
     throws IOException {
-        if (this.isOnline() == false || this.isShuttingDown() == true) {
+        if (this.isOnline() == false) {
             throw new IOException("Router is not online; cannot send.");
         }
 
@@ -472,15 +471,6 @@ public abstract class MessageRouter implements Runnable {
      */
     public boolean isOnline() {
         return this.online;
-    }
-
-    /**
-     * Determines whether or not this MessageRouter is currently going through
-     * the shutdown process.  When shutting down, the MessageRouter will not
-     * accept connections or send messages.
-     */
-    public boolean isShuttingDown() {
-        return this.shuttingDown;
     }
 
     /**

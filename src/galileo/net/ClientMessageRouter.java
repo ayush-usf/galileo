@@ -183,8 +183,6 @@ public class ClientMessageRouter extends MessageRouter {
      * messages).
      */
     private void shutdown(boolean forcible) {
-        this.shuttingDown = true;
-
         for (SocketChannel channel : connectedHosts.values()) {
             SelectionKey key = channel.keyFor(this.selector);
 
