@@ -119,7 +119,6 @@ public class HierarchicalGraph<T> {
     public void evaluateOperation(Operation operation,
             HierarchicalQueryTracker<T> tracker) {
 
-
         for (String feature : features) {
             tracker.nextLevel();
 
@@ -147,19 +146,78 @@ public class HierarchicalGraph<T> {
         }
     }
 
+    /**
+     * Evaluate query {@link Expression}s at a particular vertex.  Neighboring
+     * vertices that match the Expression will be traversed further.
+     *
+     * @param expressions List of {@link Expression}s that should be evaluated
+     * against neighboring nodes
+     * @param vertex {@link Vertex} to apply the Expression to.
+     *
+     * @return a collection of matching vertices.
+     */
     private Collection<Vertex<Feature, T>> evaluateExpressions(
             List<Expression> expressions, Vertex<Feature, T> vertex) {
 
-        Set<Vertex<Feature, T>> resultSet
-            = new HashSet<>(vertex.getAllNeighbors());
+        Set<Vertex<Feature, T>> resultSet = null;
+        boolean firstResult = true;
 
         for (Expression expression : expressions) {
-            if (expression.getOperator() == Operator.EQUAL) {
-                Vertex<Feature, T> neighbor
-                    = vertex.getNeighbor(expression.getValue());
-                Set<Vertex<Feature, T>> neighborSet = new HashSet<>();
-                neighborSet.add(neighbor);
-                resultSet.retainAll(neighborSet);
+            Set<Vertex<Feature, T>> evalSet = new HashSet<>();
+            Feature value = expression.getValue();
+
+            switch (expression.getOperator()) {
+                case EQUAL:
+                    /* Select a particular neighboring vertex */
+                    evalSet.add(vertex.getNeighbor(value));
+                    break;
+
+                case NOTEQUAL:
+                    /* Add all the neighboring vertices, and then remove the
+                     * particular value specified. */
+                    evalSet.addAll(vertex.getAllNeighbors());
+                    evalSet.remove(vertex.getNeighbor(value));
+                    break;
+
+                case LESS:
+                    evalSet.addAll(
+                            vertex.getNeighborsLessThan(value, false)
+                            .values());
+                    break;
+
+                case LESSEQUAL:
+                    evalSet.addAll(
+                            vertex.getNeighborsLessThan(value, true)
+                            .values());
+                    break;
+
+                case GREATER:
+                    evalSet.addAll(
+                            vertex.getNeighborsGreaterThan(value, false)
+                            .values());
+                    break;
+
+                case GREATEREQUAL:
+                    evalSet.addAll(
+                            vertex.getNeighborsGreaterThan(value, true)
+                            .values());
+                    break;
+
+                case UNKNOWN:
+                default:
+                    //TODO throw new Exception();
+            }
+
+            if (firstResult) {
+                /* If this is the first Expression we've evaluated, then the
+                 * evaluation set becomes our result set that will be further
+                 * reduced as more Expressions are evaluated. */
+                resultSet = evalSet;
+            } else {
+                /* Remove all items from the result set that are not present in
+                 * this current evaluation set.  This effectively drills down
+                 * through the results until we have our final query answer. */
+                resultSet.retainAll(evalSet);
             }
         }
 
