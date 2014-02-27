@@ -82,10 +82,9 @@ public class StoreNetCDF implements MessageListener {
         List<Block> blocks = new ArrayList<>();
         Map<String, Metadata> metas = ConvertNetCDF.readFile(fileName);
         for (Map.Entry<String, Metadata> entry : metas.entrySet()) {
-            blocks.add(ConvertNetCDF.createBlock("", entry.getValue()));
+            Block b = ConvertNetCDF.createBlock("", entry.getValue());
+            StorageRequest store = new StorageRequest(b);
+            client.publisher.publish(server, store);
         }
-
-        StorageRequest store = new StorageRequest(blocks.get(0));
-        client.publisher.publish(server, store);
     }
 }
