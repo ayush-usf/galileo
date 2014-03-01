@@ -321,7 +321,9 @@ public class StorageNode implements MessageListener {
             /* The logging subsystem may have already shut down, so we revert to
              * stdout for our final messages */
             System.out.println("Initiated shutdown.");
+
             fs.shutdown();
+            connectionPool.shutdown();
 
             /* Close out the status line (remove it) */
             nodeStatus.close();
