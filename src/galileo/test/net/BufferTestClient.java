@@ -66,6 +66,12 @@ public class BufferTestClient {
     }
 
     public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.out.println(
+                    "Usage: BufferTestClient <server> <num_messages>");
+            return;
+        }
+
         String hostname = args[0];
         int messages = Integer.parseInt(args[1]);
 
