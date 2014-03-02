@@ -58,4 +58,14 @@ public class ServerMessageRouter extends MessageRouter {
         Thread selectorThread = new Thread(this);
         selectorThread.start();
     }
+
+    /**
+     * Closes the server socket channel and stops processing incoming
+     * messages.
+     */
+    public void shutdown() throws IOException {
+        serverChannel.close();
+        this.online = false;
+        selector.wakeup();
+    }
 }
