@@ -33,6 +33,13 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
+/**
+ * Handles message routing on a {@link java.nio.channels.ServerSocketChannel}.
+ * This class is useful for components that must accept incoming requests from
+ * clients.
+ *
+ * @author malensek
+ */
 public class ServerMessageRouter extends MessageRouter {
 
     private int port;
