@@ -57,8 +57,8 @@ public class MetadataToJSON {
     }
 
     public static void convert(Metadata meta) {
-        System.out.println("{");
-        printValue("_id", counter++ + "");
+        System.out.print("{");
+        printValue("id", counter++ + "");
         printQuoted("name", meta.getName());
         printValue("hasSpatialProperties", meta.hasSpatialProperties());
         if (meta.hasSpatialProperties()) {
@@ -85,11 +85,11 @@ public class MetadataToJSON {
 
     private static void printQuoted(String a, String b) {
         final char quote = '"';
-        System.out.println(quote + a + quote + " : " + quote + b + quote + ",");
+        System.out.print(quote + a + quote + " : " + quote + b + quote + ",");
     }
 
     private static void printValue(String a, Object b) {
         final char quote = '"';
-        System.out.println(quote + a + quote + " : " + b + ",");
+        System.out.print(quote + a + quote + " : " + b + ",");
     }
 }
