@@ -51,7 +51,7 @@ import galileo.util.GeoHash;
  * galileo.fs.GeospatialPhysicalGraph.geohashPrecision
  * to modify how the hierarchy is created.
  */
-public class GeospatialPhysicalGraph {
+public class GeospatialPhysicalGraph implements PhysicalGraph {
 
     private static final String DEFAULT_TIME_FORMAT = "yyyy/M/d";
     private static final int DEFAULT_GEOHASH_PRECISION = 5;
