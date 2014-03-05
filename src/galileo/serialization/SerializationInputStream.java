@@ -25,7 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.serialization;
 
-import galileo.dataset.SimpleMap;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
