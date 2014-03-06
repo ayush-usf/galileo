@@ -30,6 +30,7 @@ import java.util.Random;
 
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
+import galileo.net.NetworkDestination;
 import galileo.net.ServerMessageRouter;
 
 public class BufferTestServer implements MessageListener {
@@ -46,6 +47,17 @@ public class BufferTestServer implements MessageListener {
         messageRouter.addListener(this);
         messageRouter.listen();
         System.out.println("Listening...");
+    }
+
+    @Override
+    public void onConnect(NetworkDestination endpoint) {
+        System.out.println("Accepting connection from " + endpoint);
+    }
+
+    @Override
+    public void onDisconnect(NetworkDestination endpoint) {
+        System.out.println("Client disconnect: " + endpoint);
+        System.out.println("Number of messages received so far: " + counter);
     }
 
     @Override

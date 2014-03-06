@@ -63,6 +63,16 @@ public class StoreNetCDF implements MessageListener {
     }
 
     @Override
+    public void onConnect(NetworkDestination endpoint) {
+        System.out.println("Connected to " + endpoint);
+    }
+
+    @Override
+    public void onDisconnect(NetworkDestination endpoint) {
+        System.out.println("Disconnected from " + endpoint);
+    }
+
+    @Override
     public void onMessage(GalileoMessage message) {
         if (message == null) {
             /* Connection was terminated */
