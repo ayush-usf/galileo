@@ -38,7 +38,6 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -431,7 +430,8 @@ public abstract class MessageRouter implements Runnable {
         }
 
         SocketChannel channel = (SocketChannel) key.channel();
-        logger.info("Terminating connection: " + getClientString(channel));
+        NetworkDestination destination = getDestination(channel);
+        logger.info("Terminating connection: " + destination.toString());
 
         try {
             key.cancel();
@@ -439,6 +439,19 @@ public abstract class MessageRouter implements Runnable {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to disconnect channel", e);
         }
+
+        dispatchDisconnect(destination);
+    }
+
+    /**
+     * Adds a message listener (consumer) to this MessageRouter.  Listeners
+     * receive messages that are published by this MessageRouter.
+     *
+     * @param listener {@link MessageListener} that will consume messages
+     * published by this MessageRouter.
+     */
+    public void addListener(MessageListener listener) {
+        listeners.add(listener);
     }
 
     /**
@@ -453,14 +466,13 @@ public abstract class MessageRouter implements Runnable {
     }
 
     /**
-     * Adds a message listener (consumer) to this MessageRouter.  Listeners
-     * receive messages that are published by this MessageRouter.
-     *
-     * @param listener {@link MessageListener} that will consume messages
-     * published by this MessageRouter.
+     * Informs all listening consumers that a connection to a remote endpoint
+     * has been terminated.
      */
-    public void addListener(MessageListener listener) {
-        listeners.add(listener);
+    protected void dispatchDisconnect(NetworkDestination endpoint) {
+        for (MessageListener listener : listeners) {
+            listener.onDisconnect(endpoint);
+        }
     }
 
     /**
@@ -482,5 +494,20 @@ public abstract class MessageRouter implements Runnable {
     private static String getClientString(SocketChannel channel) {
         Socket socket = channel.socket();
         return socket.getInetAddress().getHostName() + ":" + socket.getPort();
+    }
+
+    /**
+     * Determines a connection's endpoint information (hostname and port) and
+     * encapsulates them in a {@link NetworkDestination}.
+     *
+     * @param channel The SocketChannel of the network endpoint.
+     *
+     * @return NetworkDestination representation of the endpoint.
+     */
+    private static NetworkDestination getDestination(SocketChannel channel) {
+        Socket socket = channel.socket();
+        return new NetworkDestination(
+                socket.getInetAddress().getHostName(),
+                socket.getPort());
     }
 }
