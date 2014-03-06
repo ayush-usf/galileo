@@ -38,11 +38,13 @@ import galileo.dataset.FileBlock;
 import galileo.dataset.MetaArray;
 import galileo.graph.LogicalGraph;
 import galileo.graph.LogicalGraphNode;
+import galileo.graph.MetadataGraph;
 import galileo.graph.PhysicalGraph;
+import galileo.query.Query;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 
-public class FileSystem {
+public abstract class FileSystem {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
@@ -217,30 +219,7 @@ public class FileSystem {
         logicalGraph.addBlock(block.getMetadata(), blockPath);
     }
 
-    public MetaArray query(String query)
-    throws IOException {
-        LogicalGraphNode[] nodes = logicalGraph.query(query);
-
-        ArrayList<String> nodePaths = new ArrayList<String>();
-        for (LogicalGraphNode node : nodes) {
-            nodePaths.addAll(node.getBlockPaths());
-        }
-
-        MetaArray metas = new MetaArray();
-        for (String path : nodePaths) {
-            try {
-                BlockMetadata meta = physicalGraph.loadMetadata(path);
-                meta.getRuntimeMetadata().setPhysicalGraphPath(path);
-                metas.add(meta);
-            } catch (Exception e) {
-                System.out.println("Couldn't recover Metadata: " + path);
-                e.printStackTrace();
-                continue;
-            }
-        }
-
-        return metas;
-    }
+    public abstract MetadataGraph query(Query query);
 
     /**
      * Reports whether the Galileo filesystem is read-only.
