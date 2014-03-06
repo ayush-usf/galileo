@@ -25,9 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
-import galileo.client.EventPublisher;
-import galileo.comm.Disconnection;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -255,8 +252,8 @@ public class ClientMessageRouter extends MessageRouter {
      */
     public void broadcastMessage(GalileoMessage message)
     throws IOException {
-        for (SocketChannel channel : connectedHosts.values()) {
-            sendMessage(channel.keyFor(this.selector), message);
+        for (NetworkDestination dest : connections.values()) {
+            this.sendMessage(dest, message);
         }
     }
 
@@ -269,6 +266,11 @@ public class ClientMessageRouter extends MessageRouter {
     throws IOException {
 
         SocketChannel channel = connectedHosts.get(destination);
+        if (channel == null) {
+            throw new IOException("Not connected to destination: "
+                    + destination);
+        }
+
         SelectionKey key = channel.keyFor(this.selector);
         if (key == null) {
             if (!pendingRegistrations.contains(channel)) {
@@ -290,7 +292,7 @@ public class ClientMessageRouter extends MessageRouter {
             }
         }
 
-        sendMessage(key, message);
+        super.sendMessage(key, message);
     }
 
     /**
@@ -301,22 +303,10 @@ public class ClientMessageRouter extends MessageRouter {
      */
     @Override
     protected void disconnect(SelectionKey key) {
-        super.disconnect(key);
         SocketChannel channel = (SocketChannel) key.channel();
         NetworkDestination destination = connections.get(channel);
-
-        Disconnection disconnect = new Disconnection(destination);
-
-        GalileoMessage message = null;
-        try {
-            message = EventPublisher.wrapEvent(disconnect);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not create Disconnect event.", e);
-        }
-
         connectedHosts.remove(destination);
         connections.remove(channel);
-
-        super.dispatchMessage(message);
+        super.disconnect(key);
     }
 }
