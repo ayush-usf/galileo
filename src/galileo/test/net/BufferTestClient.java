@@ -25,6 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package galileo.test.net;
 
+import java.io.IOException;
 import java.util.Random;
 
 import galileo.client.EventPublisher;
@@ -33,6 +34,11 @@ import galileo.dataset.Block;
 import galileo.net.ClientMessageRouter;
 import galileo.net.NetworkDestination;
 
+/**
+ * Tests client non-blocking send operations.
+ *
+ * @author malensek
+ */
 public class BufferTestClient {
 
     private static final int MESSAGE_SIZE = 1024;
@@ -79,7 +85,11 @@ public class BufferTestClient {
                 hostname, BufferTestServer.PORT);
         BufferTestClient btc = new BufferTestClient(netDest);
 
-        btc.test(messages);
+        try {
+            btc.test(messages);
+        } catch (IOException e) {
+            System.out.println("Failed to send all messages!");
+        }
         System.out.println("Test complete");
         btc.disconnect();
     }
