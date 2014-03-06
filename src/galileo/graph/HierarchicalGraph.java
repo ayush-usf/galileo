@@ -44,7 +44,6 @@ import galileo.dataset.feature.FeatureType;
 
 import galileo.query.Expression;
 import galileo.query.Operation;
-import galileo.query.Operator;
 import galileo.query.Query;
 import galileo.util.Pair;
 
