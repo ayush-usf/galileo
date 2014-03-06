@@ -31,7 +31,6 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Random;
 
-import galileo.comm.Disconnection;
 import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
@@ -101,13 +100,6 @@ public class TextClient implements MessageListener {
                         QueryResponse.class, container.getEventPayload());
 
                 System.out.println(response.getMetadata());
-            }
-
-            if (container.getEventType() == EventType.DISCONNECT) {
-                Disconnection disconnect = Serializer.deserialize(
-                        Disconnection.class, container.getEventPayload());
-
-                System.out.println("Disconnected from " + disconnect);
             }
 
         } catch (Exception e) {
