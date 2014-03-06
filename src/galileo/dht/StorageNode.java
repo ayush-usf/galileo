@@ -27,6 +27,9 @@ package galileo.dht;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -250,7 +253,7 @@ public class StorageNode implements MessageListener {
 
             /* Determine StorageNodes that contain relevant data. */
             //featureGraph.query(
-            NodeArray queryNodes = new NodeArray();
+            List<NodeInfo> queryNodes = new ArrayList<>();
             queryNodes.addAll(network.getAllNodes());
 
             /* Set up QueryTracker for this request */
