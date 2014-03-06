@@ -190,8 +190,7 @@ public class ClientMessageRouter extends MessageRouter {
              * TransmissionTracker's pending write queue, and make sure the
              * items in the queues get sent before shutdown happens. */
             if (forcible == false) {
-                TransmissionTracker tracker = TransmissionTracker.fromKey(key);
-                safeShutdown(tracker);
+                safeShutdown(key);
             }
 
             if (key != null) {
@@ -203,15 +202,16 @@ public class ClientMessageRouter extends MessageRouter {
     }
 
     /**
-     * This method checks a given TransmissionTracker's write queue for pending
+     * This method checks a given SelectionKey's write queue for pending
      * writes, and then does a series of sleep-checks until the queue is empty.
      *
-     * @param tracker TransmissionTracker to monitor for pending writes.
+     * @param key SelectionKey to monitor for pending writes.
      */
-    private void safeShutdown(TransmissionTracker tracker) {
+    private void safeShutdown(SelectionKey key) {
         final int initialWait = 1000;
         final int longestWait = 5000;
 
+        TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         BlockingQueue<ByteBuffer> pendingWrites
             = tracker.getPendingWriteQueue();
 
@@ -237,6 +237,13 @@ public class ClientMessageRouter extends MessageRouter {
                         wait += initialWait;
                     }
                     size = pendingWrites.size();
+
+                    /* Make sure the SelectionKey is still valid. */
+                    if (key.isValid() == false) {
+                        logger.severe("Connection terminated while emptying "
+                                + "send buffer!");
+                        return;
+                    }
                 }
 
             } while (pendingWrites.isEmpty() == false);
