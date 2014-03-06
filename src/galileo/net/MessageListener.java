@@ -25,6 +25,12 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+/**
+ * Interface for classes that will listen for incoming {@link GalileoMessage}
+ * instances produced by a {@link MessageRouter}.
+ *
+ * @author malensek
+ */
 public interface MessageListener {
 
     /**
@@ -34,4 +40,15 @@ public interface MessageListener {
      * has been terminated.
      */
     public void onMessage(GalileoMessage message);
+
+    /**
+     * Called when a connection is established with a remote endpoint.
+     */
+    public void onConnect(NetworkDestination endpoint);
+
+    /**
+     * Called when the MessageListener has been disconnected from its remote
+     * endpoint.
+     */
+    public void onDisconnect(NetworkDestination endpoint);
 }
