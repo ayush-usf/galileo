@@ -54,6 +54,7 @@ import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
 import galileo.net.HostIdentifier;
 import galileo.net.MessageListener;
+import galileo.net.NetworkDestination;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
 import galileo.serialization.Serializer;
@@ -163,6 +164,12 @@ public class StorageNode implements MessageListener {
 
         partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
     }
+
+    @Override
+    public void onConnect(NetworkDestination endpoint) { }
+
+    @Override
+    public void onDisconnect(NetworkDestination endpoint) { }
 
     @Override
     public void onMessage(GalileoMessage message) {
