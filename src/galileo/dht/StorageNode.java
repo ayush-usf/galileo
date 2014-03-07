@@ -123,7 +123,6 @@ public class StorageNode implements MessageListener {
         nodeStatus.set("Initializing file system");
         try {
             fs = new GeospatialFileSystem(SystemConfig.getRootDir());
-            fs.recoverMetadata();
         } catch (FileSystemException e) {
             nodeStatus.set("File system initialization failure");
             logger.log(Level.SEVERE,
