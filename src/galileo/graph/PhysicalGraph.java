@@ -113,8 +113,11 @@ public class PhysicalGraph {
     throws IOException {
         UUID blockUuid = UUID.nameUUIDFromBytes(blockBytes);
 
-        String blockDirPath = storageDirectory + "/" + getStorageDirectory(block);
-        String blockPath = blockDirPath + "/" + blockUuid.toString();
+        String blockDirPath
+            = storageDirectory + "/" + getStorageDirectory(block);
+
+        String blockPath
+            = blockDirPath + "/" + blockUuid.toString();
 
         /* Ensure the storage directory is there. */
         File blockDirectory = new File(blockDirPath);
