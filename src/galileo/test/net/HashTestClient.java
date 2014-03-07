@@ -30,7 +30,8 @@ import galileo.net.ClientMessageRouter;
 import galileo.net.NetworkDestination;
 
 /**
- * Tests client non-blocking send operations.
+ * Sends events to a HashTestServer instance that will verify the events
+ * reached their destination without corruption.
  *
  * @author malensek
  */

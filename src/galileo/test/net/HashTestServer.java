@@ -35,6 +35,8 @@ import galileo.net.ServerMessageRouter;
 import galileo.serialization.Serializer;
 
 /**
+ * Receives messages with random binary payloads (HashTestEvents), and verifies
+ * their checksums.
  *
  * @author malensek
  */
