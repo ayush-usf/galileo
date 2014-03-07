@@ -52,7 +52,7 @@ public class GeospatialFileSystem extends FileSystem {
 
     public GeospatialFileSystem(String storageDirectory)
     throws FileSystemException, IOException, SerializationException {
-        initialize(storageDirectory);
+        super(storageDirectory);
 
         File metaFile = new File(storageDirectory + "/" + metadataStore);
         if (metaFile.exists()) {
