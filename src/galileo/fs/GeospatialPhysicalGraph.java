@@ -75,6 +75,7 @@ public class GeospatialPhysicalGraph implements PhysicalGraph {
         timeFormatter.applyPattern(timeFormat);
     }
 
+    @Override
     public Block loadBlock(String blockPath)
     throws IOException, SerializationException {
         File blockFile = new File(blockPath);
@@ -83,7 +84,19 @@ public class GeospatialPhysicalGraph implements PhysicalGraph {
         return block;
     }
 
+    @Override
+    public Metadata loadMetadata(String blockPath)
+    throws IOException, SerializationException {
+        /* We can just load the block as usual, but only perform the
+         * deserialization on the Metadata.  Metadata is stored as the first
+         * item in a serialized Block instance. */
+        File blockFile = new File(blockPath);
+        byte[] blockBytes = new byte[(int) blockFile.length()];
+        Metadata meta = Serializer.deserialize(Metadata.class, blockBytes);
+        return meta;
+    }
 
+    @Override
     public String storeBlock(Block block)
     throws IOException {
         String name = block.getMetadata().getName();
@@ -114,7 +127,15 @@ public class GeospatialPhysicalGraph implements PhysicalGraph {
         return blockPath;
     }
 
-    public String getStorageDirectory(Block block) {
+    /**
+     * Given a {@link Block}, determine its storage directory on disk.
+     *
+     * @param block The Block to inspect
+     *
+     * @return String representation of the directory on disk this Block should
+     * be stored in.
+     */
+    private String getStorageDirectory(Block block) {
         String directory = "";
 
         Metadata meta = block.getMetadata();

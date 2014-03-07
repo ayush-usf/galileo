@@ -54,18 +54,9 @@ public abstract class FileSystem {
     protected File storageDirectory;
     private boolean readOnly;
 
-    private Journal journal;
-
-    /** In-memory representation of the Galileo filesystem. */
-    private LogicalGraph logicalGraph;
-
-    /** On-disk representation of the Galileo filesystem.   */
-    private PhysicalGraph physicalGraph;
-
-    public FileSystem() { }
-
-    public long getFreeSpace() {
-        return storageDirectory.getFreeSpace();
+    public FileSystem(String storageRoot)
+    throws FileSystemException, IOException {
+        initialize(storageRoot);
     }
 
     protected void initialize(String storageRoot)
@@ -115,19 +106,7 @@ public abstract class FileSystem {
         }
     }
 
-    public FileSystem(String storageRoot)
-    throws FileSystemException, IOException {
-        initialize(storageRoot);
-
-        journal = Journal.getInstance();
-        journal.setJournalPath(storageRoot + "/journal");
-
-        logicalGraph  = new LogicalGraph();
-        physicalGraph = new PhysicalGraph(storageDirectory);
-    }
-
     public void recoverMetadata() {
-//TODO: this used to be in LogicalGraph; move elsewhere
 //        logicalGraph.recoverFromJournal();
 /*
     public void recoverFromJournal() {
@@ -154,72 +133,52 @@ public abstract class FileSystem {
             + (recoveryEnd - recoveryStart) * 1E-6 + "ms.");
     }
 */
-        recover();
     }
 
     /**
      * Does a full recovery from disk; this scans every block in the system,
      * reads its metadata, and performs a checksum to verify block integrity.
      */
-    private void recover() {
-        logger.info("Recovering graph from disk");
-
-        long recoverStart, recoverEnd, indexStart, indexEnd, metaStart, metaEnd;
-        recoverStart = System.nanoTime();
-
-        logger.info("Recovering index");
-        indexStart = System.nanoTime();
-        ArrayList<String> blockPaths = physicalGraph.getBlockPaths();
-        indexEnd = System.nanoTime();
-        logger.info("Index recovery complete.  Took " +
-                (indexEnd - indexStart) * 1E-6 + " ms.");
-
-        metaStart = System.nanoTime();
-        logger.info("Recovering metadata and building graph");
-        long counter = 0;
-        for (String path : blockPaths) {
-            try {
-                BlockMetadata metadata = physicalGraph.loadMetadata(path);
-                logicalGraph.addBlock(metadata, path);
-                ++counter;
-                if (counter % 10000 == 0) {
-                    logger.info(String.format("%d blocks scanned, " +
-                                "recovery %.2f%% complete.", counter,
-                                ((float) counter / blockPaths.size()) * 100));
-                }
-          } catch (Exception e) {
-              logger.log(Level.WARNING, "Failed to recover metadata " +
-                      "for block: " + path, e);
-          }
-      }
-        metaEnd = System.nanoTime();
-        logger.info("Metadata recovery complete.  Recovered " + counter +
-                " blocks in " + (metaEnd - metaStart) * 1E-6 + " ms.");
-
-        recoverEnd = System.nanoTime();
-        logger.info("Graph recovery complete.  Took "
-            + (recoverEnd - recoverStart) * 1E-6 + " ms.");
-    }
-
-    public void storeBlock(byte[] blockBytes)
-    throws IOException, FileSystemException, SerializationException {
-        FileBlock block = Serializer.deserialize(FileBlock.class, blockBytes);
-        storeBlock(block, blockBytes);
-    }
-
-    public void storeBlock(FileBlock block)
-    throws IOException, FileSystemException {
-        byte[] blockBytes = Serializer.serialize(block);
-        storeBlock(block, blockBytes);
-    }
-
-    public void storeBlock(FileBlock block, byte[] blockBytes)
-    throws IOException, FileSystemException {
-        String blockPath = physicalGraph.storeBlock(block, blockBytes);
-        logicalGraph.addBlock(block.getMetadata(), blockPath);
-    }
-
-    public abstract MetadataGraph query(Query query);
+//    protected void recover() {
+//        logger.info("Performing full recovery from disk");
+//
+//        long recoverStart, recoverEnd, indexStart, indexEnd, metaStart, metaEnd;
+//        recoverStart = System.nanoTime();
+//
+//        logger.info("Recovering index");
+//        indexStart = System.nanoTime();
+//        ArrayList<String> blockPaths = physicalGraph.getBlockPaths();
+//        indexEnd = System.nanoTime();
+//        logger.info("Index recovery complete.  Took " +
+//                (indexEnd - indexStart) * 1E-6 + " ms.");
+//
+//        metaStart = System.nanoTime();
+//        logger.info("Recovering metadata and building graph");
+//        long counter = 0;
+//        for (String path : blockPaths) {
+//            try {
+//                BlockMetadata metadata = physicalGraph.loadMetadata(path);
+//                logicalGraph.addBlock(metadata, path);
+//                ++counter;
+//                if (counter % 10000 == 0) {
+//                    logger.info(String.format("%d blocks scanned, " +
+//                                "recovery %.2f%% complete.", counter,
+//                                ((float) counter / blockPaths.size()) * 100));
+//                }
+//            } catch (Exception e) {
+//                logger.log(Level.WARNING, "Failed to recover metadata " +
+//                        "for block: " + path, e);
+//            }
+//        }
+//        metaEnd = System.nanoTime();
+//        logger.info("Metadata recovery complete.  Recovered " + counter +
+//                " blocks in " + (metaEnd - metaStart) * 1E-6 + " ms.");
+//
+//        recoverEnd = System.nanoTime();
+//        logger.info("Graph recovery complete.  Took "
+//            + (recoverEnd - recoverStart) * 1E-6 + " ms.");
+//    }
+//
 
     /**
      * Reports whether the Galileo filesystem is read-only.
@@ -228,5 +187,15 @@ public abstract class FileSystem {
      */
     public boolean isReadOnly() {
         return readOnly;
+    }
+
+    /**
+     * Reports the amount of free space (in bytes) in the root storage
+     * directory.
+     *
+     * @return long integer with the amount of free space, in bytes.
+     */
+    public long getFreeSpace() {
+        return storageDirectory.getFreeSpace();
     }
 }
