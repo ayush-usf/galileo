@@ -27,6 +27,7 @@ package galileo.test.net;
 
 import java.io.IOException;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -38,6 +39,9 @@ import galileo.serialization.SerializationOutputStream;
 import galileo.util.Checksum;
 
 /**
+ * An event for hash tests that includes a variable sized payload with its SHA1
+ * checksum to ensure the event was not corrupted while being transferred
+ * across the network.
  *
  * @author malensek
  */
@@ -59,9 +63,20 @@ public class HashTestEvent implements GalileoEvent {
         if (Arrays.equals(hash, check.hash(data))) {
             return true;
         } else {
-            //debug
+            BigInteger b1 = new BigInteger(1, hash);
+            BigInteger b2 = new BigInteger(1, check.hash(data));
+            System.out.println(b1.toString(16) + " =/= " + b2.toString(16));
             return false;
         }
+    }
+
+    /**
+     * Corrupt a HashTest event on purpose.  Sneaky sneaky...
+     */
+    public void corrupt() {
+        int r = random.nextInt(data.length);
+        byte b = data[r];
+        data[r] = (byte) (b + 1);
     }
 
     @Override
