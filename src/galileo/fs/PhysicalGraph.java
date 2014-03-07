@@ -28,13 +28,40 @@ package galileo.fs;
 import java.io.IOException;
 
 import galileo.dataset.Block;
+import galileo.dataset.Metadata;
 import galileo.serialization.SerializationException;
 
 public interface PhysicalGraph {
 
+    /**
+     * Retrieves a {@link Block} instance, given its path on disk.
+     *
+     * @param blockPath the physical location of the Block to load.
+     *
+     * @return Block instance stored at blockPath.
+     */
     public Block loadBlock(String blockPath)
         throws IOException, SerializationException;
 
+    /**
+     * Retrieves a {@link Metadata} instance, given a {@link Block} path on
+     * disk.
+     *
+     * @param blockPath the physical location of the Block to load metadata
+     * from.
+     *
+     * @return Metadata stored in the Block specified by blockPath.
+     */
+    public Metadata loadMetadata(String blockPath)
+        throws IOException, SerializationException;
+
+    /**
+     * Stores a {@link Block} on disk.
+     *
+     * @param block the Block instance to persist to disk.
+     *
+     * @return String representation of the Block path on disk.
+     */
     public String storeBlock(Block block)
         throws IOException;
 }
