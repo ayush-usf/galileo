@@ -177,6 +177,8 @@ public abstract class MessageRouter implements Runnable {
         logger.info("Accepted connection: " + getClientString(channel));
         channel.configureBlocking(false);
         channel.register(selector, SelectionKey.OP_READ, tracker);
+
+        dispatchConnect(getDestination(channel));
     }
 
     /**
@@ -191,6 +193,8 @@ public abstract class MessageRouter implements Runnable {
             if (channel.finishConnect()) {
                 key.interestOps(SelectionKey.OP_READ);
             }
+
+            dispatchConnect(getDestination(channel));
         } catch (IOException e) {
             disconnect(key);
         }
@@ -462,6 +466,16 @@ public abstract class MessageRouter implements Runnable {
     protected void dispatchMessage(GalileoMessage message) {
         for (MessageListener listener : listeners) {
             listener.onMessage(message);
+        }
+    }
+
+    /**
+     * Informs all listening consumers that a connection to a remote endpoint
+     * has been made.
+     */
+    protected void dispatchConnect(NetworkDestination endpoint) {
+        for (MessageListener listener : listeners) {
+            listener.onConnect(endpoint);
         }
     }
 
