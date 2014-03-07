@@ -62,6 +62,13 @@ public class HashTestServer implements MessageListener {
     @Override
     public void onDisconnect(NetworkDestination endpoint) {
         System.out.println("Client disconnected: " + endpoint);
+        printStats();
+    }
+
+    private void printStats() {
+        System.out.println("Processed " + counter + " messages");
+        System.out.println(counter - bad + " good events");
+        System.out.println(bad + " bad events");
     }
 
     @Override
@@ -81,10 +88,8 @@ public class HashTestServer implements MessageListener {
             e.printStackTrace();
         }
 
-        if (counter % 10000 == 0) {
-            System.out.println("Processed " + counter + " messages");
-            System.out.println(counter - bad + " good events");
-            System.out.println(bad + " bad events");
+        if (counter % 1000 == 0) {
+            printStats();
         }
     }
 

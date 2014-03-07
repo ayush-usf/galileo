@@ -54,10 +54,18 @@ public class HashTestClient {
 
     public void test(int size, int messages)
     throws Exception {
+        test(size, messages, false);
+    }
+
+    public void test(int size, int messages, boolean corrupt)
+    throws Exception {
         for (int i = 0; i < messages; ++i) {
             HashTestEvent hte = new HashTestEvent(size);
             if (hte.verify() == false) {
                 System.out.println("Local event corrupted!");
+            }
+            if (corrupt) {
+                hte.corrupt();
             }
             publisher.publish(netDest, hte);
         }
@@ -67,18 +75,26 @@ public class HashTestClient {
         if (args.length < 3) {
             System.out.println(
                     "Usage: HashTestClient <server> <msg_size> <num_msgs>");
+            System.out.println(
+                    "Give a fourth argument to send corrupted messages");
             return;
         }
 
         String hostname = args[0];
         int size = Integer.parseInt(args[1]);
         int messages = Integer.parseInt(args[2]);
+        boolean corrupt = (args.length == 4);
 
         NetworkDestination netDest = new NetworkDestination(
                 hostname, BufferTestServer.PORT);
         HashTestClient htc = new HashTestClient(netDest);
 
-        htc.test(size, messages);
+        if (corrupt == false) {
+            htc.test(size, messages);
+        } else {
+            System.out.println("Corrupt message test");
+            htc.test(size, messages, true);
+        }
 
         System.out.println("Test complete");
         htc.disconnect();
