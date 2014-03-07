@@ -26,49 +26,105 @@ software, even if advised of the possibility of such damage.
 package galileo.fs;
 
 import java.io.File;
-import java.io.IOException;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import galileo.dataset.Block;
+import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
+import galileo.dataset.SpatialProperties;
 import galileo.graph.FeaturePath;
 import galileo.graph.MetadataGraph;
 import galileo.query.Query;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
+import galileo.util.GeoHash;
 import galileo.util.StackTraceToString;
 
+/**
+ * Implements a {@link FileSystem} for Geospatial data.  This file system
+ * manager assumes that the information being stored has both space and time
+ * properties.
+ * <p>
+ * Relevant system properties include
+ * galileo.fs.GeospatialPhysicalGraph.timeFormat and
+ * galileo.fs.GeospatialPhysicalGraph.geohashPrecision
+ * to modify how the hierarchy is created.
+ */
 public class GeospatialFileSystem extends FileSystem {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
+    private static final String DEFAULT_TIME_FORMAT = "yyyy/M/d";
+    private static final int DEFAULT_GEOHASH_PRECISION = 5;
+
     private static final String metadataStore = "metadata.graph";
 
-    public MetadataGraph metadataGraph;
+    private MetadataGraph metadataGraph;
 
-    private GeospatialPhysicalGraph physicalGraph;
+    private SimpleDateFormat timeFormatter;
+    private String timeFormat;
+    private int geohashPrecision;
 
     public GeospatialFileSystem(String storageDirectory)
     throws FileSystemException, IOException, SerializationException {
         super(storageDirectory);
 
+        this.timeFormat = System.getProperty(
+                "galileo.fs.GeospatialPhysicalGraph.timeFormat",
+                DEFAULT_TIME_FORMAT);
+        this.geohashPrecision = Integer.parseInt(System.getProperty(
+                "galileo.fs.GeospatialPhysicalGraph.geohashPrecision",
+                DEFAULT_GEOHASH_PRECISION + ""));
+
+        timeFormatter = new SimpleDateFormat();
+        timeFormatter.applyPattern(timeFormat);
+
         File metaFile = new File(storageDirectory + "/" + metadataStore);
         if (metaFile.exists()) {
             metadataGraph = Serializer.restore(MetadataGraph.class, metaFile);
+            //TODO verification
         } else {
             metadataGraph = new MetadataGraph();
         }
-        physicalGraph = new GeospatialPhysicalGraph(storageDirectory);
     }
 
-    public void storeBlock(Block block)
+    @Override
+    public String storeBlock(Block block)
     throws FileSystemException, IOException {
-        String physicalPath = physicalGraph.storeBlock(block);
+        String name = block.getMetadata().getName();
+        if (name.equals("")) {
+            UUID blockUUID = UUID.nameUUIDFromBytes(block.getData());
+            name = blockUUID.toString();
+        }
+
+        String blockDirPath = storageDirectory + "/"
+            + getStorageDirectory(block);
+        String blockPath = blockDirPath + "/" + name
+            + FileSystem.BLOCK_EXTENSION;
+
+        /* Ensure the storage directory is there. */
+        File blockDirectory = new File(blockDirPath);
+        if (!blockDirectory.exists()) {
+            if (!blockDirectory.mkdirs()) {
+                throw new IOException("Failed to create directory (" +
+                    blockDirPath + ") for block.");
+            }
+        }
+
+        FileOutputStream blockOutStream = new FileOutputStream(blockPath);
+        byte[] blockData = Serializer.serialize(block);
+        blockOutStream.write(blockData);
+        blockOutStream.close();
 
         Metadata meta = block.getMetadata();
-        FeaturePath<String> path = createPath(physicalPath, meta);
+        FeaturePath<String> path = createPath(blockPath, meta);
 
         try {
             metadataGraph.addPath(path);
@@ -78,8 +134,42 @@ public class GeospatialFileSystem extends FileSystem {
                     + System.lineSeparator() +
                     StackTraceToString.convert(e));
         }
+
+        return blockPath;
     }
 
+    /**
+     * Given a {@link Block}, determine its storage directory on disk.
+     *
+     * @param block The Block to inspect
+     *
+     * @return String representation of the directory on disk this Block should
+     * be stored in.
+     */
+    private String getStorageDirectory(Block block) {
+        String directory = "";
+
+        Metadata meta = block.getMetadata();
+        Date date = meta.getTemporalProperties().getLowerBound();
+
+        directory = timeFormatter.format(date) + "/";
+
+        Coordinates coords = null;
+        SpatialProperties spatialProps = meta.getSpatialProperties();
+        if (spatialProps.hasRange()) {
+            coords = spatialProps.getSpatialRange().getCenterPoint();
+        } else {
+            coords = spatialProps.getCoordinates();
+        }
+        directory += GeoHash.encode(coords, geohashPrecision);
+
+        return directory;
+    }
+
+    /**
+     * Using the Feature attributes found in the provided Metadata, a
+     * path is created for insertion into the Metadata Graph.
+     */
     protected FeaturePath<String> createPath(
             String physicalPath, Metadata meta) {
 
@@ -87,6 +177,21 @@ public class GeospatialFileSystem extends FileSystem {
                 physicalPath, meta.getAttributes().toArray());
 
         return path;
+    }
+
+    @Override
+    protected void storeMetadata(String blockPath, Metadata metadata)
+    throws FileSystemException, IOException {
+        FeaturePath<String> path = createPath(blockPath, metadata);
+
+        try {
+            metadataGraph.addPath(path);
+        } catch (Exception e) {
+            throw new FileSystemException("Error storing block: "
+                    + e.getClass().getCanonicalName() + ":"
+                    + System.lineSeparator() +
+                    StackTraceToString.convert(e));
+        }
     }
 
     public MetadataGraph query(Query query) {
