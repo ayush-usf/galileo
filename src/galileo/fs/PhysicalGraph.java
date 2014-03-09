@@ -70,7 +70,7 @@ public interface PhysicalGraph {
      * @return String representation of the Block path on disk.
      */
     public String storeBlock(Block block)
-        throws IOException;
+        throws FileSystemException, IOException;
 
     /**
      * Inserts Metadata into the file system.  In many cases, Metadata is not
