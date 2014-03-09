@@ -71,4 +71,21 @@ public interface PhysicalGraph {
      */
     public String storeBlock(Block block)
         throws IOException;
+
+    /**
+     * Inserts Metadata into the file system.  In many cases, Metadata is not
+     * stored individually on disk but placed in an index instead.  This method
+     * is useful during a full recovery operation for re-linking indexed
+     * Metadata with its associated files on disk, or could be used in
+     * situations where information should only be indexed and not stored.  This
+     * functionality is also used when Metadata is stored as a separate file on
+     * disk.
+     *
+     * @param metadata the {@link Metadata} to 'store,' which may just involve
+     * updating index structures.
+     * @param blockPath the on-disk path of the Block the Metadata being stored
+     * belongs to.
+     */
+    public void storeMetadata(Metadata metadata, String blockPath)
+        throws FileSystemException, IOException;
 }
