@@ -77,10 +77,10 @@ public class GeospatialFileSystem extends FileSystem {
         super(storageDirectory);
 
         this.timeFormat = System.getProperty(
-                "galileo.fs.GeospatialPhysicalGraph.timeFormat",
+                "galileo.fs.GeospatialFileSystem.timeFormat",
                 DEFAULT_TIME_FORMAT);
         this.geohashPrecision = Integer.parseInt(System.getProperty(
-                "galileo.fs.GeospatialPhysicalGraph.geohashPrecision",
+                "galileo.fs.GeospatialFileSystem.geohashPrecision",
                 DEFAULT_GEOHASH_PRECISION + ""));
 
         timeFormatter = new SimpleDateFormat();
