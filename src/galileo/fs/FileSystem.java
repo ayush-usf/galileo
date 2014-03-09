@@ -39,7 +39,7 @@ import galileo.dataset.Metadata;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 
-public abstract class FileSystem {
+public abstract class FileSystem implements PhysicalGraph {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
@@ -176,13 +176,7 @@ public abstract class FileSystem {
         }
     }
 
-    /**
-     * Loads a {@link Block} instance from disk.
-     *
-     * @param blockPath the on-disk path of the Block to load.
-     *
-     * @return Block stored at blockPath.
-     */
+    @Override
     public Block loadBlock(String blockPath)
     throws IOException, SerializationException {
         File blockFile = new File(blockPath);
@@ -191,13 +185,7 @@ public abstract class FileSystem {
         return block;
     }
 
-    /**
-     * Recovers {@link Metadata} from disk.
-     *
-     * @param blockPath the on-disk path of the Block to recover Metadata from.
-     *
-     * @return Metadata stored at blockPath.
-     */
+    @Override
     public Metadata loadMetadata(String blockPath)
     throws IOException, SerializationException {
         /* We can just load the block as usual, but only perform the
@@ -209,14 +197,7 @@ public abstract class FileSystem {
         return meta;
     }
 
-    /**
-     * Persists a {@link Block} to disk.  The location of the Block will be
-     * determined by the particular FileSystem implementation being used.
-     *
-     * @param block Block to store on disk.
-     *
-     * @return String representing the path of the Block on disk.
-     */
+    @Override
     public String storeBlock(Block block)
     throws FileSystemException, IOException {
         String name = block.getMetadata().getName();
@@ -236,18 +217,9 @@ public abstract class FileSystem {
         return blockPath;
     }
 
-    /**
-     * Inserts Metadata into the file system.  In many cases, Metadata is not
-     * stored individually on disk but placed in an index instead.  This method
-     * is useful during a full recovery operation for re-linking indexed
-     * Metadata with its associated files on disk, or could be used in
-     * situations where information should only be indexed and not stored.
-     */
-    protected void storeMetadata(String blockPath, Metadata metadata)
-    throws FileSystemException, IOException {
-        /* The default implementation does not actually perform any indexing. */
-        return;
-    }
+    @Override
+    public abstract void storeMetadata(Metadata metadata, String blockPath)
+        throws FileSystemException, IOException;
 
     /**
      * Reports whether the Galileo filesystem is read-only.
