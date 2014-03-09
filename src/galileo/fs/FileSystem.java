@@ -239,4 +239,14 @@ public abstract class FileSystem implements PhysicalGraph {
     public long getFreeSpace() {
         return storageDirectory.getFreeSpace();
     }
+
+    /**
+     * Performs a clean shutdown of the FileSystem instance.  This includes
+     * flushing buffers, writing changes out to disk, persisting index
+     * structures, etc.  Note that this method may be called during a signal
+     * handling operation, which may mean that the logging subsystem has already
+     * shut down, so critical errors/information should be printed to stdout or
+     * stderr.
+     */
+    public abstract void shutdown();
 }
