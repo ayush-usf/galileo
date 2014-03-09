@@ -92,12 +92,16 @@ public class GeospatialFileSystem extends FileSystem {
                 metadataGraph
                     = Serializer.restore(MetadataGraph.class, metaFile);
             } catch (SerializationException e) {
+                /* We couldn't deserialize the MD graph, so we're going to have
+                 * to re-scan everything and rebuild it. */
                 logger.log(
                         Level.WARNING,
                         "Could not deserialize MetadataGraph!", e);
                 createMetadataGraph();
             }
         } else {
+            /* Generally this occurs when the file system is initialized for the
+             * first time, or the MD graph journal was somehow removed. */
             createMetadataGraph();
         }
     }
