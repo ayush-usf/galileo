@@ -180,7 +180,7 @@ public class GeospatialFileSystem extends FileSystem {
     }
 
     @Override
-    protected void storeMetadata(String blockPath, Metadata metadata)
+    public void storeMetadata(Metadata metadata, String blockPath)
     throws FileSystemException, IOException {
         FeaturePath<String> path = createPath(blockPath, metadata);
 
