@@ -31,14 +31,19 @@ import galileo.dataset.Block;
 import galileo.dataset.Metadata;
 import galileo.serialization.SerializationException;
 
+/**
+ * Defines the interface for "physical graphs" --- on-disk storage hierarchies.
+ *
+ * @author malensek
+ */
 public interface PhysicalGraph {
 
     /**
      * Retrieves a {@link Block} instance, given its path on disk.
      *
-     * @param blockPath the physical location of the Block to load.
+     * @param blockPath the physical (on-disk) location of the Block to load.
      *
-     * @return Block instance stored at blockPath.
+     * @return Block stored at blockPath.
      */
     public Block loadBlock(String blockPath)
         throws IOException, SerializationException;
