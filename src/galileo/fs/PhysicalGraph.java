@@ -77,9 +77,7 @@ public interface PhysicalGraph {
      * stored individually on disk but placed in an index instead.  This method
      * is useful during a full recovery operation for re-linking indexed
      * Metadata with its associated files on disk, or could be used in
-     * situations where information should only be indexed and not stored.  This
-     * functionality is also used when Metadata is stored as a separate file on
-     * disk.
+     * situations where information should only be indexed and not stored.
      *
      * @param metadata the {@link Metadata} to 'store,' which may just involve
      * updating index structures.
