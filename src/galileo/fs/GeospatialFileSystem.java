@@ -198,12 +198,15 @@ public class GeospatialFileSystem extends FileSystem {
         return metadataGraph.evaluateQuery(query);
     }
 
+    @Override
     public void shutdown() {
+        logger.info("FileSystem shutdown started");
         try {
             Serializer.persist(metadataGraph,
                     storageDirectory + "/" + metadataStore);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error writing persistent index file", e);
+            e.printStackTrace();
         }
     }
 }
