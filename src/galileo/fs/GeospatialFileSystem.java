@@ -88,11 +88,29 @@ public class GeospatialFileSystem extends FileSystem {
 
         File metaFile = new File(storageDirectory + "/" + metadataStore);
         if (metaFile.exists()) {
-            metadataGraph = Serializer.restore(MetadataGraph.class, metaFile);
-            //TODO verification
+            try {
+                metadataGraph
+                    = Serializer.restore(MetadataGraph.class, metaFile);
+            } catch (SerializationException e) {
+                logger.log(
+                        Level.WARNING,
+                        "Could not deserialize MetadataGraph!", e);
+                createMetadataGraph();
+            }
         } else {
-            metadataGraph = new MetadataGraph();
+            createMetadataGraph();
         }
+    }
+
+    /**
+     * Creates a new, empty MetadataGraph instance, which may be required
+     * because this is the first time the file system has been initialized, or
+     * perhaps the Metadata journal was corrupted or removed.  This operation
+     * requires scanning all the {@link Block} instances that were previously
+     * serialized to disk.
+     */
+    private void createMetadataGraph() {
+        metadataGraph = new MetadataGraph();
     }
 
     @Override
