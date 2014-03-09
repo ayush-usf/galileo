@@ -53,8 +53,8 @@ import galileo.util.StackTraceToString;
  * properties.
  * <p>
  * Relevant system properties include
- * galileo.fs.GeospatialPhysicalGraph.timeFormat and
- * galileo.fs.GeospatialPhysicalGraph.geohashPrecision
+ * galileo.fs.GeospatialFileSystem.timeFormat and
+ * galileo.fs.GeospatialFileSystem.geohashPrecision
  * to modify how the hierarchy is created.
  */
 public class GeospatialFileSystem extends FileSystem {
