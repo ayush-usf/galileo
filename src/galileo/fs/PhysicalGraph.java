@@ -61,7 +61,9 @@ public interface PhysicalGraph {
         throws IOException, SerializationException;
 
     /**
-     * Stores a {@link Block} on disk.
+     * Stores a {@link Block} on disk.  The location of the Block will be
+     * determined by the particular FileSystem implementation being used rather
+     * than as a method parameter, so only the Block itself is provided.
      *
      * @param block the Block instance to persist to disk.
      *
