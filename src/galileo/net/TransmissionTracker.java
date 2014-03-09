@@ -27,7 +27,6 @@ package galileo.net;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 

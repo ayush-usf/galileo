@@ -35,15 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import galileo.dataset.Block;
-import galileo.dataset.BlockMetadata;
-import galileo.dataset.FileBlock;
-import galileo.dataset.MetaArray;
 import galileo.dataset.Metadata;
-import galileo.graph.LogicalGraph;
-import galileo.graph.LogicalGraphNode;
-import galileo.graph.MetadataGraph;
-import galileo.graph.PhysicalGraph;
-import galileo.query.Query;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 

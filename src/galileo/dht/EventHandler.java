@@ -26,10 +26,7 @@ software, even if advised of the possibility of such damage.
 package galileo.dht;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.nio.channels.SelectionKey;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
