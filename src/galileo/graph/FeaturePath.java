@@ -51,5 +51,4 @@ public class FeaturePath<V> extends Path<Feature, V> {
         this(features);
         this.setPayload(payload);
     }
-
 }
