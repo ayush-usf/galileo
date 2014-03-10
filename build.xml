@@ -84,7 +84,7 @@
 
         <javadoc sourcepath="${src}"
                 destdir="${docs}"
-                classpath="${classpath}"
+                classpathref="classpath"
                 doctitle="${doctitle}"
                 windowtitle="${doctitle}"/>
     </target>
