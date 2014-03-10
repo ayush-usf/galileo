@@ -162,7 +162,7 @@ public abstract class FileSystem implements PhysicalGraph {
         for (String path : blockPaths) {
             try {
                 Metadata metadata = loadMetadata(path);
-                storeMetadata(path, metadata);
+                storeMetadata(metadata, path);
                 ++counter;
                 if (counter % 10000 == 0) {
                     logger.info(String.format("%d blocks scanned, " +
