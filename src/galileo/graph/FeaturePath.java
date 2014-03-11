@@ -28,6 +28,9 @@ package galileo.graph;
 import java.util.Collection;
 
 import galileo.dataset.feature.Feature;
+import galileo.query.Expression;
+import galileo.query.Operation;
+import galileo.query.Query;
 
 /**
  * Contains a graph {@link Path} composed of Features.
@@ -50,5 +53,41 @@ public class FeaturePath<V> extends Path<Feature, V> {
     public FeaturePath(Collection<V> payload, Feature... features) {
         this(features);
         this.setPayload(payload);
+    }
+
+    /**
+     * Evaluates this path against a provided {@link Query} instance.  If any of
+     * the {@link Operations} in the Query are satisfied by this Path instance,
+     * this method will return true.
+     *
+     * @param query Query to evaluate against this Path instance
+     *
+     * @return true if the Query is satisfied by this path, or false otherwise.
+     */
+    public boolean satisfiesQuery(Query query) {
+        for (Operation operation : query.getOperations()) {
+            if (this.satisfiesOperation(operation)) {
+                return true;
+            }
+        }
+
+        /* None of the query operations were satisfied by this path */
+        return false;
+    }
+
+    private boolean satisfiesOperation(Operation operation) {
+        for (Expression expression : operation.getExpressions()) {
+            if (this.satisfiesExpression(expression) == false) {
+                /* All expressions within an operation must be satisfied. */
+                return false;
+            }
+        }
+
+        /* All Expressions in the Operation were satisfied by this path */
+        return true;
+    }
+
+    private boolean satisfiesExpression(Expression expression) {
+        return false;
     }
 }

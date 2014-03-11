@@ -25,10 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
-import galileo.query.Expression;
-import galileo.query.Operation;
-import galileo.query.Query;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -150,42 +146,6 @@ implements Iterable<Vertex<L, V>> {
 
     public void sort(Comparator<? super Vertex<L, V>> c) {
         Collections.sort(vertices, c);
-    }
-
-    /**
-     * Evaluates this path against a provided {@link Query} instance.  If any of
-     * the {@link Operations} in the Query are satisfied by this Path instance,
-     * this method will return true.
-     *
-     * @param query Query to evaluate against this Path instance
-     *
-     * @return true if the Query is satisfied by this path, or false otherwise.
-     */
-    public boolean satisfiesQuery(Query query) {
-        for (Operation operation : query.getOperations()) {
-            if (this.satisfiesOperation(operation)) {
-                return true;
-            }
-        }
-
-        /* None of the query operations were satisfied by this path */
-        return false;
-    }
-
-    private boolean satisfiesOperation(Operation operation) {
-        for (Expression expression : operation.getExpressions()) {
-            if (this.satisfiesExpression(expression) == false) {
-                /* All expressions within an operation must be satisfied. */
-                return false;
-            }
-        }
-
-        /* All Expressions in the Operation were satisfied by this path */
-        return true;
-    }
-
-    private boolean satisfiesExpression(Expression expression) {
-        return false;
     }
 
     @Override
