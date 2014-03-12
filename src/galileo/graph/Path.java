@@ -42,7 +42,7 @@ import java.util.List;
 public class Path<L extends Comparable<L>, V>
 implements Iterable<Vertex<L, V>> {
 
-    private List<Vertex<L, V>> vertices = new ArrayList<>();
+    protected List<Vertex<L, V>> vertices = new ArrayList<>();
     protected Collection<V> payload = new HashSet<V>();
 
     /**
