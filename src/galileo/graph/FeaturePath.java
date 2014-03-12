@@ -27,6 +27,8 @@ package galileo.graph;
 
 import java.util.Collection;
 
+import java.util.List;
+
 import galileo.dataset.feature.Feature;
 import galileo.query.Expression;
 import galileo.query.Operation;
@@ -76,10 +78,15 @@ public class FeaturePath<V> extends Path<Feature, V> {
     }
 
     private boolean satisfiesOperation(Operation operation) {
-        for (Expression expression : operation.getExpressions()) {
-            if (this.satisfiesExpression(expression) == false) {
-                /* All expressions within an operation must be satisfied. */
-                return false;
+        for (Vertex<Feature, V> vertex : this.getVertices()) {
+            Feature feature = vertex.getLabel();
+            List<Expression> expressions
+                = operation.getOperand(feature.getName());
+            for (Expression expression : expressions) {
+                if (this.satisfiesExpression(expression) == false) {
+                    /* All expressions within an operation must be satisfied. */
+                    return false;
+                }
             }
         }
 
