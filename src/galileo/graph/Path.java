@@ -93,7 +93,7 @@ implements Iterable<Vertex<L, V>> {
     }
 
     public void add(L label, V value) {
-        vertices.add(new Vertex<>(label, value));
+        add(new Vertex<>(label, value));
     }
 
     public void remove(int index) {
