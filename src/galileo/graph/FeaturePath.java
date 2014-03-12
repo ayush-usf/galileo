@@ -83,7 +83,7 @@ public class FeaturePath<V> extends Path<Feature, V> {
             List<Expression> expressions
                 = operation.getOperand(feature.getName());
             for (Expression expression : expressions) {
-                if (this.satisfiesExpression(expression) == false) {
+                if (this.satisfiesExpression(feature, expression) == false) {
                     /* All expressions within an operation must be satisfied. */
                     return false;
                 }
@@ -94,7 +94,35 @@ public class FeaturePath<V> extends Path<Feature, V> {
         return true;
     }
 
-    private boolean satisfiesExpression(Expression expression) {
+    private boolean satisfiesExpression(
+            Feature feature, Expression expression) {
+
+        Feature value = expression.getValue();
+
+        switch (expression.getOperator()) {
+            case EQUAL:
+                return (feature.equals(value) == true);
+
+            case NOTEQUAL:
+                return (feature.equals(value) == false);
+
+            case LESS:
+                return feature.less(value);
+
+            case LESSEQUAL:
+                return (feature.less(value) || feature.equals(value));
+
+            case GREATER:
+                return feature.greater(value);
+
+            case GREATEREQUAL:
+                return (feature.greater(value) || feature.equals(value));
+
+            case UNKNOWN:
+            default:
+                //TODO throw new Exception();
+        }
+
         return false;
     }
 }
