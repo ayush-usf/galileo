@@ -36,7 +36,7 @@ import galileo.query.Query;
 
 import org.junit.Test;
 
-public class PathQuery {
+public class FeaturePathQuery {
 
     @Test
     public void singleOperationPositiveQueries()
