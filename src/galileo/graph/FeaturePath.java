@@ -82,6 +82,10 @@ public class FeaturePath<V> extends Path<Feature, V> {
             Feature feature = vertex.getLabel();
             List<Expression> expressions
                 = operation.getOperand(feature.getName());
+            if (expressions == null) {
+                continue;
+            }
+
             for (Expression expression : expressions) {
                 if (this.satisfiesExpression(feature, expression) == false) {
                     /* All expressions within an operation must be satisfied. */
