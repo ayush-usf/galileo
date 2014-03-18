@@ -66,7 +66,8 @@ public class FeaturePath<V> extends Path<Feature, V> {
      *
      * @return true if the Query is satisfied by this path, or false otherwise.
      */
-    public boolean satisfiesQuery(Query query) {
+    public boolean satisfiesQuery(Query query)
+    throws GraphException {
         for (Operation operation : query.getOperations()) {
             if (this.satisfiesOperation(operation)) {
                 return true;
@@ -77,11 +78,13 @@ public class FeaturePath<V> extends Path<Feature, V> {
         return false;
     }
 
-    private boolean satisfiesOperation(Operation operation) {
+    private boolean satisfiesOperation(Operation operation)
+    throws GraphException {
         for (Vertex<Feature, V> vertex : this.getVertices()) {
             Feature feature = vertex.getLabel();
             List<Expression> expressions
                 = operation.getOperand(feature.getName());
+
             if (expressions == null) {
                 continue;
             }
@@ -99,7 +102,8 @@ public class FeaturePath<V> extends Path<Feature, V> {
     }
 
     private boolean satisfiesExpression(
-            Feature feature, Expression expression) {
+            Feature feature, Expression expression)
+    throws GraphException {
 
         Feature value = expression.getValue();
 
@@ -124,9 +128,7 @@ public class FeaturePath<V> extends Path<Feature, V> {
 
             case UNKNOWN:
             default:
-                //TODO throw new Exception();
+                throw new GraphException("Invalid operator");
         }
-
-        return false;
     }
 }
