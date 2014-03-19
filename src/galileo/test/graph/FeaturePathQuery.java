@@ -134,6 +134,13 @@ public class FeaturePathQuery {
                     new Expression("<", new Feature("f1", 40.0)),
                     new Expression(">", new Feature("f2", 20.0))));
         assertEquals("less and greater", false, fp2.satisfiesQuery(q));
+
+        /* Other way */
+        q = new Query();
+        q.addOperation(new Operation(
+                    new Expression(">", new Feature("f2", 20.0)),
+                    new Expression("<", new Feature("f1", 40.0))));
+        assertEquals("greater and less", false, fp2.satisfiesQuery(q));
     }
 
     @Test
