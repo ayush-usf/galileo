@@ -167,4 +167,22 @@ public class FeaturePathQuery {
                     new Expression("==", new Feature("snow", 3.8))));
         assertEquals("Bad op Good op", true, fp.satisfiesQuery(q));
     }
+
+    @Test
+    public void testAllEqual()
+    throws GraphException {
+        FeaturePath<String> fp = new FeaturePath<>("test path",
+                new Feature("humidity", 32.3),
+                new Feature("wind_speed", 5.0),
+                new Feature("temperature", 274.8),
+                new Feature("snow", 3.8));
+
+        Query q = new Query();
+        q.addOperation(new Operation(
+                    new Expression("==", new Feature("humidity", 32.3)),
+                    new Expression("==", new Feature("wind_speed", 5.0)),
+                    new Expression("==", new Feature("temperature", 274.8)),
+                    new Expression("==", new Feature("snow", 3.8))));
+        assertEquals("all equal", true, fp.satisfiesQuery(q));
+    }
 }
