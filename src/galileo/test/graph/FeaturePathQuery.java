@@ -135,4 +135,29 @@ public class FeaturePathQuery {
                     new Expression(">", new Feature("f2", 20.0))));
         assertEquals("less and greater", false, fp2.satisfiesQuery(q));
     }
+
+    @Test
+    public void multiOperationQueries()
+    throws GraphException {
+        FeaturePath<String> fp = new FeaturePath<>("test path",
+                new Feature("humidity", 32.3),
+                new Feature("wind_speed", 5.0),
+                new Feature("temperature", 274.8),
+                new Feature("snow", 3.8));
+
+        Query q;
+
+        q = new Query();
+
+        /* Add an operation that won't work. */
+        q.addOperation(new Operation(
+                    new Expression("<", new Feature("humidity", 10.0))));
+
+        assertEquals("Bad op", false, fp.satisfiesQuery(q));
+
+        /* Now add another operation that should satisfy the query */
+        q.addOperation(new Operation(
+                    new Expression("==", new Feature("snow", 3.8))));
+        assertEquals("Bad op Good op", true, fp.satisfiesQuery(q));
+    }
 }
