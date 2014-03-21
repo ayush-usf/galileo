@@ -137,8 +137,8 @@ public class SpatialRange implements ByteSerializable {
 
     @Override
     public String toString() {
-        return "(" + lowerLat + ", " + lowerLon
-            + "), (" + upperLat + ", " + upperLon + ")";
+        Pair<Coordinates, Coordinates> p = get2DCoordinates();
+        return "[" + p.a + ", " + p.b + "]";
     }
 
     @Deserialize
