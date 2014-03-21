@@ -26,6 +26,8 @@ software, even if advised of the possibility of such damage.
 package galileo.test.graph;
 
 import static org.junit.Assert.*;
+import org.junit.Test;
+
 import galileo.dataset.feature.Feature;
 import galileo.graph.FeaturePath;
 
@@ -33,8 +35,6 @@ import galileo.graph.GraphException;
 import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Query;
-
-import org.junit.Test;
 
 public class FeaturePathQuery {
 
