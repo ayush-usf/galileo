@@ -64,20 +64,32 @@ public class SpatialRange implements ByteSerializable {
         this.lowerElevation = lowerElevation;
     }
 
-    public float getUpperBoundForLatitude() {
-        return upperLat;
-    }
-
+    /*
+     * Retrieves the smallest latitude value of this spatial range going east.
+     */
     public float getLowerBoundForLatitude() {
         return lowerLat;
     }
 
-    public float getUpperBoundForLongitude() {
-        return upperLon;
+    /*
+     * Retrieves the largest latitude value of this spatial range going east.
+     */
+    public float getUpperBoundForLatitude() {
+        return upperLat;
     }
 
+    /*
+     * Retrieves the smallest longitude value of this spatial range going south.
+     */
     public float getLowerBoundForLongitude() {
         return lowerLon;
+    }
+
+    /*
+     * Retrieves the largest longitude value of this spatial range going south.
+     */
+    public float getUpperBoundForLongitude() {
+        return upperLon;
     }
 
     public Coordinates getCenterPoint() {
