@@ -30,6 +30,7 @@ import java.io.IOException;
 import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
+import galileo.util.Pair;
 
 public class SpatialRange implements ByteSerializable {
     private float upperLat;
@@ -101,6 +102,25 @@ public class SpatialRange implements ByteSerializable {
 
         return new Coordinates(lowerLat + latDistance,
                                lowerLon + lonDistance);
+    }
+
+    /**
+     * Using the upper and lower boundaries for this spatial range, generate
+     * two lat, lon points that represent the upper-left and lower-right
+     * coordinates of the range.  Note that this method does not account for the
+     * curvature of the earth (aka the Earth is flat).
+     *
+     * @return a Pair of Coordinates, with the upper-left and lower-right
+     * points of this spatial range.
+     */
+    public Pair<Coordinates, Coordinates> get2DCoordinates() {
+        return new Pair<>(
+                new Coordinates(
+                    this.getLowerBoundForLatitude(),
+                    this.getLowerBoundForLongitude()),
+                new Coordinates(
+                    this.getUpperBoundForLatitude(),
+                    this.getUpperBoundForLongitude()));
     }
 
     public boolean hasElevationBounds() {
