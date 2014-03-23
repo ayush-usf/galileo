@@ -10,3 +10,6 @@ build.properties
 
 # Mac OS File Attributes
 .DS_Store
+
+# Binaries
+lib/Galileo-*.jar
