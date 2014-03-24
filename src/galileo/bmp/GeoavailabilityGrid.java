@@ -33,7 +33,7 @@ public class GeoavailabilityGrid {
     int width, height;
 
     private SpatialRange baseRange;
-    private Bitmap bmp;
+    private Bitmap<EWAHBitmap> bmp;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
         this.baseRange = GeoHash.decodeHash(baseGeohash);
@@ -51,6 +51,10 @@ public class GeoavailabilityGrid {
 
         this.width = (1 << w); /* = 2^w */
         this.height = (1 << h); /* = 2^h */
+
+        System.out.println(baseRange);
+        System.out.println(width);
+        System.out.println(height);
     }
 
     /**
@@ -77,11 +81,10 @@ public class GeoavailabilityGrid {
      *
      * @return Bitmap with matching bits set.
      */
-    public Bitmap query(GeoavailabilityQuery query)
+    public void query(GeoavailabilityQuery query)
     throws BitmapException {
-        Bitmap queryBits = query.toBitmap();
-        this.bmp.and(queryBits);
+        //this.bmp.and(queryBits);
 
-        return null;
+        return;
     }
 }
