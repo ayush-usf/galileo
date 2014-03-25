@@ -83,6 +83,14 @@ public class GeoavailabilityGrid {
         coordinatesToXY(new Coordinates(44.88f, -112.32f));
     }
 
+    /**
+     * Converts a coordinate pair (defined with latitude, longitude in decimal
+     * degrees) to an x, y location in the grid.
+     *
+     * @param coords the Coordinates to convert.
+     *
+     * @return Corresponding x, y location in the grid.
+     */
     private Point<Integer> coordinatesToXY(Coordinates coords) {
 
         /* Assuming (x, y) coordinates for the geoavailability grids, latitude
