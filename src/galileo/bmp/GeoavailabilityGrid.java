@@ -25,15 +25,25 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import galileo.dataset.Coordinates;
+import galileo.dataset.Point;
 import galileo.dataset.SpatialRange;
 import galileo.util.GeoHash;
 
 public class GeoavailabilityGrid {
 
+    private static final Logger logger = Logger.getLogger("galileo");
+
     int width, height;
 
-    private SpatialRange baseRange;
     private Bitmap<EWAHBitmap> bmp;
+
+    private SpatialRange baseRange;
+    private float xDegreesPerPixel;
+    private float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
         this.baseRange = GeoHash.decodeHash(baseGeohash);
@@ -52,9 +62,23 @@ public class GeoavailabilityGrid {
         this.width = (1 << w); /* = 2^w */
         this.height = (1 << h); /* = 2^h */
 
-        System.out.println(baseRange);
-        System.out.println(width);
-        System.out.println(height);
+        /* Determine the number of degrees in the x and y directions for the
+         * base spatial range this geoavailability grid represents */
+        float xDegrees = baseRange.getUpperBoundForLongitude()
+            - baseRange.getLowerBoundForLongitude();
+        float yDegrees = baseRange.getLowerBoundForLatitude()
+            - baseRange.getUpperBoundForLatitude();
+
+        /* Determine the number of degrees represented by each grid pixel */
+        xDegreesPerPixel = xDegrees / (float) this.width;
+        yDegreesPerPixel = yDegrees / (float) this.width;
+
+        logger.log(Level.INFO, "Created geoavailability grid: "
+                + "geohash={0}, precision={1}, width={2}, height={3}, "
+                + "baseRange={6}, xDegreesPerPixel={4}, yDegreesPerPixel={5}",
+                new Object[] { baseGeohash, precision, width, height,
+                    xDegreesPerPixel, yDegreesPerPixel, baseRange});
+
     }
 
     /**
