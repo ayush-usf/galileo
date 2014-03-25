@@ -79,6 +79,26 @@ public class GeoavailabilityGrid {
                 new Object[] { baseGeohash, precision, width, height,
                     xDegreesPerPixel, yDegreesPerPixel, baseRange});
 
+        coordinatesToXY(new Coordinates(43.3348f, -109.6358f));
+        coordinatesToXY(new Coordinates(44.88f, -112.32f));
+    }
+
+    private Point<Integer> coordinatesToXY(Coordinates coords) {
+
+        /* Assuming (x, y) coordinates for the geoavailability grids, latitude
+         * will decrease as y increases, and longitude will increase as x
+         * increases. This is reflected in how we compute the differences
+         * between the base points and the coordinates in question. */
+        float xDiff = coords.getLongitude()
+            - baseRange.getLowerBoundForLongitude();
+
+        float yDiff = baseRange.getLowerBoundForLatitude()
+            - coords.getLatitude();
+
+        int x = (int) (xDiff / xDegreesPerPixel);
+        int y = (int) (yDiff / yDegreesPerPixel);
+
+        return new Point<>(x, y);
     }
 
     /**
