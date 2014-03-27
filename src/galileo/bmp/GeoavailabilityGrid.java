@@ -25,6 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,19 +36,23 @@ import galileo.dataset.Point;
 import galileo.dataset.SpatialRange;
 import galileo.util.GeoHash;
 
-public class GeoavailabilityGrid {
+public class GeoavailabilityGrid<T> {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
     int width, height;
 
     private Bitmap<EWAHBitmap> bmp;
+    private Map<Integer, List<T>> points;
 
     private SpatialRange baseRange;
     private float xDegreesPerPixel;
     private float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
+
+        this.points = new HashMap<Integer, List<T>>();
+
         this.baseRange = GeoHash.decodeHash(baseGeohash);
 
         /*
