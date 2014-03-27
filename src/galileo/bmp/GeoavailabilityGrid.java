@@ -40,7 +40,7 @@ public class GeoavailabilityGrid<T> {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
-    int width, height;
+    private int width, height;
 
     private Bitmap<EWAHBitmap> bmp;
     private Map<Integer, List<T>> points;
