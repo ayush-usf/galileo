@@ -85,9 +85,6 @@ public class GeoavailabilityGrid<T> {
                 + "baseRange={6}, xDegreesPerPixel={4}, yDegreesPerPixel={5}",
                 new Object[] { baseGeohash, precision, width, height,
                     xDegreesPerPixel, yDegreesPerPixel, baseRange});
-
-        coordinatesToXY(new Coordinates(43.3348f, -109.6358f));
-        coordinatesToXY(new Coordinates(44.88f, -112.32f));
     }
 
     private Point<Integer> coordinatesToXY(Coordinates coords) {
