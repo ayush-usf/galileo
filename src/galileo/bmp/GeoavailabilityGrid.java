@@ -115,9 +115,10 @@ public class GeoavailabilityGrid<T> {
      * @return true if the supplied {@link GeoavailabilityQuery} intersects with
      * the data in the geoavailability grid.
      */
-    public boolean intersects(GeoavailabilityQuery query) {
-
-        return false;
+    public boolean intersects(GeoavailabilityQuery query)
+    throws BitmapException {
+        Bitmap<EWAHBitmap> queryBitmap = query.toBitmap();
+        return this.bmp.intersects(queryBitmap);
     }
 
     /**
