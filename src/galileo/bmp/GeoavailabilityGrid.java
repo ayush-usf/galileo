@@ -136,4 +136,16 @@ public class GeoavailabilityGrid<T> {
 
         return;
     }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public SpatialRange getBaseRange() {
+        return new SpatialRange(baseRange);
+    }
 }
