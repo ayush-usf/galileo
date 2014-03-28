@@ -28,97 +28,14 @@ package galileo.bmp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import galileo.dataset.Coordinates;
-import galileo.dataset.Point;
-import galileo.dataset.SpatialRange;
-import galileo.util.GeoHash;
+public class GeoavailabilityMap<T> extends GeoavailabilityGrid {
 
-public class GeoavailabilityMap<T> {
-
-    private static final Logger logger = Logger.getLogger("galileo");
-
-    private int width, height;
-
-    private Bitmap<EWAHBitmap> bmp;
     private Map<Integer, List<T>> points;
 
-    private SpatialRange baseRange;
-    private float xDegreesPerPixel;
-    private float yDegreesPerPixel;
-
     public GeoavailabilityMap(String baseGeohash, int precision) {
-
-        this.points = new HashMap<Integer, List<T>>();
-
-        this.baseRange = GeoHash.decodeHash(baseGeohash);
-
-        /*
-         * height, width calculated like so:
-         * width = 2^(floor(precision / 2))
-         * height = 2^(ceil(precision / 2))
-         */
-        int w = precision / 2;
-        int h = precision / 2;
-        if (precision % 2 != 0) {
-            h += 1;
-        }
-
-        this.width = (1 << w); /* = 2^w */
-        this.height = (1 << h); /* = 2^h */
-
-        /* Determine the number of degrees in the x and y directions for the
-         * base spatial range this geoavailability grid represents */
-        float xDegrees = baseRange.getUpperBoundForLongitude()
-            - baseRange.getLowerBoundForLongitude();
-        float yDegrees = baseRange.getLowerBoundForLatitude()
-            - baseRange.getUpperBoundForLatitude();
-
-        /* Determine the number of degrees represented by each grid pixel */
-        xDegreesPerPixel = xDegrees / (float) this.width;
-        yDegreesPerPixel = yDegrees / (float) this.width;
-
-        logger.log(Level.INFO, "Created geoavailability grid: "
-                + "geohash={0}, precision={1}, width={2}, height={3}, "
-                + "baseRange={6}, xDegreesPerPixel={4}, yDegreesPerPixel={5}",
-                new Object[] { baseGeohash, precision, width, height,
-                    xDegreesPerPixel, yDegreesPerPixel, baseRange});
-    }
-
-    private Point<Integer> coordinatesToXY(Coordinates coords) {
-
-        /* Assuming (x, y) coordinates for the geoavailability grids, latitude
-         * will decrease as y increases, and longitude will increase as x
-         * increases. This is reflected in how we compute the differences
-         * between the base points and the coordinates in question. */
-        float xDiff = coords.getLongitude()
-            - baseRange.getLowerBoundForLongitude();
-
-        float yDiff = baseRange.getLowerBoundForLatitude()
-            - coords.getLatitude();
-
-        int x = (int) (xDiff / xDegreesPerPixel);
-        int y = (int) (yDiff / yDegreesPerPixel);
-
-        return new Point<>(x, y);
-    }
-
-    /**
-     * Reports whether or not the supplied {@link GeoavailabilityQuery}
-     * instance intersects with the bits set in this geoavailability grid.  This
-     * operation can be much faster than performing a full query.
-     *
-     * @param query The query geometry to test for intersection.
-     *
-     * @return true if the supplied {@link GeoavailabilityQuery} intersects with
-     * the data in the geoavailability grid.
-     */
-    public boolean intersects(GeoavailabilityQuery query)
-    throws BitmapException {
-        Bitmap<EWAHBitmap> queryBitmap = query.toBitmap();
-        return this.bmp.intersects(queryBitmap);
+        super(baseGeohash, precision);
+        points = new HashMap<>();
     }
 
     /**
@@ -135,17 +52,5 @@ public class GeoavailabilityMap<T> {
         //this.bmp.and(queryBits);
 
         return;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public SpatialRange getBaseRange() {
-        return new SpatialRange(baseRange);
     }
 }
