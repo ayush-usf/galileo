@@ -122,6 +122,14 @@ public class GeoavailabilityGrid {
         return height;
     }
 
+    /**
+     * Retrieves the base SpatialRange that this GeoavailabilityGrid is
+     * responsible for; the base range defines the geographic scope of this
+     * GeoavailabilityGrid instance.
+     *
+     * @return {@link SpatialRange} representing this GeoavailabilityGrid's
+     * scope.
+     */
     public SpatialRange getBaseRange() {
         return new SpatialRange(baseRange);
     }
