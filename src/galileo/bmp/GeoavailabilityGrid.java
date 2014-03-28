@@ -35,15 +35,15 @@ import galileo.util.GeoHash;
 
 public class GeoavailabilityGrid {
 
-    private static final Logger logger = Logger.getLogger("galileo");
+    protected static final Logger logger = Logger.getLogger("galileo");
 
-    private int width, height;
+    protected int width, height;
 
-    private Bitmap<EWAHBitmap> bmp;
+    protected Bitmap<EWAHBitmap> bmp;
 
-    private SpatialRange baseRange;
-    private float xDegreesPerPixel;
-    private float yDegreesPerPixel;
+    protected SpatialRange baseRange;
+    protected float xDegreesPerPixel;
+    protected float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
         this.baseRange = GeoHash.decodeHash(baseGeohash);
