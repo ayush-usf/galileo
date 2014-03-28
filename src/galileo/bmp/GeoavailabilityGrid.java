@@ -25,9 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,23 +33,19 @@ import galileo.dataset.Point;
 import galileo.dataset.SpatialRange;
 import galileo.util.GeoHash;
 
-public class GeoavailabilityGrid<T> {
+public class GeoavailabilityGrid {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
     private int width, height;
 
     private Bitmap<EWAHBitmap> bmp;
-    private Map<Integer, List<T>> points;
 
     private SpatialRange baseRange;
     private float xDegreesPerPixel;
     private float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
-
-        this.points = new HashMap<Integer, List<T>>();
-
         this.baseRange = GeoHash.decodeHash(baseGeohash);
 
         /*
@@ -87,7 +80,7 @@ public class GeoavailabilityGrid<T> {
                     xDegreesPerPixel, yDegreesPerPixel, baseRange});
     }
 
-    private Point<Integer> coordinatesToXY(Coordinates coords) {
+    protected Point<Integer> coordinatesToXY(Coordinates coords) {
 
         /* Assuming (x, y) coordinates for the geoavailability grids, latitude
          * will decrease as y increases, and longitude will increase as x
@@ -119,22 +112,6 @@ public class GeoavailabilityGrid<T> {
     throws BitmapException {
         Bitmap<EWAHBitmap> queryBitmap = query.toBitmap();
         return this.bmp.intersects(queryBitmap);
-    }
-
-    /**
-     * Queries the geoavailability grid, which involves performing a logical AND
-     * operation and reporting the resulting Bitmap.
-     *
-     * @param query The query geometry to evaluate against the geoavailability
-     * grid.
-     *
-     * @return Bitmap with matching bits set.
-     */
-    public void query(GeoavailabilityQuery query)
-    throws BitmapException {
-        //this.bmp.and(queryBits);
-
-        return;
     }
 
     public int getWidth() {
