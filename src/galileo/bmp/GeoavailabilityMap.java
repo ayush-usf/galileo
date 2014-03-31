@@ -25,10 +25,32 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
-public class GeoavailabilityQuery {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    public Bitmap<EWAHBitmap> toBitmap() {
+public class GeoavailabilityMap<T> extends GeoavailabilityGrid {
 
-        return null;
+    private Map<Integer, List<T>> points;
+
+    public GeoavailabilityMap(String baseGeohash, int precision) {
+        super(baseGeohash, precision);
+        points = new HashMap<>();
+    }
+
+    /**
+     * Queries the geoavailability grid, which involves performing a logical AND
+     * operation and reporting the resulting Bitmap.
+     *
+     * @param query The query geometry to evaluate against the geoavailability
+     * grid.
+     *
+     * @return Bitmap with matching bits set.
+     */
+    public void query(GeoavailabilityQuery query)
+    throws BitmapException {
+        //this.bmp.and(queryBits);
+
+        return;
     }
 }

@@ -35,15 +35,15 @@ import galileo.util.GeoHash;
 
 public class GeoavailabilityGrid {
 
-    private static final Logger logger = Logger.getLogger("galileo");
+    protected static final Logger logger = Logger.getLogger("galileo");
 
-    int width, height;
+    protected int width, height;
 
-    private Bitmap<EWAHBitmap> bmp;
+    protected Bitmap<EWAHBitmap> bmp;
 
-    private SpatialRange baseRange;
-    private float xDegreesPerPixel;
-    private float yDegreesPerPixel;
+    protected SpatialRange baseRange;
+    protected float xDegreesPerPixel;
+    protected float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
         this.baseRange = GeoHash.decodeHash(baseGeohash);
@@ -78,9 +78,6 @@ public class GeoavailabilityGrid {
                 + "baseRange={6}, xDegreesPerPixel={4}, yDegreesPerPixel={5}",
                 new Object[] { baseGeohash, precision, width, height,
                     xDegreesPerPixel, yDegreesPerPixel, baseRange});
-
-        coordinatesToXY(new Coordinates(43.3348f, -109.6358f));
-        coordinatesToXY(new Coordinates(44.88f, -112.32f));
     }
 
     /**
@@ -92,6 +89,7 @@ public class GeoavailabilityGrid {
      * @return Corresponding x, y location in the grid.
      */
     private Point<Integer> coordinatesToXY(Coordinates coords) {
+    protected Point<Integer> coordinatesToXY(Coordinates coords) {
 
         /* Assuming (x, y) coordinates for the geoavailability grids, latitude
          * will decrease as y increases, and longitude will increase as x
@@ -119,24 +117,29 @@ public class GeoavailabilityGrid {
      * @return true if the supplied {@link GeoavailabilityQuery} intersects with
      * the data in the geoavailability grid.
      */
-    public boolean intersects(GeoavailabilityQuery query) {
+    public boolean intersects(GeoavailabilityQuery query)
+    throws BitmapException {
+        Bitmap<EWAHBitmap> queryBitmap = query.toBitmap();
+        return this.bmp.intersects(queryBitmap);
+    }
 
-        return false;
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     /**
-     * Queries the geoavailability grid, which involves performing a logical AND
-     * operation and reporting the resulting Bitmap.
+     * Retrieves the base SpatialRange that this GeoavailabilityGrid is
+     * responsible for; the base range defines the geographic scope of this
+     * GeoavailabilityGrid instance.
      *
-     * @param query The query geometry to evaluate against the geoavailability
-     * grid.
-     *
-     * @return Bitmap with matching bits set.
+     * @return {@link SpatialRange} representing this GeoavailabilityGrid's
+     * scope.
      */
-    public void query(GeoavailabilityQuery query)
-    throws BitmapException {
-        //this.bmp.and(queryBits);
-
-        return;
+    public SpatialRange getBaseRange() {
+        return new SpatialRange(baseRange);
     }
 }

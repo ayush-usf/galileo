@@ -65,6 +65,17 @@ public class SpatialRange implements ByteSerializable {
         this.lowerElevation = lowerElevation;
     }
 
+    public SpatialRange(SpatialRange copyFrom) {
+        this.lowerLat = copyFrom.lowerLat;
+        this.upperLat = copyFrom.upperLat;
+        this.lowerLon = copyFrom.lowerLon;
+        this.upperLon = copyFrom.upperLon;
+
+        this.hasElevation = copyFrom.hasElevation;
+        this.upperElevation = copyFrom.upperElevation;
+        this.lowerElevation = copyFrom.lowerElevation;
+    }
+
     /*
      * Retrieves the smallest latitude value of this spatial range going east.
      */
