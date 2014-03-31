@@ -83,7 +83,12 @@ public class GeoavailabilityGrid {
                     xDegreesPerPixel, yDegreesPerPixel, baseRange});
     }
 
-    public void addPoint(Coordinates coords) {
+    /**
+     * Adds a new point to this GeoavailabilityGrid.
+     *
+     * @param coords The location (coordinates in lat, lon) to add.
+     */
+    public void add(Coordinates coords) {
         Point<Integer> gridPoint = coordinatesToXY(coords);
         int index = XYtoIndex(gridPoint.X(), gridPoint.Y());
 
@@ -119,10 +124,25 @@ public class GeoavailabilityGrid {
         return new Point<>(x, y);
     }
 
+    /**
+     * Converts X, Y coordinates to a particular index within the underlying
+     * bitmap implementation.  Essentially this converts a 2D index to a 1D
+     * index.
+     *
+     * @param x The x coordinate to convert
+     * @param y The y coorddinate to convert
+     *
+     * @return A single integer representing the bitmap location of the X, Y
+     * coordinates.
+     */
     private int XYtoIndex(int x, int y) {
         return y * this.width + x;
     }
 
+    /**
+     * Applies pending updates that have not yet been integrated into the
+     * GeoavailabilityGrid instance.
+     */
     private void applyUpdates() {
         Bitmap updateBitmap = new Bitmap();
         for (int i : pendingUpdates) {
