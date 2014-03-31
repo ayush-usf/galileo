@@ -172,10 +172,16 @@ public class GeoavailabilityGrid {
         return this.bmp.intersects(queryBitmap);
     }
 
+    /**
+     * Retrieves the width of this GeoavailabilityGrid, in grid cells.
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Retrieves the height of this GeoavailabilityGrid, in grid cells.
+     */
     public int getHeight() {
         return height;
     }
