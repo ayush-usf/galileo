@@ -27,7 +27,7 @@ package galileo.bmp;
 
 public class GeoavailabilityQuery {
 
-    public Bitmap<EWAHBitmap> toBitmap() {
+    public Bitmap toBitmap() {
 
         return null;
     }

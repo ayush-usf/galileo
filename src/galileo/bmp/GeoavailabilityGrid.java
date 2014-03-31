@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +41,8 @@ public class GeoavailabilityGrid {
 
     protected int width, height;
 
-    protected Bitmap<EWAHBitmap> bmp;
+    protected Bitmap bmp;
+    protected SortedSet<Integer> pendingUpdates = new TreeSet<>();
 
     protected SpatialRange baseRange;
     protected float xDegreesPerPixel;
@@ -80,6 +83,16 @@ public class GeoavailabilityGrid {
                     xDegreesPerPixel, yDegreesPerPixel, baseRange});
     }
 
+    public void addPoint(Coordinates coords) {
+        Point<Integer> gridPoint = coordinatesToXY(coords);
+        int index = XYtoIndex(gridPoint.X(), gridPoint.Y());
+
+        if (this.bmp.set(index) == false) {
+            /* Could not set the bits now; add to pending updates */
+            pendingUpdates.add(index);
+        }
+    }
+
     /**
      * Converts a coordinate pair (defined with latitude, longitude in decimal
      * degrees) to an x, y location in the grid.
@@ -89,7 +102,6 @@ public class GeoavailabilityGrid {
      * @return Corresponding x, y location in the grid.
      */
     private Point<Integer> coordinatesToXY(Coordinates coords) {
-    protected Point<Integer> coordinatesToXY(Coordinates coords) {
 
         /* Assuming (x, y) coordinates for the geoavailability grids, latitude
          * will decrease as y increases, and longitude will increase as x
@@ -107,6 +119,22 @@ public class GeoavailabilityGrid {
         return new Point<>(x, y);
     }
 
+    private int XYtoIndex(int x, int y) {
+        return y * this.width + x;
+    }
+
+    private void applyUpdates() {
+        Bitmap updateBitmap = new Bitmap();
+        for (int i : pendingUpdates) {
+            if (updateBitmap.set(i) == false) {
+                logger.warning("Could not set update bit");
+            }
+        }
+        pendingUpdates.clear();
+
+        this.bmp.or(updateBitmap);
+    }
+
     /**
      * Reports whether or not the supplied {@link GeoavailabilityQuery}
      * instance intersects with the bits set in this geoavailability grid.  This
@@ -119,7 +147,8 @@ public class GeoavailabilityGrid {
      */
     public boolean intersects(GeoavailabilityQuery query)
     throws BitmapException {
-        Bitmap<EWAHBitmap> queryBitmap = query.toBitmap();
+        applyUpdates();
+        Bitmap queryBitmap = query.toBitmap();
         return this.bmp.intersects(queryBitmap);
     }
 

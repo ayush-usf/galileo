@@ -25,12 +25,24 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import com.googlecode.javaewah.EWAHCompressedBitmap;
+
 /**
- * An interface for bitmap indexes.
+ * A thin wrapper around {@link com.googlecode.javaewah.EWAHCompressedBitmap}
+ * to enable us to decouple from a particular bitmap implementation in the
+ * future if need be.
  *
  * @author malensek
  */
-public interface Bitmap<T> {
+public class Bitmap {
+
+    private EWAHCompressedBitmap bmp;
+
+    public Bitmap() { }
+
+    private Bitmap(EWAHCompressedBitmap bmp) {
+        this.bmp = bmp;
+    }
 
     /**
      * Sets the specified bit(s) in the index.
@@ -39,7 +51,18 @@ public interface Bitmap<T> {
      *
      * @throws BitmapException if the bits could not be set.
      */
-    public void set(int... bits) throws BitmapException;
+    public boolean set(int... bits) {
+        for (int i : bits) {
+            return bmp.set(i);
+        }
+        return false;
+    }
 
-    public boolean intersects(Bitmap<T> otherBitmap) throws BitmapException;
+    public Bitmap or(Bitmap otherBitmap) {
+        return new Bitmap(this.bmp.or(otherBitmap.bmp));
+    }
+
+    public boolean intersects(Bitmap otherBitmap) {
+        return this.bmp.intersects(otherBitmap.bmp);
+    }
 }
