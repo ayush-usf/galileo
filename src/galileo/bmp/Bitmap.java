@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import java.util.Iterator;
+
 import com.googlecode.javaewah.EWAHCompressedBitmap;
 
 /**
@@ -34,7 +36,7 @@ import com.googlecode.javaewah.EWAHCompressedBitmap;
  *
  * @author malensek
  */
-public class Bitmap {
+public class Bitmap implements Iterable<Integer> {
 
     private EWAHCompressedBitmap bmp;
 
@@ -66,5 +68,10 @@ public class Bitmap {
 
     public boolean intersects(Bitmap otherBitmap) {
         return this.bmp.intersects(otherBitmap.bmp);
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return bmp.iterator();
     }
 }
