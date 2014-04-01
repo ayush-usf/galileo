@@ -41,7 +41,7 @@ public class GeoavailabilityGrid {
 
     protected int width, height;
 
-    protected Bitmap bmp;
+    public Bitmap bmp = new Bitmap();
     protected SortedSet<Integer> pendingUpdates = new TreeSet<>();
 
     protected SpatialRange baseRange;
@@ -158,7 +158,8 @@ public class GeoavailabilityGrid {
     /**
      * Reports whether or not the supplied {@link GeoavailabilityQuery}
      * instance intersects with the bits set in this geoavailability grid.  This
-     * operation can be much faster than performing a full query.
+     * operation can be much faster than performing a full inspection of what
+     * bits are actually set.
      *
      * @param query The query geometry to test for intersection.
      *
