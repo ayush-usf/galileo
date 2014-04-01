@@ -77,6 +77,73 @@ public class Bitmap implements Iterable<Integer> {
         return this.bmp.intersects(otherBitmap.bmp);
     }
 
+    /**
+     * Given an array of raw bytes, convert the bytes into a compressed bitmap
+     * representation with 2D characteristics.  This method provides
+     * functionality slightly different from a direct conversion; it assumes
+     * that the bitmaps in question are two-dimensional (represented by a 1D bit
+     * stream) and have geometric properties (height, width, x, y, etc.).
+     * <p>
+     * One assumption this method makes is that incoming bytes are word-aligned;
+     * that is, the width and height of the bytes being converted must be
+     * evenly-divisible by 64.
+     *
+     * @param bytes The raw bytes to convert
+     * @param x The x-coordinate to begin placing the bytes
+     * @param y The y-coordinate to begin placing the bytes
+     * @param width The width of the raw data in the array
+     * @param height The height of the raw data in the array
+     * @param canvasWidth The desired width of the bitmap 'canvas' the bytes
+     * will be placed on
+     * @param canvasHeight The desired height of the bitmap 'canvas' the bytes
+     * will be placed on
+     *
+     * @return Bitmap representation of the bytes provided, integrated onto the
+     * bitmap 'canvas' with the width, height, and positions provided.
+     */
+    public static Bitmap fromBytes(byte[] bytes, int x, int y,
+            int width, int height,
+            int canvasWidth, int canvasHeight) {
+
+        EWAHCompressedBitmap bmp = new EWAHCompressedBitmap();
+
+        /* Shift through the bitmap to the first place we need to draw. */
+        int idx = canvasWidth * y + x;
+        int shift = idx % 64;
+        int skipWords = (idx - shift) / 64;
+        bmp.addStreamOfEmptyWords(false, skipWords);
+
+        /* Convert raw image data to binary words */
+        long[] words = bytesToWords(bytes);
+
+        int lines = height;
+        int wordsPerLine = width / 64;
+        for (int line = 0; line < lines; ++line) {
+            int wordIdx = line * wordsPerLine;
+            bmp.addStreamOfLiteralWords(words, wordIdx, wordsPerLine);
+            bmp.addStreamOfEmptyWords(false, (canvasWidth / 64) - wordsPerLine);
+        }
+
+        return new Bitmap(bmp);
+    }
+
+    /**
+     * Do a direct conversion of a byte array to 64-bit words (longs).
+     *
+     * @return an array of 64-bit words.
+     */
+    private static long[] bytesToWords(byte[] bytes) {
+        long[] words = new long[bytes.length / 64];
+        for (int i = 0; i < bytes.length / 64; ++i) {
+            for (int j = 0; j < 64; ++j) {
+                if (bytes[i * 64 + j] < 0) {
+                    words[i] |= (1l << j);
+                }
+            }
+        }
+        return words;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
