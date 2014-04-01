@@ -27,9 +27,9 @@ package galileo.bmp;
 
 public class BitmapException extends Exception {
 
-	private static final long serialVersionUID = -4516532285359101020L;
+    private static final long serialVersionUID = -4516532285359101020L;
 
-	public BitmapException() {
+    public BitmapException() {
         super();
     }
 
