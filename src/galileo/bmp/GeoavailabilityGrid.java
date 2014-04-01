@@ -183,6 +183,31 @@ public class GeoavailabilityGrid {
         return this.bmp.intersects(queryBitmap);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        GeoavailabilityGrid g = (GeoavailabilityGrid) obj;
+        Bitmap b1 = g.getBitmap();
+        Bitmap b2 = this.getBitmap();
+        return b1.equals(b2);
+    }
+
+    protected Bitmap getBitmap() {
+        applyUpdates();
+        return bmp;
+    }
+
     /**
      * Retrieves the width of this GeoavailabilityGrid, in grid cells.
      */
