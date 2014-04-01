@@ -66,6 +66,14 @@ public class Bitmap implements Iterable<Integer> {
         return new Bitmap(this.bmp.or(otherBitmap.bmp));
     }
 
+    public Bitmap xor(Bitmap otherBitmap) {
+        return new Bitmap(this.bmp.xor(otherBitmap.bmp));
+    }
+
+    public Bitmap and(Bitmap otherBitmap) {
+        return new Bitmap(this.bmp.and(otherBitmap.bmp));
+    }
+
     public boolean intersects(Bitmap otherBitmap) {
         return this.bmp.intersects(otherBitmap.bmp);
     }
