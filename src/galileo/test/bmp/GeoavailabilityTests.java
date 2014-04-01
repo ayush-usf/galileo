@@ -32,8 +32,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 import galileo.bmp.GeoavailabilityGrid;
 import galileo.bmp.Visualization;
 import galileo.dataset.Coordinates;
@@ -62,8 +60,8 @@ public class GeoavailabilityTests {
     @Test
     public void testBitmapCorners() throws IOException {
         GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 10);
-        gg.addPoint(new Coordinates(44.819f, -112.242f));
-        gg.addPoint(new Coordinates(44.819f, -101.514f));
+        gg.addPoint(new Coordinates(44.919f, -112.242f));
+        gg.addPoint(new Coordinates(44.919f, -101.514f));
         gg.addPoint(new Coordinates(39.496f, -112.242f));
         gg.addPoint(new Coordinates(39.496f, -101.514f));
 
@@ -109,8 +107,8 @@ public class GeoavailabilityTests {
     public void testUpdates() throws Exception {
         /* Insert points in indexed order */
         GeoavailabilityGrid g1 = new GeoavailabilityGrid("9x", 10);
-        g1.addPoint(new Coordinates(44.819f, -112.242f));
-        g1.addPoint(new Coordinates(44.819f, -101.514f));
+        g1.addPoint(new Coordinates(44.919f, -112.242f));
+        g1.addPoint(new Coordinates(44.919f, -101.514f));
         g1.addPoint(new Coordinates(39.496f, -112.242f));
         g1.addPoint(new Coordinates(39.496f, -101.514f));
 
@@ -118,8 +116,8 @@ public class GeoavailabilityTests {
         GeoavailabilityGrid g2 = new GeoavailabilityGrid("9x", 10);
         g2.addPoint(new Coordinates(39.496f, -101.514f));
         g2.addPoint(new Coordinates(39.496f, -112.242f));
-        g2.addPoint(new Coordinates(44.819f, -101.514f));
-        g2.addPoint(new Coordinates(44.819f, -112.242f));
+        g2.addPoint(new Coordinates(44.919f, -101.514f));
+        g2.addPoint(new Coordinates(44.919f, -112.242f));
 
         if (draw) {
             BufferedImage b1 = Visualization.drawGeoavailabilityGrid(g1);
