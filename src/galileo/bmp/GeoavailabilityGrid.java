@@ -162,7 +162,7 @@ public class GeoavailabilityGrid {
         }
         pendingUpdates.clear();
 
-        this.bmp.or(updateBitmap);
+        this.bmp = this.bmp.or(updateBitmap);
     }
 
     /**
