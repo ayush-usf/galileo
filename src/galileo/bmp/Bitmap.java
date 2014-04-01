@@ -38,7 +38,9 @@ public class Bitmap {
 
     private EWAHCompressedBitmap bmp;
 
-    public Bitmap() { }
+    public Bitmap() {
+        bmp = new EWAHCompressedBitmap();
+    }
 
     private Bitmap(EWAHCompressedBitmap bmp) {
         this.bmp = bmp;
