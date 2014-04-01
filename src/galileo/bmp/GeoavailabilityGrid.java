@@ -87,15 +87,25 @@ public class GeoavailabilityGrid {
      * Adds a new point to this GeoavailabilityGrid.
      *
      * @param coords The location (coordinates in lat, lon) to add.
+     *
+     * @return true if the point could be added to grid, false otherwise (for
+     * example, if the point falls outside the purview of the grid)
      */
-    public void add(Coordinates coords) {
+    public boolean addPoint(Coordinates coords) {
         Point<Integer> gridPoint = coordinatesToXY(coords);
         int index = XYtoIndex(gridPoint.X(), gridPoint.Y());
+
+        if (gridPoint.X() < 0 || gridPoint.X() >= this.width
+                || gridPoint.Y() < 0 || gridPoint.Y() >= this.height) {
+
+            return false;
+        }
 
         if (this.bmp.set(index) == false) {
             /* Could not set the bits now; add to pending updates */
             pendingUpdates.add(index);
         }
+        return true;
     }
 
     /**
