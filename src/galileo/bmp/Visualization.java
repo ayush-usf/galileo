@@ -37,6 +37,31 @@ import java.util.Iterator;
 public class Visualization {
 
     /**
+     * Convenience function to draw a {@link GeoavailabilityGrid} as a
+     * {@link BufferedImage}.
+     *
+     * @param g GeoavailabilityGrid to draw
+     */
+    public static BufferedImage drawGeoavailabilityGrid(GeoavailabilityGrid g) {
+        return drawIterableMap(g.getBitmap().iterator(),
+                g.getWidth(), g.getHeight());
+    }
+
+    /**
+     * Convenience function to draw a {@link GeoavailabilityGrid} as a
+     * {@link BufferedImage}, with a specific color for the bits that are set
+     * to 1.
+     *
+     * @param g GeoavailabilityGrid to draw
+     * @param color {@link java.awt.Color} to use for bits that are set to 1.
+     */
+    public static BufferedImage drawGeoavailabilityGrid(
+            GeoavailabilityGrid g, Color color) {
+        return drawIterableMap(g.getBitmap().iterator(),
+                g.getWidth(), g.getHeight(), color);
+    }
+
+    /**
      * Given an iterator of integer indices in a bit set, this method will draw
      * the visual representation of the set.  This is useful for visualizing
      * what a bitmap index or query polygon looks like.
