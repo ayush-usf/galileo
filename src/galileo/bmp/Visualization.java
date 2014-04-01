@@ -27,7 +27,12 @@ package galileo.bmp;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
+import java.io.IOException;
 import java.util.Iterator;
+
+import javax.imageio.ImageIO;
 
 /**
  * Provides functionality for visualizing bitmaps.
@@ -86,7 +91,7 @@ public class Visualization {
      * @param it Iterator of bit set indices.
      * @param width Width of the output image.
      * @param height Height of the output image.
-     * @param color Color of bits set to 1.
+     * @param color {@link java.awt.Color} of bits set to 1.
      *
      * @return A BufferedImage with the visual representation of the bitset.
      */
@@ -104,5 +109,14 @@ public class Visualization {
         }
 
         return img;
+    }
+
+    /**
+     * Convenience function to write a BufferedImage to a file.
+     */
+    public static void imageToFile(BufferedImage image, String file)
+    throws IOException {
+        File f = new File(file);
+        ImageIO.write(image, "gif", f);
     }
 }
