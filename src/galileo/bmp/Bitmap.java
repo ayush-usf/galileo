@@ -31,8 +31,7 @@ import com.googlecode.javaewah.EWAHCompressedBitmap;
 
 /**
  * A thin wrapper around {@link com.googlecode.javaewah.EWAHCompressedBitmap}
- * to enable us to decouple from a particular bitmap implementation in the
- * future if need be.
+ * to enable us to change bitmap implementations if need be.
  *
  * @author malensek
  */
@@ -76,6 +75,24 @@ public class Bitmap implements Iterable<Integer> {
 
     public boolean intersects(Bitmap otherBitmap) {
         return this.bmp.intersects(otherBitmap.bmp);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Bitmap b = (Bitmap) obj;
+        return this.bmp.equals(b.bmp);
     }
 
     @Override
