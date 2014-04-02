@@ -39,14 +39,21 @@ import javax.imageio.ImageIO;
  *
  * @author malensek
  */
-public class Visualization {
+public class BitmapVisualization {
 
+    /**
+     * Draws a {@link Bitmap} instance as a BufferedImage.
+     */
     public static BufferedImage drawBitmap(
             Bitmap bitmap, int width, int height) {
 
         return drawIterableMap(bitmap.iterator(), width, height);
     }
 
+    /**
+     * Draws a {@link Bitmap} instance as a BufferedImage with a particular
+     * color used to indicate the areas of the bitmap set to 1.
+     */
     public static BufferedImage drawBitmap(
             Bitmap bitmap, int width, int height, Color color) {
 
