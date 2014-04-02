@@ -25,10 +25,19 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import galileo.dataset.Coordinates;
+
+import java.util.List;
+
 public class GeoavailabilityQuery {
 
-    public Bitmap toBitmap() {
+    private List<Coordinates> polygon;
 
-        return null;
+    public GeoavailabilityQuery(List<Coordinates> polygon) {
+        this.polygon = polygon;
+    }
+
+    public List<Coordinates> getPolygon() {
+        return polygon;
     }
 }
