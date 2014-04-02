@@ -41,6 +41,18 @@ import javax.imageio.ImageIO;
  */
 public class Visualization {
 
+    public static BufferedImage drawBitmap(
+            Bitmap bitmap, int width, int height) {
+
+        return drawIterableMap(bitmap.iterator(), width, height);
+    }
+
+    public static BufferedImage drawBitmap(
+            Bitmap bitmap, int width, int height, Color color) {
+
+        return drawIterableMap(bitmap.iterator(), width, height, color);
+    }
+
     /**
      * Convenience function to draw a {@link GeoavailabilityGrid} as a
      * {@link BufferedImage}.
