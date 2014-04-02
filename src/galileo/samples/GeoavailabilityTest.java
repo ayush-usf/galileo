@@ -25,9 +25,11 @@ software, even if advised of the possibility of such damage.
 
 package galileo.samples;
 
+import galileo.bmp.Bitmap;
 import galileo.bmp.GeoavailabilityGrid;
-
+import galileo.bmp.GeoavailabilityMap;
 import galileo.bmp.GeoavailabilityQuery;
+import galileo.bmp.QueryTransform;
 import galileo.bmp.Visualization;
 import galileo.dataset.Block;
 import galileo.dataset.Coordinates;
@@ -78,13 +80,13 @@ public class GeoavailabilityTest {
          * of 20.  That's 2^20 total grid points. */
         GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 20);
 
+        System.out.println("Adding points...");
         for (String str : metaMap.keySet()) {
             if (str.toLowerCase().substring(0, 2).equals("9x")) {
                 /* We found a sample for our particular region */
                 Coordinates coords
                     = metaMap.get(str).getSpatialProperties().getCoordinates();
                 gg.addPoint(coords);
-                System.out.println("Adding point: " + coords);
             }
         }
 
@@ -99,18 +101,56 @@ public class GeoavailabilityTest {
         poly.add(new Coordinates(39.98f, -108.47f));
         GeoavailabilityQuery gq = new GeoavailabilityQuery(poly);
 
+        /* Let's see what the polygon looks like too... */
+        Bitmap queryBitamp = QueryTransform.queryToGridBitmap(gq, gg);
+        BufferedImage polyImage
+            = Visualization.drawBitmap(queryBitamp,
+                    gg.getWidth(), gg.getHeight(), Color.RED);
+        Visualization.imageToFile(polyImage, "NetCDF-GeoavailabilityQuery.gif");
+
         /* Does this polygon overlap the grid? */
         boolean intersects = gg.intersects(gq);
         System.out.println("Polygon intersects the grid: " + intersects);
 
-        /* Alternatively, a little polygon that shouldn't intersect: */
+        /* Alternatively, a little 'polygon' that won't intersect: */
         poly = new ArrayList<>();
         poly.add(new Coordinates(43.79f, -105.39f));
-        //poly.add(new Coordinates(43.96f, -105.50f));
-        //poly.add(new Coordinates(43.78f, -105.47f));
         gq = new GeoavailabilityQuery(poly);
 
         intersects = gg.intersects(gq);
         System.out.println("Polygon intersects the grid: " + intersects);
+
+        /* GeoavailabilityMap tests */
+        GeoavailabilityMap<String> gm
+            = new GeoavailabilityMap<>("9x", 20);
+
+        System.out.println("Adding points to Map");
+        for (String str : metaMap.keySet()) {
+            if (str.toLowerCase().substring(0, 2).equals("9x")) {
+                /* We found a sample for our particular region */
+                Coordinates coords
+                    = metaMap.get(str).getSpatialProperties().getCoordinates();
+                /* We'll store the point's coordinates.  Generally, the item
+                 * stored with the point should be a unique identifier or
+                 * something of that nature. */
+                gm.addPoint(coords, str);
+            }
+        }
+
+        poly = new ArrayList<>();
+        poly.add(new Coordinates(43.79f, -105.00f));
+        poly.add(new Coordinates(40.96f, -103.50f));
+        poly.add(new Coordinates(39.98f, -108.47f));
+        gq = new GeoavailabilityQuery(poly);
+
+        System.out.println("Intersecting points:");
+        Map<Integer, List<String>> results = gm.query(gq);
+        for (int i : results.keySet()) {
+            System.out.print(i + ", ");
+        }
+        System.out.println();
+        System.out.println("Total points: " + results.keySet().size());
+        /* Homework: see if the total points in the result set matches the
+         * number of points in the outputted gifs */
     }
 }
