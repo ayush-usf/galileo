@@ -29,11 +29,22 @@ public class BitmapException extends Exception {
 
     private static final long serialVersionUID = -4516532285359101020L;
 
+    private int bit;
+
     public BitmapException() {
         super();
     }
 
     public BitmapException(String s) {
         super(s);
+    }
+
+    public BitmapException(String s, int bit) {
+        super(s);
+        this.bit = bit;
+    }
+
+    public int getBit() {
+        return bit;
     }
 }

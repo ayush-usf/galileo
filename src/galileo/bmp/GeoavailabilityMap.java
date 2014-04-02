@@ -25,32 +25,75 @@ software, even if advised of the possibility of such damage.
 
 package galileo.bmp;
 
+import galileo.dataset.Coordinates;
+
+import galileo.dataset.Point;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GeoavailabilityMap<T> extends GeoavailabilityGrid {
+/**
+ * Similar to the GeoavailabilityGrid, the GeoavailabilityMap allows arbitrary
+ * spatial locations to be mapped to lists of data points.
+ *
+ * @author malensek
+ */
+public class GeoavailabilityMap<T> {
 
+    private GeoavailabilityGrid grid;
     private Map<Integer, List<T>> points;
 
     public GeoavailabilityMap(String baseGeohash, int precision) {
-        super(baseGeohash, precision);
+        grid = new GeoavailabilityGrid(baseGeohash, precision);
         points = new HashMap<>();
     }
 
     /**
-     * Queries the geoavailability grid, which involves performing a logical AND
-     * operation and reporting the resulting Bitmap.
+     * Adds a new point to this GeoavailabilityMap, and associates it with a
+     * data point.
      *
-     * @param query The query geometry to evaluate against the geoavailability
-     * grid.
+     * @param coords The location (coordinates in lat, lon) to add.
+     * @param data Data point to associate with the location.
      *
-     * @return Bitmap with matching bits set.
+     * @return true if the point could be added to map, false otherwise (for
+     * example, if the point falls outside the purview of the grid)
      */
-    public void query(GeoavailabilityQuery query)
-    throws BitmapException {
-        //this.bmp.and(queryBits);
+    public boolean addPoint(Coordinates coords, T data) {
+        if (grid.addPoint(coords) == false) {
+            return false;
+        }
 
-        return;
+        Point<Integer> gridPoint = grid.coordinatesToXY(coords);
+        int index = grid.XYtoIndex(gridPoint.X(), gridPoint.Y());
+
+        List<T> dataList = points.get(index);
+        if (dataList == null) {
+            dataList = new ArrayList<>();
+            points.put(index, dataList);
+        }
+
+        dataList.add(data);
+        return true;
+    }
+
+    /**
+     * Queries the GeoavailabilityGrid, returning the grid indices that contain
+     * matching points, with lists of their associated data points.
+     *
+     * @param query GeoavailabilityQuery to evaluate
+     *
+     * @return results, as a Map of indices to arrays of data points.
+     */
+    public Map<Integer, List<T>> query(GeoavailabilityQuery query)
+    throws BitmapException {
+        Map<Integer, List<T>> results = new HashMap<>();
+        int[] indices = grid.query(query);
+        for (int i : indices) {
+            results.put(i, points.get(i));
+        }
+
+        return results;
     }
 }

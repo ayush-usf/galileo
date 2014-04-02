@@ -52,13 +52,12 @@ public class Bitmap implements Iterable<Integer> {
      *
      * @param bits list of bits to set (as in, set to 1).
      *
-     * @throws BitmapException if the bits could not be set.
+     * @return true if the bit could be set, false otherwise.  In some cases,
+     * the underlying bitmap implementation may disallow updates, causing this
+     * method to return false.
      */
-    public boolean set(int... bits) {
-        for (int i : bits) {
-            return bmp.set(i);
-        }
-        return false;
+    public boolean set(int bit) {
+        return bmp.set(bit);
     }
 
     public Bitmap or(Bitmap otherBitmap) {
@@ -75,6 +74,10 @@ public class Bitmap implements Iterable<Integer> {
 
     public boolean intersects(Bitmap otherBitmap) {
         return this.bmp.intersects(otherBitmap.bmp);
+    }
+
+    public int[] toArray() {
+        return this.bmp.toArray();
     }
 
     /**

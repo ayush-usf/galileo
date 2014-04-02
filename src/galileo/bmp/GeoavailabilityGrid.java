@@ -37,16 +37,16 @@ import galileo.util.GeoHash;
 
 public class GeoavailabilityGrid {
 
-    protected static final Logger logger = Logger.getLogger("galileo");
+    private static final Logger logger = Logger.getLogger("galileo");
 
-    protected int width, height;
+    private int width, height;
 
     public Bitmap bmp = new Bitmap();
-    protected SortedSet<Integer> pendingUpdates = new TreeSet<>();
+    private SortedSet<Integer> pendingUpdates = new TreeSet<>();
 
-    protected SpatialRange baseRange;
-    protected float xDegreesPerPixel;
-    protected float yDegreesPerPixel;
+    private SpatialRange baseRange;
+    private float xDegreesPerPixel;
+    private float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
         this.baseRange = GeoHash.decodeHash(baseGeohash);
@@ -148,8 +148,13 @@ public class GeoavailabilityGrid {
      * @return A single integer representing the bitmap location of the X, Y
      * coordinates.
      */
-    private int XYtoIndex(int x, int y) {
+    protected int XYtoIndex(int x, int y) {
         return y * this.width + x;
+    }
+
+    protected SpatialRange indexToSpatialRange(int index) {
+        //TODO
+        return null;
     }
 
     /**
@@ -184,6 +189,22 @@ public class GeoavailabilityGrid {
         applyUpdates();
         Bitmap queryBitmap = QueryTransform.queryToGridBitmap(query, this);
         return this.bmp.intersects(queryBitmap);
+    }
+
+    /**
+     * Queries the geoavailability grid, which involves performing a logical AND
+     * operation and reporting the resulting Bitmap.
+     *
+     * @param query The query geometry to evaluate against the geoavailability
+     * grid.
+     *
+     * @return An array of bitmap indices that matched the query.
+     */
+    public int[] query(GeoavailabilityQuery query)
+    throws BitmapException {
+        applyUpdates();
+        Bitmap queryBitmap = QueryTransform.queryToGridBitmap(query, this);
+        return this.bmp.and(queryBitmap).toArray();
     }
 
     @Override
