@@ -29,15 +29,16 @@ import static org.junit.Assert.*;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import galileo.bmp.GeoavailabilityGrid;
+import galileo.bmp.GeoavailabilityQuery;
+import galileo.bmp.QueryTransform;
 import galileo.bmp.Visualization;
 import galileo.dataset.Coordinates;
-import galileo.dataset.Point;
-import galileo.util.GeoHash;
-import galileo.util.Pair;
 
 import org.junit.Test;
 
@@ -51,11 +52,36 @@ public class GeoavailabilityTests {
                 "false"));
     }
 
-//    @Test
-//    public void coordinateTransform() {
-//        GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 10);
-//
-//    }
+    @Test
+    public void testQuery() throws Exception {
+        GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 20);
+        gg.addPoint(new Coordinates(43.438f, -110.300f));
+        List<Coordinates> p1 = new ArrayList<>();
+        p1.add(new Coordinates(44.919f, -112.242f));
+        p1.add(new Coordinates(43.111f, -105.414f));
+        p1.add(new Coordinates(41.271f, -111.421f));
+        GeoavailabilityQuery q1 = new GeoavailabilityQuery(p1);
+        assertEquals(true, gg.intersects(q1));
+        if (draw) {
+            BufferedImage b = Visualization.drawBitmap(
+                    QueryTransform.queryToGridBitmap(q1, gg),
+                    gg.getWidth(), gg.getHeight(), Color.BLACK);
+            Visualization.imageToFile(b, "Query1.gif");
+        }
+
+        List<Coordinates> p2 = new ArrayList<>();
+        p2.add(new Coordinates(41.223f, -101.609f));
+        p2.add(new Coordinates(39.663f, -101.641f));
+        p2.add(new Coordinates(39.745f, -104.701f));
+        GeoavailabilityQuery q2 = new GeoavailabilityQuery(p2);
+        assertEquals(false, gg.intersects(q2));
+        if (draw) {
+            BufferedImage b = Visualization.drawBitmap(
+                    QueryTransform.queryToGridBitmap(q2, gg),
+                    gg.getWidth(), gg.getHeight(), Color.BLACK);
+            Visualization.imageToFile(b, "Query2.gif");
+        }
+    }
 
     @Test
     public void testBitmapCorners() throws IOException {
