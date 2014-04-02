@@ -98,6 +98,21 @@ public class GeoavailabilityTests {
         }
     }
 
+    @Test
+    public void testHiResCorners() throws IOException {
+        GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 25);
+        gg.addPoint(new Coordinates(44.919f, -112.242f));
+        gg.addPoint(new Coordinates(44.919f, -101.514f));
+        gg.addPoint(new Coordinates(39.496f, -112.242f));
+        gg.addPoint(new Coordinates(39.496f, -101.514f));
+
+        if (draw) {
+            BufferedImage b = Visualization.drawGeoavailabilityGrid(
+                    gg, Color.BLACK);
+            Visualization.imageToFile(b, "HiResCorners.gif");
+        }
+    }
+
     /**
      * Ensures out-of-bounds X points are not inserted into the
      * GeoavailabilityGrid.
