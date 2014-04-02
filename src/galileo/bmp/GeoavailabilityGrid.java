@@ -119,7 +119,7 @@ public class GeoavailabilityGrid {
      *
      * @return Corresponding x, y location in the grid.
      */
-    private Point<Integer> coordinatesToXY(Coordinates coords) {
+    public Point<Integer> coordinatesToXY(Coordinates coords) {
 
         /* Assuming (x, y) coordinates for the geoavailability grids, latitude
          * will decrease as y increases, and longitude will increase as x
@@ -182,7 +182,7 @@ public class GeoavailabilityGrid {
     public boolean intersects(GeoavailabilityQuery query)
     throws BitmapException {
         applyUpdates();
-        Bitmap queryBitmap = query.toBitmap();
+        Bitmap queryBitmap = QueryTransform.queryToGridBitmap(query, this);
         return this.bmp.intersects(queryBitmap);
     }
 
