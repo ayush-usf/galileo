@@ -76,11 +76,14 @@ public class GeoavailabilityGrid {
         xDegreesPerPixel = xDegrees / (float) this.width;
         yDegreesPerPixel = yDegrees / (float) this.width;
 
-        logger.log(Level.INFO, "Created geoavailability grid: "
-                + "geohash={0}, precision={1}, width={2}, height={3}, "
-                + "baseRange={6}, xDegreesPerPixel={4}, yDegreesPerPixel={5}",
-                new Object[] { baseGeohash, precision, width, height,
-                    xDegreesPerPixel, yDegreesPerPixel, baseRange});
+        if (logger.isLoggable(Level.INFO)) {
+            logger.log(Level.INFO, "Created geoavailability grid: "
+                    + "geohash={0}, precision={1}, "
+                    + "width={2}, height={3}, baseRange={6}, "
+                    + "xDegreesPerPixel={4}, yDegreesPerPixel={5}",
+                    new Object[] { baseGeohash, precision, width, height,
+                        xDegreesPerPixel, yDegreesPerPixel, baseRange});
+        }
     }
 
     /**
@@ -203,6 +206,10 @@ public class GeoavailabilityGrid {
         return b1.equals(b2);
     }
 
+    /**
+     * Retrieves the underlying Bitmap instance backing this
+     * GeoavailabilityGrid.
+     */
     protected Bitmap getBitmap() {
         applyUpdates();
         return bmp;
