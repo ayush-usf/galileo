@@ -28,8 +28,6 @@ package galileo.samples;
 import java.io.IOException;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import galileo.client.EventPublisher;
@@ -89,7 +87,6 @@ public class StoreNetCDF implements MessageListener {
         StoreNetCDF client = new StoreNetCDF();
         NetworkDestination server = client.connect(serverHostName, serverPort);
 
-        List<Block> blocks = new ArrayList<>();
         Map<String, Metadata> metas = ConvertNetCDF.readFile(fileName);
         for (Map.Entry<String, Metadata> entry : metas.entrySet()) {
             Block b = ConvertNetCDF.createBlock("", entry.getValue());

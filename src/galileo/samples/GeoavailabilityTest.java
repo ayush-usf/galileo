@@ -32,37 +32,14 @@ import galileo.bmp.GeoavailabilityGrid;
 import galileo.bmp.GeoavailabilityMap;
 import galileo.bmp.GeoavailabilityQuery;
 import galileo.bmp.QueryTransform;
-import galileo.dataset.Block;
 import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
-import galileo.dataset.SpatialProperties;
-import galileo.dataset.TemporalProperties;
-import galileo.dataset.feature.Feature;
-import galileo.serialization.Serializer;
-import galileo.util.FileNames;
-import galileo.util.GeoHash;
-import galileo.util.Pair;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ucar.ma2.*;
-import ucar.nc2.*;
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dt.GridDatatype;
-import ucar.nc2.dt.grid.GridDataset;
-import ucar.nc2.util.DiskCache;
-import ucar.unidata.geoloc.LatLonPoint;
 
 /**
  * Demonstrates the use of a {@link GeoavailabilityGrid} in determining whether
