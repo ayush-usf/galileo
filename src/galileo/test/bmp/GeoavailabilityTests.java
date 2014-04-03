@@ -37,7 +37,7 @@ import java.util.List;
 import galileo.bmp.GeoavailabilityGrid;
 import galileo.bmp.GeoavailabilityQuery;
 import galileo.bmp.QueryTransform;
-import galileo.bmp.Visualization;
+import galileo.bmp.BitmapVisualization;
 import galileo.dataset.Coordinates;
 
 import org.junit.Test;
@@ -63,10 +63,10 @@ public class GeoavailabilityTests {
         GeoavailabilityQuery q1 = new GeoavailabilityQuery(p1);
         assertEquals(true, gg.intersects(q1));
         if (draw) {
-            BufferedImage b = Visualization.drawBitmap(
+            BufferedImage b = BitmapVisualization.drawBitmap(
                     QueryTransform.queryToGridBitmap(q1, gg),
                     gg.getWidth(), gg.getHeight(), Color.BLACK);
-            Visualization.imageToFile(b, "Query1.gif");
+            BitmapVisualization.imageToFile(b, "Query1.gif");
         }
 
         List<Coordinates> p2 = new ArrayList<>();
@@ -76,10 +76,10 @@ public class GeoavailabilityTests {
         GeoavailabilityQuery q2 = new GeoavailabilityQuery(p2);
         assertEquals(false, gg.intersects(q2));
         if (draw) {
-            BufferedImage b = Visualization.drawBitmap(
+            BufferedImage b = BitmapVisualization.drawBitmap(
                     QueryTransform.queryToGridBitmap(q2, gg),
                     gg.getWidth(), gg.getHeight(), Color.BLACK);
-            Visualization.imageToFile(b, "Query2.gif");
+            BitmapVisualization.imageToFile(b, "Query2.gif");
         }
     }
 
@@ -92,9 +92,9 @@ public class GeoavailabilityTests {
         gg.addPoint(new Coordinates(39.496f, -101.514f));
 
         if (draw) {
-            BufferedImage b = Visualization.drawGeoavailabilityGrid(
+            BufferedImage b = BitmapVisualization.drawGeoavailabilityGrid(
                     gg, Color.BLACK);
-            Visualization.imageToFile(b, "BitmapCorners.gif");
+            BitmapVisualization.imageToFile(b, "BitmapCorners.gif");
         }
     }
 
@@ -107,9 +107,9 @@ public class GeoavailabilityTests {
         gg.addPoint(new Coordinates(39.496f, -101.514f));
 
         if (draw) {
-            BufferedImage b = Visualization.drawGeoavailabilityGrid(
+            BufferedImage b = BitmapVisualization.drawGeoavailabilityGrid(
                     gg, Color.BLACK);
-            Visualization.imageToFile(b, "HiResCorners.gif");
+            BitmapVisualization.imageToFile(b, "HiResCorners.gif");
         }
     }
 
@@ -161,10 +161,10 @@ public class GeoavailabilityTests {
         g2.addPoint(new Coordinates(44.919f, -112.242f));
 
         if (draw) {
-            BufferedImage b1 = Visualization.drawGeoavailabilityGrid(g1);
-            BufferedImage b2 = Visualization.drawGeoavailabilityGrid(g2);
-            Visualization.imageToFile(b1, "Updates1.gif");
-            Visualization.imageToFile(b2, "Updates2.gif");
+            BufferedImage b1 = BitmapVisualization.drawGeoavailabilityGrid(g1);
+            BufferedImage b2 = BitmapVisualization.drawGeoavailabilityGrid(g2);
+            BitmapVisualization.imageToFile(b1, "Updates1.gif");
+            BitmapVisualization.imageToFile(b2, "Updates2.gif");
         }
         assertEquals(true, g1.equals(g2));
     }

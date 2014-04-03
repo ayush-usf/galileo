@@ -26,11 +26,12 @@ software, even if advised of the possibility of such damage.
 package galileo.samples;
 
 import galileo.bmp.Bitmap;
+
+import galileo.bmp.BitmapVisualization;
 import galileo.bmp.GeoavailabilityGrid;
 import galileo.bmp.GeoavailabilityMap;
 import galileo.bmp.GeoavailabilityQuery;
 import galileo.bmp.QueryTransform;
-import galileo.bmp.Visualization;
 import galileo.dataset.Block;
 import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
@@ -92,8 +93,8 @@ public class GeoavailabilityTest {
 
         /* What does this grid look like? */
         BufferedImage b
-            = Visualization.drawGeoavailabilityGrid(gg, Color.BLACK);
-        Visualization.imageToFile(b, "NetCDF-GeoavailabilityGrid.gif");
+            = BitmapVisualization.drawGeoavailabilityGrid(gg, Color.BLACK);
+        BitmapVisualization.imageToFile(b, "NetCDF-GeoavailabilityGrid.gif");
 
         List<Coordinates> poly = new ArrayList<>();
         poly.add(new Coordinates(43.79f, -105.00f));
@@ -104,9 +105,10 @@ public class GeoavailabilityTest {
         /* Let's see what the polygon looks like too... */
         Bitmap queryBitamp = QueryTransform.queryToGridBitmap(gq, gg);
         BufferedImage polyImage
-            = Visualization.drawBitmap(queryBitamp,
+            = BitmapVisualization.drawBitmap(queryBitamp,
                     gg.getWidth(), gg.getHeight(), Color.RED);
-        Visualization.imageToFile(polyImage, "NetCDF-GeoavailabilityQuery.gif");
+        BitmapVisualization.imageToFile(
+                polyImage, "NetCDF-GeoavailabilityQuery.gif");
 
         /* Does this polygon overlap the grid? */
         boolean intersects = gg.intersects(gq);
