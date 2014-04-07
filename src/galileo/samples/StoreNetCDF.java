@@ -82,7 +82,7 @@ public class StoreNetCDF implements MessageListener {
     public static void main(String[] args) throws Exception {
         String serverHostName = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        String fileName = args[1];
+        String fileName = args[2];
 
         StoreNetCDF client = new StoreNetCDF();
         NetworkDestination server = client.connect(serverHostName, serverPort);
