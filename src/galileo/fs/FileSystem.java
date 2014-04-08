@@ -43,7 +43,6 @@ public abstract class FileSystem implements PhysicalGraph {
 
     private static final Logger logger = Logger.getLogger("galileo");
 
-    public static final String METADATA_EXTENSION = ".gmeta";
     public static final String BLOCK_EXTENSION = ".gblock";
 
     protected File storageDirectory;
@@ -248,10 +247,13 @@ public abstract class FileSystem implements PhysicalGraph {
     /**
      * Performs a clean shutdown of the FileSystem instance.  This includes
      * flushing buffers, writing changes out to disk, persisting index
-     * structures, etc.  Note that this method may be called during a signal
-     * handling operation, which may mean that the logging subsystem has already
-     * shut down, so critical errors/information should be printed to stdout or
-     * stderr.
+     * structures, etc.
+     * <p>
+     * Note that this method may be called during a signal handling operation,
+     * which may mean that the logging subsystem has already shut down, so
+     * critical errors/information should be printed to stdout or stderr.
+     * Furthermore, there is no guarantee all the shutdown operations will be
+     * executed, so time is of the essence here.
      */
     public abstract void shutdown();
 }
