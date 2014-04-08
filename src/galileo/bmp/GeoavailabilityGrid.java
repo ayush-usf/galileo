@@ -26,6 +26,8 @@ software, even if advised of the possibility of such damage.
 package galileo.bmp;
 
 import java.util.SortedSet;
+
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
