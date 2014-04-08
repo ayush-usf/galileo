@@ -193,7 +193,7 @@ public class TextClient implements MessageListener {
     throws Exception {
         if (args.length != 3) {
             System.out.println("Usage: galileo.client.TextClient " +
-                    "<server-hostname> <server-port> <messages>");
+                    "<server-hostname> <server-port> <num-blocks>");
             return;
         }
 
