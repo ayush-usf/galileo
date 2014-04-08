@@ -1,3 +1,10 @@
+**0.7 : 2014/04/08 ---- Geoavailability Grids, stability improvements**
+- Added Geoavailability Grid implementation: spatial queries
+- Refactored FileSystem implementation
+- Improved Metadata journaling
+- Many more samples and tests
+- Fixed a critical network queueing bug
+
 **0.6 : 2014/01/15 ---- Stable Data Model**
 - galileo.dataset.feature complete beta implementation
 - Networking improvements
