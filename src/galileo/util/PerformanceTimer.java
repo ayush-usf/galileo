@@ -56,11 +56,15 @@ public class PerformanceTimer {
 
         @Override
         public String toString() {
-            String str = "" + (end - start) * 1E-6;
+            String str = "" + timeInMs();
             if (running) {
                 str += " (running)";
             }
             return str;
+        }
+
+        public double timeInMs() {
+            return ((end - start) * 1E-6);
         }
     }
 
