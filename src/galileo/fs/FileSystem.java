@@ -140,11 +140,11 @@ public abstract class FileSystem implements PhysicalGraph {
 
     /**
      * Does a full recovery from disk; this scans every block in the system,
-     * reads its metadata, and performs a checksum to verify block integrity.
-     * If not already obvious, this could be very slow.
+     * reads metadata, and performs a checksum to verify integrity.  If not
+     * already obvious, this could be very slow.
      */
     protected void fullRecovery() {
-        logger.info("Performing full recovery from disk");
+        logger.warning("Performing full recovery from disk");
         recover(storageDirectory);
     }
 
