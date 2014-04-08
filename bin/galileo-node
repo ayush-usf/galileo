@@ -24,7 +24,7 @@ Commands:
 Options:
     -c             colorize output
     -f             forceful shutdown (SIGKILL)
-    -r root_dir    Set the Galileo root storage directory
+    -r root_dir    set the Galileo root storage directory
 EOM
 }
 
