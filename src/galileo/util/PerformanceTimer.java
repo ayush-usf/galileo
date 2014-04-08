@@ -28,6 +28,7 @@ package galileo.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -128,6 +129,20 @@ public class PerformanceTimer {
         Collections.reverse(outputSamples);
 
         return outputSamples;
+    }
+
+    /**
+     * Retrieves the last timing result, in miliseconds.  If no results have
+     * been recorded yet, this method will return 0.0.
+     */
+    public double getLastResult() {
+        Iterator<PerformanceSample> it = samples.iterator();
+        it.next();
+        if (it.hasNext()) {
+            return it.next().timeInMs();
+        } else {
+            return 0.0;
+        }
     }
 
     /**
