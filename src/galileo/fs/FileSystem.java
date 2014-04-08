@@ -179,9 +179,7 @@ public abstract class FileSystem implements PhysicalGraph {
     @Override
     public Block loadBlock(String blockPath)
     throws IOException, SerializationException {
-        File blockFile = new File(blockPath);
-        byte[] blockBytes = new byte[(int) blockFile.length()];
-        Block block = Serializer.deserialize(Block.class, blockBytes);
+        Block block = Serializer.restore(Block.class, blockPath);
         return block;
     }
 
@@ -191,9 +189,7 @@ public abstract class FileSystem implements PhysicalGraph {
         /* We can just load the block as usual, but only perform the
          * deserialization on the Metadata.  Metadata is stored as the first
          * item in a serialized Block instance. */
-        File blockFile = new File(blockPath);
-        byte[] blockBytes = new byte[(int) blockFile.length()];
-        Metadata meta = Serializer.deserialize(Metadata.class, blockBytes);
+        Metadata meta = Serializer.restore(Metadata.class, blockPath);
         return meta;
     }
 
