@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.client;
+package galileo.samples;
 
 import java.io.IOException;
 
@@ -31,6 +31,7 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Random;
 
+import galileo.client.EventPublisher;
 import galileo.comm.QueryRequest;
 import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
@@ -51,14 +52,20 @@ import galileo.serialization.Serializer;
 import galileo.util.GeoHash;
 import galileo.util.PerformanceTimer;
 
-public class TextClient implements MessageListener {
+/**
+ * Sample class that generates {@link Block} instances using random data and
+ * streams the blocks to a Galileo cluster.
+ *
+ * @author malensek
+ */
+public class RandomBlocks implements MessageListener {
 
     private static Random randomGenerator = new Random(System.nanoTime());
 
     private ClientMessageRouter messageRouter;
     private EventPublisher publisher;
 
-    public TextClient() throws IOException {
+    public RandomBlocks() throws IOException {
         messageRouter = new ClientMessageRouter();
         publisher = new EventPublisher(messageRouter);
 
@@ -201,7 +208,7 @@ public class TextClient implements MessageListener {
         int serverPort = Integer.parseInt(args[1]);
         int num = Integer.parseInt(args[2]);
 
-        TextClient client = new TextClient();
+        RandomBlocks client = new RandomBlocks();
         NetworkDestination server = client.connect(serverHostName, serverPort);
 
         System.out.println("Sending " + num + " blocks...");
