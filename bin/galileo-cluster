@@ -2,8 +2,9 @@
 ################################################################################
 # galileo-cluster - manage a Galileo cluster
 #
-# This script is a simple wrapper around galileo-node.  Valid flags passed to
-# this script are simply passed on to galileo-node processes on the cluster.
+# This is a basic convenience script that will SSH to the machines in the
+# cluster and execute galileo-node on them with any relevant command line
+# options.
 ################################################################################
 
 colorize=""
@@ -42,6 +43,8 @@ while getopts "cfu:" flag; do
     esac
 done
 
+shift $(($OPTIND - 1))
+
 source "$(cd "$(dirname "$0")" && pwd)/galileo-environment"
 
 groups=$(ls "${GALILEO_CONF}"/network/*.group 2> /dev/null)
@@ -56,6 +59,6 @@ for group in ${groups}; do
     # character (used to specify communication ports)
     sed 's/^#.*//g; s/[\t ]//g; /^$/d; s/\(.*\):.*/\1/g' "${group}" | \
         "${GALILEO_HOME}"/bin/dssh -pq ${colorize} -o "${ssh_opts}" \
-        '${GALILEO_HOME}/bin/galileo-node '"${node_opts}" &
+        '${GALILEO_HOME}/bin/galileo-node '"${node_opts} ${@}" &
 done
 wait
