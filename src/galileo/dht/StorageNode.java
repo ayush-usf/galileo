@@ -74,6 +74,10 @@ public class StorageNode implements MessageListener {
     private StatusLine nodeStatus;
 
     private int port;
+    private String rootDir;
+
+    private File pidFile;
+
     private int threads = 1;
 
     private NetworkInfo network;
@@ -90,11 +94,18 @@ public class StorageNode implements MessageListener {
 
     private String sessionId;
 
-    public StorageNode(int port) {
-        this.port = port;
+    public StorageNode() {
+        this.port = NetworkConfig.DEFAULT_PORT;
+        this.rootDir = SystemConfig.getRootDir();
+
         this.sessionId = HostIdentifier.getSessionId(port);
         nodeStatus = new StatusLine(SystemConfig.getRootDir() + "/status.txt");
-    }
+
+        String pid = System.getProperty("pidFile");
+        if (pid != null) {
+            this.pidFile = new File(pid);
+        }
+     }
 
     /**
      * Begins Server execution.  This method attempts to fail fast to provide
@@ -122,7 +133,7 @@ public class StorageNode implements MessageListener {
         /* Set up the FileSystem. */
         nodeStatus.set("Initializing file system");
         try {
-            fs = new GeospatialFileSystem(SystemConfig.getRootDir());
+            fs = new GeospatialFileSystem(rootDir);
         } catch (FileSystemException e) {
             nodeStatus.set("File system initialization failure");
             logger.log(Level.SEVERE,
@@ -331,20 +342,20 @@ public class StorageNode implements MessageListener {
              * stdout for our final messages */
             System.out.println("Initiated shutdown.");
 
-            fs.shutdown();
-            connectionPool.shutdown();
+            try {
+                connectionPool.forceShutdown();
+                messageRouter.shutdown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            /* Close out the status line (remove it) */
             nodeStatus.close();
 
-            /* Remove the pid file, if it exists. */
-            String pidFile = System.getProperty("pidFile");
-            if (pidFile != null) {
-                File pid = new File(pidFile);
-                if (pid.exists()) {
-                    pid.delete();
-                }
+            if (pidFile != null && pidFile.exists()) {
+                pidFile.delete();
             }
+
+            fs.shutdown();
 
             System.out.println("Goodbye!");
         }
@@ -354,8 +365,7 @@ public class StorageNode implements MessageListener {
      * Executable entrypoint for a Galileo DHT Storage Node
      */
     public static void main(String[] args) {
-        int port = NetworkConfig.DEFAULT_PORT;
-        StorageNode node = new StorageNode(port);
+        StorageNode node = new StorageNode();
         try {
             node.start();
         } catch (Exception e) {

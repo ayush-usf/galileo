@@ -92,7 +92,7 @@ public class ClientMessageRouter extends MessageRouter {
     throws IOException {
         return connectTo(new NetworkDestination(hostname, port));
     }
- 
+
     /**
      * Connects to a server at the specified network destination.
      *
