@@ -109,7 +109,7 @@ public class NetworkConfig {
         while ((line = reader.readLine()) != null) {
             ++lineNum;
             line = line.trim().replaceAll("\\s","");
-            if (line.startsWith("#")) {
+            if (line.startsWith("#") || line.equals("")) {
                 continue;
             }
 
