@@ -26,7 +26,6 @@ software, even if advised of the possibility of such damage.
 package galileo.fs;
 
 import java.io.File;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ import galileo.dataset.Block;
 import galileo.dataset.Metadata;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
+import galileo.util.PerformanceTimer;
 
 public abstract class FileSystem implements PhysicalGraph {
 
@@ -154,9 +154,15 @@ public abstract class FileSystem implements PhysicalGraph {
      * checksum to verify block integrity.
      */
     protected void recover(File storageDir) {
+        PerformanceTimer recoveryTimer = new PerformanceTimer();
+        recoveryTimer.start();
         logger.info("Recovering path index");
         ArrayList<String> blockPaths = scanDirectory(storageDir);
+        recoveryTimer.stop();
+        logger.info("Index recovery took "
+                + recoveryTimer.getLastResult() + " ms.");
 
+        recoveryTimer.start();
         logger.info("Recovering metadata and building graph");
         long counter = 0;
         for (String path : blockPaths) {
@@ -174,6 +180,9 @@ public abstract class FileSystem implements PhysicalGraph {
                         "for block: " + path, e);
             }
         }
+        recoveryTimer.stop();
+        logger.info("Recovery operation complete. Time: "
+                + recoveryTimer.getLastResult() + " ms.");
     }
 
     @Override
