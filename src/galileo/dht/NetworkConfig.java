@@ -105,9 +105,13 @@ public class NetworkConfig {
         int lineNum = 0;
         String line;
 
+        /* A line looks something like hostname:port */
         while ((line = reader.readLine()) != null) {
             ++lineNum;
             line = line.trim().replaceAll("\\s","");
+            if (line.startsWith("#")) {
+                continue;
+            }
 
             String[] hostInfo = line.split(":", 2);
             String nodeName = hostInfo[0];
