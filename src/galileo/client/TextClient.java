@@ -49,6 +49,7 @@ import galileo.net.NetworkDestination;
 import galileo.query.Query;
 import galileo.serialization.Serializer;
 import galileo.util.GeoHash;
+import galileo.util.PerformanceTimer;
 
 public class TextClient implements MessageListener {
 
@@ -190,23 +191,28 @@ public class TextClient implements MessageListener {
 
     public static void main(String[] args)
     throws Exception {
-        if (args.length != 2) {
+        if (args.length != 3) {
             System.out.println("Usage: galileo.client.TextClient " +
-                    "<server-hostname> <server-port> ");
+                    "<server-hostname> <server-port> <messages>");
             return;
         }
 
         String serverHostName = args[0];
         int serverPort = Integer.parseInt(args[1]);
+        int num = Integer.parseInt(args[2]);
 
         TextClient client = new TextClient();
         NetworkDestination server = client.connect(serverHostName, serverPort);
-        //NetworkDestination server2 = client.connect("lattice-22", serverPort);
-        //NetworkDestination server3 = client.connect("lattice-22", 5555);
-        System.out.println("sending");
 
-        Block block = client.generateData();
-        client.store(server, block);
+        System.out.println("Sending " + num + " blocks...");
+        PerformanceTimer pt = new PerformanceTimer("Send operation time");
+        pt.start();
+        for (int i = 0; i < num; ++i) {
+            Block block = client.generateData();
+            client.store(server, block);
+        }
+        pt.stopAndPrint();
 
+        client.disconnect();
     }
 }
