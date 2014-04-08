@@ -130,6 +130,16 @@ public class PerformanceTimer {
         return outputSamples;
     }
 
+    /**
+     * Retrieves the number of samples recorded by this PerformanceTimer
+     * instance.
+     */
+    public int size() {
+        /* Ignore the head of the queue; this contains a currently-running (or
+         * empty) sample. */
+        return samples.size() - 1;
+    }
+
     @Override
     public String toString() {
         String str = "";
