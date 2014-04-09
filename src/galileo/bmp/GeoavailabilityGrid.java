@@ -149,13 +149,47 @@ public class GeoavailabilityGrid {
      * @return A single integer representing the bitmap location of the X, Y
      * coordinates.
      */
-    protected int XYtoIndex(int x, int y) {
+    public int XYtoIndex(int x, int y) {
         return y * this.width + x;
     }
 
-    protected SpatialRange indexToSpatialRange(int index) {
-        //TODO
-        return null;
+    /**
+     * Converts a bitmap index to X, Y coordinates in the grid.
+     */
+    public Point<Integer> indexToXY(int index) {
+        int x = index % this.width;
+        int y = index / this.width;
+        return new Point<>(x, y);
+    }
+
+    /**
+     * Converts an X, Y grid point to the corresponding SpatialRange that the
+     * grid point spans.
+     */
+    public SpatialRange XYtoSpatialRange(int x, int y) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+            throw new IllegalArgumentException(
+                    "Out-of-bounds grid coordinates specified");
+        }
+
+        float baseLon = baseRange.getLowerBoundForLongitude();
+        float baseLat = baseRange.getLowerBoundForLatitude();
+
+        float lowerLon = baseLon + (x * xDegreesPerPixel);
+        float upperLon = lowerLon + xDegreesPerPixel;
+        float lowerLat = baseLat - (y * yDegreesPerPixel);
+        float upperLat = lowerLat - yDegreesPerPixel;
+
+        return new SpatialRange(lowerLat, upperLat, lowerLon, upperLon);
+    }
+
+    /**
+     * Converts a bitmap index location to a corresponding SpatialRange that
+     * the indexed grid point spans.
+     */
+    public SpatialRange indexToSpatialRange(int index) {
+        Point<Integer> gridLocation = indexToXY(index);
+        return XYtoSpatialRange(gridLocation.X(), gridLocation.Y());
     }
 
     /**
