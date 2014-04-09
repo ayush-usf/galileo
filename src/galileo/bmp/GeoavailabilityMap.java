@@ -28,6 +28,7 @@ package galileo.bmp;
 import galileo.dataset.Coordinates;
 
 import galileo.dataset.Point;
+import galileo.dataset.SpatialRange;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +77,10 @@ public class GeoavailabilityMap<T> {
 
         dataList.add(data);
         return true;
+    }
+
+    public SpatialRange indexToSpatialRange(int index) {
+        return grid.indexToSpatialRange(index);
     }
 
     /**
