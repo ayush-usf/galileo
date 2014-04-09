@@ -79,6 +79,9 @@ public class GeoavailabilityMap<T> {
         return true;
     }
 
+    /**
+     * Retrieves the {@link SpatialRange} represented by a grid index point.
+     */
     public SpatialRange indexToSpatialRange(int index) {
         return grid.indexToSpatialRange(index);
     }
