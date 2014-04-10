@@ -79,6 +79,7 @@ public class GeospatialFileSystem extends FileSystem {
         this.timeFormat = System.getProperty(
                 "galileo.fs.GeospatialFileSystem.timeFormat",
                 DEFAULT_TIME_FORMAT);
+
         this.geohashPrecision = Integer.parseInt(System.getProperty(
                 "galileo.fs.GeospatialFileSystem.geohashPrecision",
                 DEFAULT_GEOHASH_PRECISION + ""));
@@ -86,24 +87,25 @@ public class GeospatialFileSystem extends FileSystem {
         timeFormatter = new SimpleDateFormat();
         timeFormatter.applyPattern(timeFormat);
 
-        File metaFile = new File(storageDirectory + "/" + metadataStore);
-        if (metaFile.exists()) {
-            try {
-                metadataGraph
-                    = Serializer.restore(MetadataGraph.class, metaFile);
-            } catch (SerializationException e) {
-                /* We couldn't deserialize the MD graph, so we're going to have
-                 * to re-scan everything and rebuild it. */
-                logger.log(
-                        Level.WARNING,
-                        "Could not deserialize MetadataGraph!", e);
-                createMetadataGraph();
-            }
-        } else {
-            /* Generally this occurs when the file system is initialized for the
-             * first time, or the MD graph journal was somehow removed. */
-            createMetadataGraph();
-        }
+        createMetadataGraph();
+//        File metaFile = new File(storageDirectory + "/" + metadataStore);
+//        if (metaFile.exists()) {
+//            try {
+//                metadataGraph
+//                    = Serializer.restore(MetadataGraph.class, metaFile);
+//            } catch (SerializationException e) {
+//                /* We couldn't deserialize the MD graph, so we're going to have
+//                 * to re-scan everything and rebuild it. */
+//                logger.log(
+//                        Level.WARNING,
+//                        "Could not deserialize MetadataGraph!", e);
+//                createMetadataGraph();
+//            }
+//        } else {
+//            /* Generally this occurs when the file system is initialized for the
+//             * first time, or the MD graph journal was somehow removed. */
+//            createMetadataGraph();
+//        }
     }
 
     /**
@@ -115,6 +117,8 @@ public class GeospatialFileSystem extends FileSystem {
      */
     private void createMetadataGraph() {
         metadataGraph = new MetadataGraph();
+        /* The graph will be automatically re-populated with a full recovery. */
+        fullRecovery();
     }
 
     @Override
@@ -216,13 +220,20 @@ public class GeospatialFileSystem extends FileSystem {
         }
     }
 
+    public MetadataGraph getMetadataGraph() {
+        return metadataGraph;
+    }
+
+    /*TODO: this method should be removed.  It's better to just expose the 
+     * MetadataGraph functionality to clients instead. */
+    @Deprecated
     public MetadataGraph query(Query query) {
         return metadataGraph.evaluateQuery(query);
     }
 
     @Override
     public void shutdown() {
-        logger.info("FileSystem shutdown started");
+        logger.info("FileSystem shutting down");
         try {
             Serializer.persist(metadataGraph,
                     storageDirectory + "/" + metadataStore);
