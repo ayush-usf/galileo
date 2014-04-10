@@ -149,14 +149,14 @@ public class GeoavailabilityGrid {
      * @return A single integer representing the bitmap location of the X, Y
      * coordinates.
      */
-    protected int XYtoIndex(int x, int y) {
+    public int XYtoIndex(int x, int y) {
         return y * this.width + x;
     }
 
     /**
      * Converts a bitmap index to X, Y coordinates in the grid.
      */
-    protected Point<Integer> indexToXY(int index) {
+    public Point<Integer> indexToXY(int index) {
         int x = index % this.width;
         int y = index / this.width;
         return new Point<>(x, y);
@@ -166,7 +166,7 @@ public class GeoavailabilityGrid {
      * Converts an X, Y grid point to the corresponding SpatialRange that the
      * grid point spans.
      */
-    protected SpatialRange XYtoSpatialRange(int x, int y) {
+    public SpatialRange XYtoSpatialRange(int x, int y) {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
             throw new IllegalArgumentException(
                     "Out-of-bounds grid coordinates specified");
