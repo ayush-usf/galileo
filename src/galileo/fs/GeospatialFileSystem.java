@@ -224,9 +224,6 @@ public class GeospatialFileSystem extends FileSystem {
         return metadataGraph;
     }
 
-    /*TODO: this method should be removed.  It's better to just expose the 
-     * MetadataGraph functionality to clients instead. */
-    @Deprecated
     public MetadataGraph query(Query query) {
         return metadataGraph.evaluateQuery(query);
     }
