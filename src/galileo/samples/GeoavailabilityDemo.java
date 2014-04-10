@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * @author malensek
  */
-public class GeoavailabilityTest {
+public class GeoavailabilityDemo {
     public static void main(String[] args)
     throws Exception {
         String file = args[0];
