@@ -39,6 +39,7 @@ import galileo.bmp.GeoavailabilityQuery;
 import galileo.bmp.QueryTransform;
 import galileo.bmp.BitmapVisualization;
 import galileo.dataset.Coordinates;
+import galileo.dataset.SpatialRange;
 
 import org.junit.Test;
 
@@ -50,6 +51,44 @@ public class GeoavailabilityTests {
         this.draw = Boolean.parseBoolean(System.getProperty(
                 "galileo.test.bmp.GeoavailabilityTests.draw",
                 "false"));
+    }
+
+    /**
+     * Test converting X, Y grid coordinates to spatial ranges using the
+     * calculated corners of the grid.
+     */
+    @Test
+    public void testXYtoSpatialRange() {
+        GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 10);
+        gg.addPoint(new Coordinates(44.919f, -112.242f));
+        gg.addPoint(new Coordinates(44.919f, -101.514f));
+        gg.addPoint(new Coordinates(39.496f, -112.242f));
+        gg.addPoint(new Coordinates(39.496f, -101.514f));
+
+
+        float epsilon = 0.01f;
+
+        SpatialRange s1 = gg.XYtoSpatialRange(0, 0);
+        SpatialRange s2 = gg.XYtoSpatialRange(31, 0);
+        SpatialRange s3 = gg.XYtoSpatialRange(0, 31);
+        SpatialRange s4 = gg.XYtoSpatialRange(31, 31);
+
+        assertEquals(s1.getLowerBoundForLatitude(), 45.0f, epsilon);
+        assertEquals(s1.getLowerBoundForLongitude(), -112.5f, epsilon);
+        assertEquals(s1.getUpperBoundForLatitude(), 44.82f, epsilon);
+        assertEquals(s1.getUpperBoundForLongitude(), -112.14f, epsilon);
+        assertEquals(s2.getLowerBoundForLatitude(), 45.0f, epsilon);
+        assertEquals(s2.getLowerBoundForLongitude(), -101.60f, epsilon);
+        assertEquals(s2.getUpperBoundForLatitude(), 44.82f, epsilon);
+        assertEquals(s2.getUpperBoundForLongitude(), -101.25f, epsilon);
+        assertEquals(s3.getLowerBoundForLatitude(), 39.55f, epsilon);
+        assertEquals(s3.getLowerBoundForLongitude(), -112.5f, epsilon);
+        assertEquals(s3.getUpperBoundForLatitude(), 39.37f, epsilon);
+        assertEquals(s3.getUpperBoundForLongitude(), -112.14f, epsilon);
+        assertEquals(s4.getLowerBoundForLatitude(), 39.55f, epsilon);
+        assertEquals(s4.getLowerBoundForLongitude(), -101.60f, epsilon);
+        assertEquals(s4.getUpperBoundForLatitude(), 39.37f, epsilon);
+        assertEquals(s4.getUpperBoundForLongitude(), -101.25f, epsilon);
     }
 
     @Test
