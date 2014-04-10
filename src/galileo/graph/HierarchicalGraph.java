@@ -30,20 +30,20 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import java.util.logging.Logger;
-
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
 import galileo.dataset.feature.Feature;
 import galileo.dataset.feature.FeatureType;
-
 import galileo.query.Expression;
 import galileo.query.Operation;
+import galileo.query.PayloadFilter;
 import galileo.query.Query;
 import galileo.util.Pair;
 
@@ -112,6 +112,22 @@ public class HierarchicalGraph<T> {
         for (Path<Feature, T> path : paths) {
             removeNullFeatures(path);
         }
+        return paths;
+    }
+
+    public List<Path<Feature, T>> evaluateQuery(
+            Query query, PayloadFilter<T> filter) {
+
+        List<Path<Feature, T>> paths = evaluateQuery(query);
+        Iterator<Path<Feature, T>> it = paths.iterator();
+        while (it.hasNext()) {
+            Path<Feature, T> path = it.next();
+            boolean empty = applyPayloadFilter(path, filter);
+            if (empty) {
+                it.remove();
+            }
+        }
+
         return paths;
     }
 
@@ -343,18 +359,40 @@ public class HierarchicalGraph<T> {
      * @param path Path to remove null Features from.
      */
     private void removeNullFeatures(Path<Feature, T> path) {
-        List<Vertex<Feature, T>> removals = new ArrayList<>();
+//        List<Vertex<Feature, T>> removals = new ArrayList<>();
 
-        for (Vertex<Feature, T> v : path) {
-            Feature f = v.getLabel();
+        Iterator<Vertex<Feature, T>> it = path.iterator();
+        while (it.hasNext()) {
+            Feature f = it.next().getLabel();
             if (f == null || f.getType() == FeatureType.NULL) {
-                removals.add(v);
+                it.remove();
             }
         }
+//        for (Vertex<Feature, T> v : path) {
+//            Feature f = v.getLabel();
+//            if (f == null || f.getType() == FeatureType.NULL) {
+//                removals.add(v);
+//            }
+//        }
+//
+//        for (Vertex<Feature, T> v : removals) {
+//            path.remove(v);
+//        }
+    }
 
-        for (Vertex<Feature, T> v : removals) {
-            path.remove(v);
+    private boolean applyPayloadFilter(Path<Feature, T> path,
+            PayloadFilter<T> filter) {
+
+        Set<T> payload = path.getPayload();
+        if (filter.excludesItems() == false) {
+            /* We only include the items in the filter */
+            payload.retainAll(filter.getItems());
+        } else {
+            /* Excludes anything in the filter */
+            payload.removeAll(filter.getItems());
         }
+
+        return payload.isEmpty();
     }
 
     /**
