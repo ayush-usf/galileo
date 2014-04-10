@@ -34,12 +34,21 @@ import galileo.bmp.GeoavailabilityQuery;
 import galileo.bmp.QueryTransform;
 import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
+import galileo.dataset.feature.Feature;
+import galileo.fs.GeospatialFileSystem;
+import galileo.graph.MetadataGraph;
+import galileo.graph.Path;
+import galileo.query.Expression;
+import galileo.query.Operation;
+import galileo.query.Query;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Demonstrates the use of a {@link GeoavailabilityGrid} in determining whether
@@ -50,6 +59,11 @@ import java.util.Map;
 public class GeoavailabilityDemo {
     public static void main(String[] args)
     throws Exception {
+        if (args.length < 1) {
+            System.out.println("Usage: GeoavailabilityDemo <NetCDF-File>");
+            return;
+        }
+
         String file = args[0];
         System.out.println("Reading NetCDF file: " + file + "...");
         Map<String, Metadata> metaMap = ConvertNetCDF.readFile(file);
@@ -103,16 +117,18 @@ public class GeoavailabilityDemo {
         GeoavailabilityMap<String> gm
             = new GeoavailabilityMap<>("9x", 20);
 
+        GeospatialFileSystem gfs = new GeospatialFileSystem("/tmp/galileo");
+
         System.out.println("Adding points to Map");
         for (String str : metaMap.keySet()) {
             if (str.toLowerCase().substring(0, 2).equals("9x")) {
                 /* We found a sample for our particular region */
+                Metadata meta = metaMap.get(str);
                 Coordinates coords
-                    = metaMap.get(str).getSpatialProperties().getCoordinates();
-                /* We'll store the point's coordinates.  Generally, the item
-                 * stored with the point should be a unique identifier or
-                 * something of that nature. */
-                gm.addPoint(coords, str);
+                    = meta.getSpatialProperties().getCoordinates();
+                gm.addPoint(coords, meta.getName());
+
+                gfs.storeMetadata(meta, meta.getName());
             }
         }
 
@@ -124,12 +140,37 @@ public class GeoavailabilityDemo {
 
         System.out.println("Intersecting points:");
         Map<Integer, List<String>> results = gm.query(gq);
+        Set<String> files = new HashSet<>();
         for (int i : results.keySet()) {
             System.out.print(i + ", ");
+            for (String s : results.get(i)) {
+                System.out.print(s + " ");
+                files.add(s);
+            }
+            System.out.println();
         }
-        System.out.println();
-        System.out.println("Total points: " + results.keySet().size());
         /* Homework: see if the total points in the result set matches the
          * number of points in the outputted gifs */
+        System.out.println();
+        System.out.println("Total points: " + results.keySet().size());
+
+        Query q = new Query();
+        q.addOperation(new Operation(new Expression(">",
+                        new Feature("temperature_surface", 270.0f))));
+        System.out.println("Query: " + q);
+        List<Path<Feature, String>> result
+            = gfs.getMetadataGraph().evaluateQueryAsPaths(q);
+
+        List<Path<Feature, String>> finalResults = new ArrayList<>();
+        for (Path<Feature, String> p : result) {
+            for (String s : p.getPayload()) {
+                if (files.contains(s)) {
+                    finalResults.add(p);
+                    break;
+                }
+            }
+        }
+        System.out.println("Number of filtered results: "
+                + finalResults.size());
     }
 }
