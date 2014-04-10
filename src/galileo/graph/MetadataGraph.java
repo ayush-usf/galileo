@@ -87,6 +87,10 @@ public class MetadataGraph implements ByteSerializable {
         return resultGraph;
     }
 
+    public List<Path<Feature, String>> evaluateQueryAsPaths(Query query) {
+        return graph.evaluateQuery(query);
+    }
+
     public long numVertices() {
         return graph.getRoot().numDescendants();
     }
