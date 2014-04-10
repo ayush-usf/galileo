@@ -36,10 +36,12 @@ import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
 import galileo.dataset.feature.Feature;
 import galileo.fs.GeospatialFileSystem;
+import galileo.graph.FeaturePath;
 import galileo.graph.MetadataGraph;
 import galileo.graph.Path;
 import galileo.query.Expression;
 import galileo.query.Operation;
+import galileo.query.PayloadFilter;
 import galileo.query.Query;
 
 import java.awt.Color;
@@ -149,6 +151,7 @@ public class GeoavailabilityDemo {
             }
             System.out.println();
         }
+
         /* Homework: see if the total points in the result set matches the
          * number of points in the outputted gifs */
         System.out.println();
@@ -158,19 +161,16 @@ public class GeoavailabilityDemo {
         q.addOperation(new Operation(new Expression(">",
                         new Feature("temperature_surface", 270.0f))));
         System.out.println("Query: " + q);
-        List<Path<Feature, String>> result
-            = gfs.getMetadataGraph().evaluateQueryAsPaths(q);
 
-        List<Path<Feature, String>> finalResults = new ArrayList<>();
-        for (Path<Feature, String> p : result) {
-            for (String s : p.getPayload()) {
-                if (files.contains(s)) {
-                    finalResults.add(p);
-                    break;
-                }
-            }
-        }
-        System.out.println("Number of filtered results: "
-                + finalResults.size());
+        PayloadFilter<String> pf = new PayloadFilter<>(false, files);
+
+        List<Path<Feature, String>> result
+            = gfs.getMetadataGraph().evaluateQueryAsPaths(q, pf);
+        /* Alternatively, get a Metadata graph back: */
+        //MetadataGraph mdg = gfs.getMetadataGraph().evaluateQuery(q, pf);
+        /* See the graph: */
+        //System.out.println(mdg);
+
+        System.out.println("Number of filtered results: " + result.size());
     }
 }
