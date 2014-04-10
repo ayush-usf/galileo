@@ -25,9 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
-import java.util.Collection;
-
 import java.util.List;
+import java.util.Set;
 
 import galileo.dataset.feature.Feature;
 import galileo.query.Expression;
@@ -52,7 +51,7 @@ public class FeaturePath<V> extends Path<Feature, V> {
         this.addPayload(payload);
     }
 
-    public FeaturePath(Collection<V> payload, Feature... features) {
+    public FeaturePath(Set<V> payload, Feature... features) {
         this(features);
         this.setPayload(payload);
     }
