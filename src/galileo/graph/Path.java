@@ -85,6 +85,9 @@ implements Iterable<Vertex<L, V>> {
         }
     }
 
+    /**
+     * Retrieves the number of {@link Vertex} instances in this Path.
+     */
     public int size() {
         return vertices.size();
     }
