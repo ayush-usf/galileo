@@ -42,7 +42,7 @@ public class PathJournalTests {
         fp.add(new Feature("temperature", 43.1f));
         fp.add(new Feature("wind", 1.0f));
         fp.add(new Feature("snow", 0.0f));
-        fp.addPayload("/a/b/c/d");
+        fp.addPayload("/a/b/c/test");
 
         PathJournal pj = new PathJournal("/tmp/pathjournal");
         pj.start();
@@ -50,6 +50,5 @@ public class PathJournalTests {
         pj.persistPath(fp2);
 
         System.out.println("=======");
-        pj.recover();
     }
 }
