@@ -96,6 +96,10 @@ implements Iterable<Vertex<L, V>> {
         vertices.add(vertex);
     }
 
+    public void add(L label) {
+        add(new Vertex<L, V>(label));
+    }
+
     public void add(L label, V value) {
         add(new Vertex<>(label, value));
     }
