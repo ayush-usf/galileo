@@ -60,21 +60,6 @@ public class Feature implements Comparable<Feature>, ByteSerializable {
     }
 
     /**
-     * Constructs a nameless Feature from a FeatureData container.
-     */
-    public Feature(FeatureData<?> data) {
-        this("", data);
-    }
-
-    /**
-     * Constructs a Feature from a FeatureData container.
-     */
-    public Feature(String name, FeatureData<?> data) {
-        setName(name);
-        this.data = data;
-    }
-
-    /**
      * Constructs an integer Feature.
      */
     public Feature(String name, int value) {
