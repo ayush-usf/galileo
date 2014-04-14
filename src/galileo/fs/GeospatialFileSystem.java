@@ -209,11 +209,15 @@ public class GeospatialFileSystem extends FileSystem {
     public void storeMetadata(Metadata metadata, String blockPath)
     throws FileSystemException, IOException {
         FeaturePath<String> path = createPath(blockPath, metadata);
+        storePath(path);
+    }
 
+    private void storePath(FeaturePath<String> path)
+    throws FileSystemException {
         try {
             metadataGraph.addPath(path);
         } catch (Exception e) {
-            throw new FileSystemException("Error storing block: "
+            throw new FileSystemException("Error storing metadata: "
                     + e.getClass().getCanonicalName() + ":"
                     + System.lineSeparator() +
                     StackTraceToString.convert(e));
