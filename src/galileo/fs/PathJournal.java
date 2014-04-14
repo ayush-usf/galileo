@@ -27,7 +27,6 @@ package galileo.fs;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -79,6 +78,14 @@ public class PathJournal {
         this.indexFile = pathFile + ".index";
     }
 
+    /**
+     * Recovers the Path Journal from disk.
+     *
+     * @param paths A list that will be populated with all the recovered paths.
+     *
+     * @return true if the recovery was completed cleanly; if false, there were
+     * issues with the journal files (possible corruption).
+     */
     public boolean recover(List<FeaturePath<String>> paths)
     throws IOException {
         boolean clean = true;
@@ -110,6 +117,12 @@ public class PathJournal {
         return clean;
     }
 
+    /**
+     * Recovers the Feature index.  The index contains a mapping from feature
+     * identification numbers (used in this class only) to FeatureTypes and
+     * names.  After executing this method, the index is populated with Feature
+     * mappings read from disk.
+     */
     private void recoverIndex()
     throws FileNotFoundException, IOException {
         DataInputStream indexIn = new DataInputStream(
@@ -150,6 +163,9 @@ public class PathJournal {
         indexIn.close();
     }
 
+    /**
+     * Recovers Paths stored in the Path Journal.
+     */
     private void recoverPaths(List<FeaturePath<String>> paths)
     throws IOException, SerializationException {
         DataInputStream pathIn = new DataInputStream(
@@ -201,6 +217,9 @@ public class PathJournal {
         pathIn.close();
     }
 
+    /**
+     * Prepares the journal files and allows new entries to be written.
+     */
     public void start()
     throws IOException {
         OutputStream out = Files.newOutputStream(Paths.get(pathFile),
@@ -219,6 +238,12 @@ public class PathJournal {
         running = true;
     }
 
+    /**
+     * Determines whether the specified Feature information is in the index.  If
+     * the feature is not present, it is added to the index.
+     *
+     * @param feature Feature to check for in the index.
+     */
     private void checkIndex(Feature feature) {
         String featureName = feature.getName();
 
@@ -235,6 +260,9 @@ public class PathJournal {
         }
     }
 
+    /**
+     * Adds a particular feature to the index.
+     */
     private int newFeature(Feature feature) {
         int featureId = nextId;
         FeatureType type = feature.getType();
@@ -243,6 +271,9 @@ public class PathJournal {
         return newFeature(featureId, type, name);
     }
 
+    /**
+     * Adds a (featureId, FeatureType, FeatureName) tuple to the index directly.
+     */
     private int newFeature(int featureId, FeatureType type, String name) {
         logger.log(Level.INFO, "Adding new Feature to path journal index: {0}",
                 name);
@@ -255,6 +286,12 @@ public class PathJournal {
         return featureId;
     }
 
+    /**
+     * Appends a new {@link Feature} to the on-disk Feature index.
+     *
+     * @param featureId identifier of the Feature being written
+     * @param feature 
+     */
     private void writeIndex(int featureId, Feature feature)
     throws IOException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -275,6 +312,11 @@ public class PathJournal {
         indexStore.flush();
     }
 
+    /**
+     * Adds a graph {@link FeaturePath} to the journal.
+     *
+     * @param path The FeaturePath to add to the journal.
+     */
     public void persistPath(FeaturePath<String> path)
     throws FileSystemException, IOException {
         if (running == false) {
@@ -308,6 +350,10 @@ public class PathJournal {
         pathStore.flush();
     }
 
+    /**
+     * Removes the Path Journal and its Feature index files.  This method shuts
+     * the PathJournal down before deleting the files.
+     */
     public void erase()
     throws IOException {
         shutdown();
@@ -316,6 +362,9 @@ public class PathJournal {
         new File(pathFile).delete();
     }
 
+    /**
+     * Closes open journal files and stops accepting new FeaturePaths.
+     */
     public void shutdown()
     throws IOException {
         if (running == false) {
