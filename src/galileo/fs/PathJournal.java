@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,6 @@ import galileo.graph.Vertex;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
-import galileo.serialization.Serializer;
 import galileo.util.Pair;
 
 public class PathJournal {
@@ -56,8 +55,10 @@ public class PathJournal {
         this.indexFile = pathFile + ".index";
     }
 
-    public List<FeaturePath<String>> recover()
+    public boolean recover(List<FeaturePath<String>> paths)
     throws IOException {
+        boolean clean = true;
+
         try {
             recoverIndex();
         } catch (EOFException e) {
@@ -65,25 +66,24 @@ public class PathJournal {
         } catch (FileNotFoundException e) {
             logger.info("Could not locate journal index.  Journal recovery is "
                     + "not possible.");
-            return new ArrayList<FeaturePath<String>>(0);
+            return false;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error reading path index!", e);
-            //TODO nuke the file since it is corrupted, and re-create it.
+            clean = false;
         }
         logger.log(Level.INFO, "Features read: {0}", featureNames.size());
 
-        List<FeaturePath<String>> paths = new ArrayList<FeaturePath<String>>(0);
         try {
             recoverPaths(paths);
         } catch (EOFException e) {
             logger.info("Reached end of path journal.");
         } catch (SerializationException e) {
             logger.log(Level.WARNING, "Error deserializing path!", e);
+            clean = false;
         }
-
         logger.log(Level.INFO, "Recovered {0} paths.", paths.size());
 
-        return paths;
+        return clean;
     }
 
     private void recoverIndex()
