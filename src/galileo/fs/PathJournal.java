@@ -284,6 +284,14 @@ public class PathJournal {
         pathStore.flush();
     }
 
+    public void erase()
+    throws IOException {
+        shutdown();
+
+        new File(indexFile).delete();
+        new File(pathFile).delete();
+    }
+
     public void shutdown()
     throws IOException {
         if (running == false) {
