@@ -60,16 +60,30 @@ public class PathJournal {
     throws IOException {
         try {
             recoverIndex();
+        } catch (EOFException e) {
+            logger.info("Reached end of path journal index.");
         } catch (FileNotFoundException e) {
             logger.info("Could not locate journal index.  Journal recovery is "
                     + "not possible.");
             return new ArrayList<FeaturePath<String>>(0);
-        } catch (EOFException e) {
-            logger.info("Reached end of journal index.");
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error reading path index!", e);
+            //TODO nuke the file since it is corrupted, and re-create it.
         }
         logger.log(Level.INFO, "Features read: {0}", featureNames.size());
 
-        return null;
+        List<FeaturePath<String>> paths = new ArrayList<FeaturePath<String>>(0);
+        try {
+            recoverPaths(paths);
+        } catch (EOFException e) {
+            logger.info("Reached end of path journal.");
+        } catch (SerializationException e) {
+            logger.log(Level.WARNING, "Error deserializing path!", e);
+        }
+
+        logger.log(Level.INFO, "Recovered {0} paths.", paths.size());
+
+        return paths;
     }
 
     private void recoverIndex()
@@ -112,13 +126,11 @@ public class PathJournal {
         indexIn.close();
     }
 
-    private List<FeaturePath<String>> recoverPaths()
+    private void recoverPaths(List<FeaturePath<String>> paths)
     throws IOException, SerializationException {
-        List<FeaturePath<String>> paths = new ArrayList<>();
-
         DataInputStream pathIn = new DataInputStream(
                 new BufferedInputStream(
-                    new FileInputStream(indexFile)));
+                    new FileInputStream(pathFile)));
 
         while (true) {
             long check = pathIn.readLong();
@@ -159,12 +171,10 @@ public class PathJournal {
             }
 
             paths.add(fp);
-
             sIn.close();
         }
 
         pathIn.close();
-        return paths;
     }
 
     public void start()
