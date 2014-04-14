@@ -64,7 +64,7 @@ public class GeospatialFileSystem extends FileSystem {
     private static final String DEFAULT_TIME_FORMAT = "yyyy/M/d";
     private static final int DEFAULT_GEOHASH_PRECISION = 5;
 
-    private static final String metadataStore = "metadata.graph";
+    private static final String pathStore = "metadata.paths";
 
     private MetadataGraph metadataGraph;
 
@@ -231,12 +231,5 @@ public class GeospatialFileSystem extends FileSystem {
     @Override
     public void shutdown() {
         logger.info("FileSystem shutting down");
-        try {
-            Serializer.persist(metadataGraph,
-                    storageDirectory + "/" + metadataStore);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error writing persistent index file", e);
-            e.printStackTrace();
-        }
     }
 }
