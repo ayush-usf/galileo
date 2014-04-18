@@ -55,6 +55,7 @@ import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 import galileo.util.Pair;
+import galileo.util.PerformanceTimer;
 
 public class PathJournal {
 
@@ -88,7 +89,15 @@ public class PathJournal {
      */
     public boolean recover(List<FeaturePath<String>> paths)
     throws IOException {
+        PerformanceTimer timer = new PerformanceTimer();
+        timer.start();
         boolean clean = true;
+
+        if (new File(pathFile).exists() == false
+                || new File(indexFile).exists() == false) {
+            erase();
+            return false;
+        }
 
         try {
             recoverIndex();
@@ -108,12 +117,14 @@ public class PathJournal {
             recoverPaths(paths);
         } catch (EOFException e) {
             logger.info("Reached end of path journal.");
-        } catch (SerializationException e) {
+        } catch (NullPointerException | SerializationException e) {
             logger.log(Level.WARNING, "Error deserializing path!", e);
             clean = false;
         }
         logger.log(Level.INFO, "Recovered {0} paths.", paths.size());
-
+        timer.stop();
+        logger.log(Level.INFO, "Finished PathJournal recovery in "
+                + timer.getLastResult() + " ms.");
         return clean;
     }
 
