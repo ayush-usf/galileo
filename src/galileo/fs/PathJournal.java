@@ -69,7 +69,7 @@ public class PathJournal {
     private Map<String, Integer> featureNames = new HashMap<>();
     private Map<Integer, Pair<String, FeatureType>> featureIndex
         = new HashMap<>();
-    private int nextId;
+    private int nextId = 1;
 
     private boolean running = false;
 
