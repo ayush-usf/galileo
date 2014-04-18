@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,8 +110,8 @@ public abstract class FileSystem implements PhysicalGraph {
      *
      * @return ArrayList of String paths to blocks on disk.
      */
-    protected ArrayList<String> scanDirectory(File directory) {
-        ArrayList<String> blockPaths = new ArrayList<String>();
+    protected List<String> scanDirectory(File directory) {
+        List<String> blockPaths = new ArrayList<String>();
         scanSubDirectory(directory, blockPaths);
         return blockPaths;
     }
@@ -123,7 +125,7 @@ public abstract class FileSystem implements PhysicalGraph {
      * @param fileList
      *     ArrayList of Strings to populate with FileBlock paths.
      */
-    private void scanSubDirectory(File directory, ArrayList<String> fileList) {
+    private void scanSubDirectory(File directory, List<String> fileList) {
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
                 scanSubDirectory(file, fileList);
@@ -144,7 +146,24 @@ public abstract class FileSystem implements PhysicalGraph {
      */
     protected void fullRecovery() {
         logger.warning("Performing full recovery from disk");
-        recover(storageDirectory);
+        List<String> blockPaths = rebuildPaths(storageDirectory);
+        recover(blockPaths);
+    }
+
+    /**
+     * Scans the directory structure on disk to find all the blocks stored.
+     *
+     * @param storageDir the root directory to start scanning from.
+     */
+    protected List<String> rebuildPaths(File storageDir) {
+        PerformanceTimer rebuildTimer = new PerformanceTimer();
+        rebuildTimer.start();
+        logger.info("Recovering path index");
+        List<String> blockPaths = scanDirectory(storageDir);
+        rebuildTimer.stop();
+        logger.info("Index recovery took "
+                + rebuildTimer.getLastResult() + " ms.");
+        return blockPaths;
     }
 
     /**
@@ -152,15 +171,8 @@ public abstract class FileSystem implements PhysicalGraph {
      * scans every block in the partition, reads its metadata, and performs a
      * checksum to verify block integrity.
      */
-    protected void recover(File storageDir) {
+    protected void recover(List<String> blockPaths) {
         PerformanceTimer recoveryTimer = new PerformanceTimer();
-        recoveryTimer.start();
-        logger.info("Recovering path index");
-        ArrayList<String> blockPaths = scanDirectory(storageDir);
-        recoveryTimer.stop();
-        logger.info("Index recovery took "
-                + recoveryTimer.getLastResult() + " ms.");
-
         recoveryTimer.start();
         logger.info("Recovering metadata and building graph");
         long counter = 0;
