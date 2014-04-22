@@ -113,7 +113,7 @@ public abstract class MessageRouter implements Runnable {
             try {
                 processSelectionKeys();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Error in selector thread", e);
             }
         }
     }
@@ -196,6 +196,7 @@ public abstract class MessageRouter implements Runnable {
 
             dispatchConnect(getDestination(channel));
         } catch (IOException e) {
+            logger.log(Level.INFO, "Connection finalization failed", e);
             disconnect(key);
         }
     }
