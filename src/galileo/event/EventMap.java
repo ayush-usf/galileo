@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, Colorado State University
+Copyright (c) 2014, Colorado State University
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -25,52 +25,15 @@ software, even if advised of the possibility of such damage.
 
 package galileo.event;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Enumerates the supported event types.
+ * Provides an interface for enumerations that can be mapped to or from their
+ * integer representations.
  *
  * @author malensek
  */
-public enum EventType implements EventMap {
-    UNKNOWN (0),
-    GENERAL (1),
-    QUERY (2),
-    QUERY_REQUEST (8),
-    QUERY_RESPONSE (3),
-    QUERY_PREAMBLE (10),
-    STORAGE (4),
-    STORAGE_REQUEST (7),
-    SYSTEM (5),
-    DEBUG (6),
-    DISCONNECT(9);
-
-    private final int type;
-
-    private EventType(int type) {
-        this.type = type;
-    }
-
-    @Override
-    public int toInt() {
-        return type;
-    }
-
-    static Map<Integer, EventType> typeMap = new HashMap<>();
-
-    static {
-        for (EventType t : EventType.values()) {
-            typeMap.put(t.toInt(), t);
-        }
-    }
-
-    public static EventType fromInt(int i) {
-        EventType t = typeMap.get(i);
-        if (t == null) {
-            return EventType.UNKNOWN;
-        }
-
-        return t;
-    }
+public interface EventMap {
+    /**
+     * @return Integer equivalent of the enum constant.
+     */
+    public int toInt();
 }
