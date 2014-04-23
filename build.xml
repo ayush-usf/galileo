@@ -70,7 +70,6 @@
                         value="${project.version}"/>
                 <attribute name="Specification-URL"
                         value="${project.url}"/>
-                <attribute name="Class-Path" value="${jar.classpath}"/>
             </manifest>
         </jar>
     </target>
