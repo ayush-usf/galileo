@@ -31,7 +31,7 @@ package galileo.event;
  *
  * @author malensek
  */
-public interface EventMap {
+public interface EventTypeMap {
     /**
      * @return Integer equivalent of the enum constant.
      */

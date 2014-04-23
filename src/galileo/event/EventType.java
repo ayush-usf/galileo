@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @author malensek
  */
-public enum EventType implements EventMap {
+public enum EventType implements EventTypeMap {
     UNKNOWN (0),
     GENERAL (1),
     QUERY (2),
