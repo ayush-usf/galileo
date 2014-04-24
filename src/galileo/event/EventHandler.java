@@ -35,6 +35,4 @@ import java.lang.annotation.RetentionPolicy;
  * @author malensek
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HandlesEvent {
-    EventType value();
-}
+public @interface EventHandler { }
