@@ -40,6 +40,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,28 +202,8 @@ public class PathJournal {
                 continue;
             }
 
-            SerializationInputStream sIn = new SerializationInputStream(
-                    new ByteArrayInputStream(pathBytes));
-
-            int vertices = sIn.readInt();
-            FeaturePath<String> fp = new FeaturePath<>();
-            for (int i = 0; i < vertices; ++i) {
-                int featureId = sIn.readInt();
-                Pair<String, FeatureType> featureInfo
-                    = featureIndex.get(featureId);
-
-                Feature f = new Feature(featureInfo.a, featureInfo.b, sIn);
-                fp.add(f);
-            }
-
-            int payloads = sIn.readInt();
-            for (int i = 0; i < payloads; ++i) {
-                String payload = sIn.readString();
-                fp.addPayload(payload);
-            }
-
+            FeaturePath<String> fp = deserializePath(pathBytes);
             paths.add(fp);
-            sIn.close();
         }
 
         pathIn.close();
@@ -292,6 +273,7 @@ public class PathJournal {
         featureNames.put(name, featureId);
         featureIndex.put(featureId, new Pair<>(name, type));
 
+        /* Update the nextId counter here */
         nextId = featureId + 1;
 
         return featureId;
@@ -334,6 +316,24 @@ public class PathJournal {
             throw new FileSystemException("Path Journal has not been started!");
         }
 
+        byte[] pathBytes = serializePath(path);
+
+        CRC32 crc = new CRC32();
+        crc.update(pathBytes);
+        long check = crc.getValue();
+
+        pathStore.writeLong(check);
+        pathStore.writeInt(pathBytes.length);
+        pathStore.write(pathBytes);
+        pathStore.flush();
+    }
+
+    /**
+     * Given a {@link FeaturePath}, this method serializes the path data to a
+     * byte array that can be appended to the path journal.
+     */
+    private byte[] serializePath(FeaturePath<String> path)
+    throws IOException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         SerializationOutputStream sOut = new SerializationOutputStream(bOut);
         sOut.writeInt(path.size());
@@ -349,16 +349,35 @@ public class PathJournal {
             sOut.writeString(s);
         }
         sOut.close();
-        byte[] pathBytes = bOut.toByteArray();
+        return bOut.toByteArray();
+    }
 
-        CRC32 crc = new CRC32();
-        crc.update(pathBytes);
-        long check = crc.getValue();
+    /**
+     * Deserializes a {@link FeaturePath} from a byte array.
+     */
+    private FeaturePath<String> deserializePath(byte[] pathBytes)
+    throws IOException, SerializationException {
+        SerializationInputStream sIn = new SerializationInputStream(
+                new ByteArrayInputStream(pathBytes));
 
-        pathStore.writeLong(check);
-        pathStore.writeInt(pathBytes.length);
-        pathStore.write(pathBytes);
-        pathStore.flush();
+        int vertices = sIn.readInt();
+        FeaturePath<String> fp = new FeaturePath<>();
+        for (int i = 0; i < vertices; ++i) {
+            int featureId = sIn.readInt();
+            Pair<String, FeatureType> featureInfo
+                = featureIndex.get(featureId);
+
+            Feature f = new Feature(featureInfo.a, featureInfo.b, sIn);
+            fp.add(f);
+        }
+
+        int payloads = sIn.readInt();
+        for (int i = 0; i < payloads; ++i) {
+            String payload = sIn.readString();
+            fp.addPayload(payload);
+        }
+        sIn.close();
+        return fp;
     }
 
     /**
