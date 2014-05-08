@@ -25,8 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.event;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -44,8 +42,6 @@ import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
 import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.Serializer;
 import galileo.util.StackTraceToString;
 
 /**
@@ -62,6 +58,7 @@ public class EventReactor implements MessageListener {
     private Object handlerObject;
 
     private EventMap eventMap;
+    private EventWrapper eventWrapper;
 
     private Map<Class<?>, Method> classToMethod = new HashMap<>();
 
@@ -79,7 +76,7 @@ public class EventReactor implements MessageListener {
         this.handlerClass = handlerObject.getClass();
         this.handlerObject = handlerObject;
         this.eventMap = eventMap;
-        System.out.println(eventMap.getClass(1));
+        this.eventWrapper = new BasicEventWrapper(eventMap);
     }
 
     /**
@@ -151,22 +148,10 @@ public class EventReactor implements MessageListener {
             InterruptedException, SerializationException {
 
         GalileoMessage message = messageQueue.take();
-        ByteArrayInputStream byteIn
-            = new ByteArrayInputStream(message.getPayload());
-        BufferedInputStream buffIn = new BufferedInputStream(byteIn);
-        SerializationInputStream in = new SerializationInputStream(buffIn);
 
         try {
-            int type = in.readInt();
-            Class<? extends Event> clazz = eventMap.getClass(type);
-            if (clazz == null) {
-                in.close();
-                throw new EventException(
-                        "Class mapping for event type not found!");
-            }
-
-            Event e = Serializer.deserializeFromStream(clazz, in);
-            Method m = classToMethod.get(clazz);
+            Event e = eventWrapper.unwrap(message);
+            Method m = classToMethod.get(e.getClass());
             m.invoke(handlerObject, e);
         } catch (IOException | SerializationException e) {
             throw e;
@@ -176,8 +161,6 @@ public class EventReactor implements MessageListener {
              * we wrap this up in a catch-all exception. */
             throw new EventException("Error processing event!  "
                     + StackTraceToString.convert(e));
-        } finally {
-            in.close();
         }
     }
 
