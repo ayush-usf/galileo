@@ -27,6 +27,8 @@ package galileo.event;
 
 public class EventException extends Exception {
 
+    private static final long serialVersionUID = 7898445170109030502L;
+
     public EventException() {
         super();
     }
