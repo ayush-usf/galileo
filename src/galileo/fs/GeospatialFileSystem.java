@@ -26,11 +26,14 @@ software, even if advised of the possibility of such damage.
 package galileo.fs;
 
 import java.io.File;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +43,7 @@ import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
 import galileo.graph.FeaturePath;
+import galileo.graph.FeatureTypeMismatchException;
 import galileo.graph.MetadataGraph;
 import galileo.query.Query;
 import galileo.serialization.SerializationException;
@@ -68,6 +72,8 @@ public class GeospatialFileSystem extends FileSystem {
 
     private MetadataGraph metadataGraph;
 
+    private PathJournal pathJournal;
+
     private SimpleDateFormat timeFormatter;
     private String timeFormat;
     private int geohashPrecision;
@@ -87,38 +93,42 @@ public class GeospatialFileSystem extends FileSystem {
         timeFormatter = new SimpleDateFormat();
         timeFormatter.applyPattern(timeFormat);
 
+        pathJournal = new PathJournal(storageDirectory + "/" + pathStore);
+
         createMetadataGraph();
-//        File metaFile = new File(storageDirectory + "/" + metadataStore);
-//        if (metaFile.exists()) {
-//            try {
-//                metadataGraph
-//                    = Serializer.restore(MetadataGraph.class, metaFile);
-//            } catch (SerializationException e) {
-//                /* We couldn't deserialize the MD graph, so we're going to have
-//                 * to re-scan everything and rebuild it. */
-//                logger.log(
-//                        Level.WARNING,
-//                        "Could not deserialize MetadataGraph!", e);
-//                createMetadataGraph();
-//            }
-//        } else {
-//            /* Generally this occurs when the file system is initialized for the
-//             * first time, or the MD graph journal was somehow removed. */
-//            createMetadataGraph();
-//        }
     }
 
     /**
-     * Creates a new, empty MetadataGraph instance, which may be required
-     * because this is the first time the file system has been initialized, or
-     * perhaps the Metadata journal was corrupted or removed.  This operation
-     * requires scanning all the {@link Block} instances that were previously
-     * serialized to disk.
+     * Initializes the Metadata Graph, either from a successful recovery from
+     * the PathJournal, or by scanning all the {@link Block}s on disk.
      */
-    private void createMetadataGraph() {
+    private void createMetadataGraph()
+    throws IOException {
         metadataGraph = new MetadataGraph();
-        /* The graph will be automatically re-populated with a full recovery. */
-        fullRecovery();
+
+        /* Recover the path index from the PathJournal */
+        List<FeaturePath<String>> graphPaths = new ArrayList<>();
+        boolean recoveryOk = pathJournal.recover(graphPaths);
+        pathJournal.start();
+
+        if (recoveryOk == true) {
+            for (FeaturePath<String> path : graphPaths) {
+                try {
+                    metadataGraph.addPath(path);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Failed to add path", e);
+                    recoveryOk = false;
+                    break;
+                }
+            }
+        }
+
+        if (recoveryOk == false) {
+            logger.log(Level.SEVERE, "Failed to recover path journal!");
+            pathJournal.erase();
+            pathJournal.start();
+            fullRecovery();
+        }
     }
 
     @Override
@@ -202,6 +212,7 @@ public class GeospatialFileSystem extends FileSystem {
         FeaturePath<String> path = new FeaturePath<String>(
                 physicalPath, meta.getAttributes().toArray());
 
+        System.out.println("Created path: " + path);
         return path;
     }
 
@@ -209,6 +220,7 @@ public class GeospatialFileSystem extends FileSystem {
     public void storeMetadata(Metadata metadata, String blockPath)
     throws FileSystemException, IOException {
         FeaturePath<String> path = createPath(blockPath, metadata);
+        pathJournal.persistPath(path);
         storePath(path);
     }
 
@@ -235,5 +247,11 @@ public class GeospatialFileSystem extends FileSystem {
     @Override
     public void shutdown() {
         logger.info("FileSystem shutting down");
+        try {
+            pathJournal.shutdown();
+        } catch (Exception e) {
+            /* Everything is going down here, just print out the error */
+            e.printStackTrace();
+        }
     }
 }
