@@ -43,7 +43,8 @@ public class GalileoMessage implements ByteSerializable {
 
     private byte[] payload;
 
-    public SelectionKey key;
+    private MessageContext context;
+    private SelectionKey key;
 
     /**
      * Constructs a GalileoMessage from an array of bytes.
@@ -61,9 +62,23 @@ public class GalileoMessage implements ByteSerializable {
      * @param payload message payload in the form of a byte array.
      * @param key SelectionKey of the message source.
      */
+    @Deprecated
     public GalileoMessage(byte[] payload, SelectionKey key) {
-        this.payload = payload;
+        this(payload);
         this.key = key;
+    }
+
+    /**
+     * Constructs a GalileoMessage from an array of bytes with an associated
+     * {@link MessageContext} representing the source of the message.
+     *
+     * @param payload message payload in the form of a byte array.
+     * @param context context information for this message
+     */
+    public GalileoMessage(byte[] payload, MessageContext context) {
+        this(payload);
+        this.context = context;
+        this.key = context.getSelectionKey();
     }
 
     /**
@@ -73,6 +88,10 @@ public class GalileoMessage implements ByteSerializable {
      */
     public byte[] getPayload() {
         return payload;
+    }
+
+    public MessageContext getContext() {
+        return context;
     }
 
     public SelectionKey getSelectionKey() {
