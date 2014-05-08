@@ -94,6 +94,7 @@ public class GalileoMessage implements ByteSerializable {
         return context;
     }
 
+    @Deprecated
     public SelectionKey getSelectionKey() {
         return key;
     }
