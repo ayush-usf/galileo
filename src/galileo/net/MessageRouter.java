@@ -508,7 +508,7 @@ public abstract class MessageRouter implements Runnable {
      *
      * @param channel Channel to get client information about.
      */
-    private static String getClientString(SocketChannel channel) {
+    protected static String getClientString(SocketChannel channel) {
         Socket socket = channel.socket();
         return socket.getInetAddress().getHostName() + ":" + socket.getPort();
     }
@@ -521,7 +521,7 @@ public abstract class MessageRouter implements Runnable {
      *
      * @return NetworkDestination representation of the endpoint.
      */
-    private static NetworkDestination getDestination(SocketChannel channel) {
+    protected static NetworkDestination getDestination(SocketChannel channel) {
         Socket socket = channel.socket();
         return new NetworkDestination(
                 socket.getInetAddress().getHostName(),
