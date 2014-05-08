@@ -28,6 +28,7 @@ package galileo.event;
 import java.io.IOException;
 
 import galileo.net.GalileoMessage;
+import galileo.serialization.SerializationException;
 
 /**
  * Defines how Events are wrapped and unwrapped for serialization and
@@ -41,12 +42,14 @@ public interface EventWrapper {
      * Wraps an {@link Event} up in a {@link GalileoMessage}, ready to be
      * transmitted across the network.
      */
-    public GalileoMessage wrap(Event e) throws IOException;
+    public GalileoMessage wrap(Event e)
+        throws IOException, SerializationException;
 
     /**
      * Unwraps a {@link GalileoMessage} to extract the {@link Event} it
      * contains.
      */
-    public Event unwrap(GalileoMessage msg) throws IOException;
+    public Event unwrap(GalileoMessage msg)
+        throws IOException, SerializationException;
 
 }
