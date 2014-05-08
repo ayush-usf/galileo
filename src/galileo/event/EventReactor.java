@@ -110,7 +110,22 @@ public class EventReactor implements MessageListener {
             for (Annotation a : m.getAnnotations()) {
                 if (a.annotationType().equals(EventHandler.class)) {
                     /* This method is an event handler */
+                    logger.log(Level.INFO, "Found EventHandler annotation on "
+                            + "method: {0}", m.getName());
+
                     Class<?>[] params = m.getParameterTypes();
+                    if (params.length != 2) {
+                        logger.log(Level.WARNING, "Incorrect number of method "
+                                + "parameters found.  Ignoring method.");
+                        break;
+                    }
+
+                    if (params[1].equals(EventContext.class) == false) {
+                        logger.log(Level.WARNING, "Second method parameter must"
+                                + " be EventContext.  Ignoring method.");
+                        break;
+                    }
+
                     Class<?> eventClass;
                     try {
                         eventClass = extractEventClass(params);
