@@ -27,8 +27,10 @@ package galileo.event;
 
 import galileo.net.GalileoMessage;
 
+import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
+import galileo.serialization.Serializer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -36,16 +38,29 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * Implements a basic EventWrapper that uses an EventMap to identify Events by
+ * their ID numbers.
+ *
+ * @author malensek
+ */
 public class BasicEventWrapper implements EventWrapper {
+
+    private EventMap eventMap;
+
+    public BasicEventWrapper(EventMap eventMap) {
+        this.eventMap = eventMap;
+    }
 
     @Override
     public GalileoMessage wrap(Event e)
-    throws IOException {
+    throws IOException, SerializationException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         SerializationOutputStream sOut = new SerializationOutputStream(
                 new BufferedOutputStream(bOut));
 
-        //sOut.writeInt(e.getTypeMap().toInt());
+        int eventId = eventMap.getInt(e.getClass());
+        sOut.writeInt(eventId);
         sOut.writeSerializable(e);
         sOut.close();
 
@@ -55,12 +70,17 @@ public class BasicEventWrapper implements EventWrapper {
     }
 
     @Override
-    public Event unwrap(GalileoMessage msg) {
+    public Event unwrap(GalileoMessage msg)
+    throws IOException, SerializationException {
         ByteArrayInputStream byteIn
             = new ByteArrayInputStream(msg.getPayload());
         BufferedInputStream buffIn = new BufferedInputStream(byteIn);
         SerializationInputStream sIn = new SerializationInputStream(buffIn);
 
-        return null;
+        int eventId = sIn.readInt();
+        Class<? extends Event> clazz = eventMap.getClass(eventId);
+        Event e = Serializer.deserializeFromStream(clazz, sIn);
+
+        return e;
     }
 }
