@@ -47,6 +47,6 @@ public interface EventWrapper {
      * Unwraps a {@link GalileoMessage} to extract the {@link Event} it
      * contains.
      */
-    public Event unwrap(GalileoMessage msg);
+    public Event unwrap(GalileoMessage msg) throws IOException;
 
 }
