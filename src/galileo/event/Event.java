@@ -27,12 +27,11 @@ package galileo.event;
 
 import galileo.serialization.ByteSerializable;
 
+/**
+ * Defines an interface for events in the Galileo network.
+ *
+ * @author malensek
+ */
 public interface Event extends ByteSerializable {
 
-    /**
-     * Returns the {@link EventType} of this event.
-     *
-     * @return EventType
-     */
-    public EventTypeMap getTypeMap();
 }
