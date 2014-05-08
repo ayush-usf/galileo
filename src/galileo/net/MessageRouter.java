@@ -266,7 +266,9 @@ public abstract class MessageRouter implements Runnable {
 
         if (transmission.readPointer == transmission.expectedBytes) {
             /* The payload has been read */
-            GalileoMessage msg = new GalileoMessage(transmission.payload, key);
+            GalileoMessage msg = new GalileoMessage(
+                    transmission.payload,
+                    new MessageContext(this, key));
             dispatchMessage(msg);
             transmission.resetCounters();
 
