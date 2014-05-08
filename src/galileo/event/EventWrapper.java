@@ -43,7 +43,7 @@ public interface EventWrapper {
      * transmitted across the network.
      */
     public GalileoMessage wrap(Event e)
-        throws IOException, SerializationException;
+        throws IOException;
 
     /**
      * Unwraps a {@link GalileoMessage} to extract the {@link Event} it

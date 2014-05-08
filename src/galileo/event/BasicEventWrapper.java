@@ -54,7 +54,7 @@ public class BasicEventWrapper implements EventWrapper {
 
     @Override
     public GalileoMessage wrap(Event e)
-    throws IOException, SerializationException {
+    throws IOException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         SerializationOutputStream sOut = new SerializationOutputStream(
                 new BufferedOutputStream(bOut));
