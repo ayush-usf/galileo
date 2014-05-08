@@ -27,6 +27,8 @@ package galileo.net;
 
 import java.io.IOException;
 
+import java.nio.channels.SocketChannel;
+
 import galileo.serialization.ByteSerializable;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
@@ -89,6 +91,14 @@ public class NetworkDestination implements ByteSerializable {
     @Override
     public String toString() {
         return stringRepresentation();
+    }
+
+    /**
+     * Retrieves host:port information from a SocketChannel and instantiates a
+     * new NetworkDestination with the information.
+     */
+    public static NetworkDestination fromSocketChannel(SocketChannel channel) {
+        return MessageRouter.getDestination(channel);
     }
 
     @Deserialize
