@@ -185,9 +185,10 @@ public class EventReactor implements MessageListener {
         GalileoMessage message = messageQueue.take();
 
         try {
-            Event e = eventWrapper.unwrap(message);
-            Method m = classToMethod.get(e.getClass());
-            m.invoke(handlerObject, e);
+            Event event = eventWrapper.unwrap(message);
+            Method method = classToMethod.get(event.getClass());
+            EventContext context = new EventContext(message, eventWrapper);
+            method.invoke(handlerObject, event, context);
         } catch (IOException | SerializationException e) {
             throw e;
         } catch (Exception e) {
