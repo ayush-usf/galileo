@@ -28,7 +28,10 @@ package galileo.event;
 public interface EventListener {
 
     /**
-     * Called when an event is ready to be processed.
+     * Called when an event is ready to be processed.  The implementation of
+     * this method should be lightweight; large amounts of processing here will
+     * delay the event processing framework because its threads will call this
+     * method.
      *
      * @param event GalileoEvent that was received; null if the connection has
      * been terminated.
