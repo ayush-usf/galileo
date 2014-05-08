@@ -66,6 +66,9 @@ public class EventReactor implements MessageListener {
         = new LinkedBlockingQueue<>();
 
     /**
+     * Creates an EventReactor with the default {@link BasicEventWrapper}
+     * EventWrapper implementation.
+     *
      * @param handlerObject an Object instance that contains the implementations
      * for event handlers, denoted by the {@link EventHandler} annotation.
      * @param eventMap a EventMap implementation that provides a mapping from
@@ -77,6 +80,23 @@ public class EventReactor implements MessageListener {
         this.handlerObject = handlerObject;
         this.eventMap = eventMap;
         this.eventWrapper = new BasicEventWrapper(eventMap);
+    }
+
+    /**
+     * Creates an EventReactor with a custom EventWrapper implementation.
+     *
+     * @param handlerObject an Object instance that contains the implementations
+     * for event handlers, denoted by the {@link EventHandler} annotation.
+     * @param eventMap a EventMap implementation that provides a mapping from
+     * integer identification numbers to specific classes that represent an
+     * event.
+     */
+    public EventReactor(Object handlerObject,
+            EventMap eventMap, EventWrapper wrapper) {
+        this.handlerClass = handlerObject.getClass();
+        this.handlerObject = handlerObject;
+        this.eventMap = eventMap;
+        this.eventWrapper = wrapper;
     }
 
     /**
