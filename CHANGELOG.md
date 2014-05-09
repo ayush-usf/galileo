@@ -1,3 +1,9 @@
+**0.8 : 2014/05/08 ---- Event handling subsystem updates**
+- Implementation of the reactor pattern for event handling
+- Automatic annotation-based event mapping
+- Usability improvements to the net subsystem
+- Began migrating away from use of SelectionKeys in client code
+
 **0.7 : 2014/04/08 ---- Geoavailability Grids, stability improvements**
 - Added Geoavailability Grid implementation: spatial queries
 - Refactored FileSystem implementation
