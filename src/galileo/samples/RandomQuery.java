@@ -25,12 +25,16 @@ software, even if advised of the possibility of such damage.
 
 package galileo.samples;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Random;
 
+import galileo.client.EventPublisher;
+import galileo.comm.QueryEvent;
 import galileo.dataset.feature.Feature;
+import galileo.net.ClientMessageRouter;
+import galileo.net.NetworkDestination;
 import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Operator;
@@ -75,8 +79,26 @@ public class RandomQuery {
         return q;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    throws Exception {
+        if (args.length < 2) {
+            System.out.println("Usage: galileo.samples.RandomQuery host port");
+            System.exit(1);
+        }
+        String serverHostName = args[0];
+        int serverPort = Integer.parseInt(args[1]);
+
+        ClientMessageRouter messageRouter = new ClientMessageRouter();
+        NetworkDestination server = new NetworkDestination(
+                serverHostName, serverPort);
+        messageRouter.connectTo(server);
+
+        byte[] id = new byte[1024];
+        random.nextBytes(id);
+        BigInteger bi = new BigInteger(id);
+
         Query q = randomQuery();
-        System.out.println(q);
+        QueryEvent qe = new QueryEvent(bi.toString(16), q);
+        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
     }
 }
