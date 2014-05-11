@@ -146,10 +146,8 @@ public abstract class MessageRouter implements Runnable {
      */
     protected void processSelectionKeys()
     throws IOException {
-        int updated = selector.select();
-        if (updated == 0) {
-            return;
-        }
+
+        selector.select();
 
         Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
         while (keys.hasNext()) {
