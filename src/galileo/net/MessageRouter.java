@@ -359,44 +359,23 @@ public abstract class MessageRouter implements Runnable {
             throw new IOException("MessageRouter is not online.");
         }
 
-        SocketChannel channel = (SocketChannel) key.channel();
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
         BlockingQueue<ByteBuffer> pendingWriteQueue
             = tracker.getPendingWriteQueue();
 
-        if (!pendingWriteQueue.isEmpty()) {
-            try {
-                pendingWriteQueue.put(payload);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Sender thread interrupted");
-            }
-            key.interestOps(SelectionKey.OP_WRITE);
-            selector.wakeup();
-            return;
+        try {
+            pendingWriteQueue.put(payload);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Sender thread interrupted");
         }
 
-        int written = 0;
-        while (payload.hasRemaining()) {
-            written = channel.write(payload);
+        pendingWriters.add(key);
 
-            if (written == 0) {
-                /* If the write operation failed to write any bytes, register it
-                 * with the Selector so it can be handled during the next
-                 * selection phase. */
-                try {
-                    pendingWriteQueue.put(payload);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new IOException("Sender thread interrupted");
-                }
-                key.interestOps(SelectionKey.OP_WRITE);
-                selector.wakeup();
+        selector.wakeup();
+        return;
 
-                return;
-            }
-        }
     }
 
 
@@ -413,7 +392,6 @@ public abstract class MessageRouter implements Runnable {
         BlockingQueue<ByteBuffer> pendingWrites
             = tracker.getPendingWriteQueue();
 
-        key.interestOps(SelectionKey.OP_READ);
 
         while (pendingWrites.isEmpty() == false) {
             ByteBuffer buffer = pendingWrites.peek();
@@ -437,13 +415,14 @@ public abstract class MessageRouter implements Runnable {
                 }
 
                 if (written == 0) {
-                    key.interestOps(SelectionKey.OP_WRITE);
+                    /* Return now, to keep our OP_WRITE interest op set. */
                     return;
                 }
             }
         }
 
         /* At this point, the queue is empty. */
+        key.interestOps(SelectionKey.OP_READ);
         return;
     }
 
