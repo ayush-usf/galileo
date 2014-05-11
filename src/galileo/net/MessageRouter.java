@@ -134,11 +134,12 @@ public abstract class MessageRouter implements Runnable {
             SelectionKey key = keys.next();
             keys.remove();
 
-            if (!key.isValid()) {
+            if (key.isValid() == false) {
                 continue;
             }
 
             try {
+
                 if (key.isAcceptable()) {
                     accept(key);
                     continue;
@@ -250,7 +251,7 @@ public abstract class MessageRouter implements Runnable {
 
             /* Check if we have read the payload size prefix yet.  If
              * not, then we're done for now. */
-            if (!ready) {
+            if (ready == false) {
                 return;
             }
         }
@@ -335,7 +336,7 @@ public abstract class MessageRouter implements Runnable {
     public void sendMessage(SelectionKey key, GalileoMessage message)
     throws IOException {
         if (this.isOnline() == false) {
-            throw new IOException("Router is not online; cannot send.");
+            throw new IOException("MessageRouter is not online.");
         }
 
         SocketChannel channel = (SocketChannel) key.channel();
@@ -394,7 +395,7 @@ public abstract class MessageRouter implements Runnable {
 
         key.interestOps(SelectionKey.OP_READ);
 
-        while (!pendingWrites.isEmpty()) {
+        while (pendingWrites.isEmpty() == false) {
             ByteBuffer buffer = pendingWrites.peek();
             if (buffer == null) {
                 break;
@@ -410,7 +411,7 @@ public abstract class MessageRouter implements Runnable {
                     return;
                 }
 
-                if (!buffer.hasRemaining()) {
+                if (buffer.hasRemaining() == false) {
                     /* Done writing */
                     pendingWrites.remove();
                 }
@@ -432,7 +433,7 @@ public abstract class MessageRouter implements Runnable {
      * @param key The SelectionKey of the SocketChannel that has disconnected.
      */
     protected void disconnect(SelectionKey key) {
-        if (!key.isValid()) {
+        if (key.isValid() == false) {
             return;
         }
 
