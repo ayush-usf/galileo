@@ -36,8 +36,11 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,6 +80,9 @@ public abstract class MessageRouter implements Runnable {
 
     protected Selector selector;
 
+    private Set<SelectionKey> pendingWriters
+        = Collections.synchronizedSet(new HashSet<SelectionKey>());
+
     protected int readBufferSize;
     protected int writeQueueSize;
     private ByteBuffer readBuffer;
@@ -111,9 +117,25 @@ public abstract class MessageRouter implements Runnable {
     public void run() {
         while (online) {
             try {
+                processPendingWriters();
                 processSelectionKeys();
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Error in selector thread", e);
+            }
+        }
+    }
+
+    protected void processPendingWriters() {
+        synchronized (pendingWriters) {
+            Iterator<SelectionKey> it = pendingWriters.iterator();
+            while (it.hasNext()) {
+                SelectionKey key = it.next();
+                TransmissionTracker tracker = TransmissionTracker.fromKey(key);
+                if (tracker.getPendingWriteQueue().isEmpty() == true) {
+                    continue;
+                }
+
+                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
             }
         }
     }
