@@ -34,13 +34,18 @@ import galileo.client.EventPublisher;
 import galileo.comm.QueryEvent;
 import galileo.dataset.feature.Feature;
 import galileo.net.ClientMessageRouter;
+import galileo.net.GalileoMessage;
+import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
 import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Operator;
 import galileo.query.Query;
+import galileo.util.PerformanceTimer;
 
 public class RandomQuery {
+
+//    private static final double STORAGE_RATIO = 0.25;
 
     public static Random random = new Random();
 
@@ -60,10 +65,10 @@ public class RandomQuery {
         Query q = new Query();
 
         List<Feature> features = new ArrayList<>();
-        features.add(randomFeature("pressure", 1, 100));
-        features.add(randomFeature("visibility", 1, 100));
-        features.add(randomFeature("total_precipitation", 1, 100));
-        features.add(randomFeature("temperature_surface", 1, 100));
+        features.add(randomFeature("humidity", 1, 100));
+        features.add(randomFeature("wind_direction", 1, 100));
+        features.add(randomFeature("condensation", 1, 100));
+        features.add(randomFeature("temperature", 1, 100));
 
 
         List<Expression> expressions = new ArrayList<>();
@@ -93,12 +98,42 @@ public class RandomQuery {
                 serverHostName, serverPort);
         messageRouter.connectTo(server);
 
-        byte[] id = new byte[1024];
-        random.nextBytes(id);
-        BigInteger bi = new BigInteger(id);
+        class Listener implements MessageListener {
 
-        Query q = randomQuery();
-        QueryEvent qe = new QueryEvent(bi.toString(16), q);
-        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
+            private int counter;
+            private PerformanceTimer pt = new PerformanceTimer();
+
+            @Override
+            public void onConnect(NetworkDestination endpoint) { }
+
+            @Override
+            public void onDisconnect(NetworkDestination endpoint) { }
+
+            @Override
+            public void onMessage(GalileoMessage message) {
+                if (counter == 0) {
+                    pt.start();
+                }
+                counter++;
+                if (counter == 10000) {
+                    pt.stopAndPrint();
+                    System.exit(0);
+                }
+                //System.out.println(counter++);
+            }
+        }
+        messageRouter.addListener(new Listener());
+
+        for (int i = 0; i < 10000; ++i) {
+            byte[] id = new byte[1024];
+            random.nextBytes(id);
+            BigInteger bi = new BigInteger(id);
+
+            Query q = randomQuery();
+            QueryEvent qe = new QueryEvent(bi.toString(16), q);
+            messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
+        }
+        System.out.println("Test complete.");
+        messageRouter.shutdown();
     }
 }
