@@ -25,26 +25,68 @@ software, even if advised of the possibility of such damage.
 
 package galileo.test.net;
 
+import java.io.IOException;
+import java.util.Random;
+
 import galileo.client.EventPublisher;
 import galileo.net.ClientMessageRouter;
+import galileo.net.GalileoMessage;
+import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
+import galileo.util.PerformanceTimer;
 
-public class EchoTestClient {
+public class EchoTestClient implements MessageListener, Runnable {
 
+    private int counter;
     private ClientMessageRouter messageRouter;
-    private EventPublisher publisher;
     private NetworkDestination netDest;
+    private PerformanceTimer pt = new PerformanceTimer("response");
+    private Random random = new Random();
 
     public EchoTestClient(NetworkDestination netDest) throws Exception {
         this.netDest = netDest;
         messageRouter = new ClientMessageRouter();
-        publisher = new EventPublisher(messageRouter);
 
+        messageRouter.addListener(this);
         messageRouter.connectTo(netDest.getHostname(), netDest.getPort());
     }
 
     public void disconnect() {
         messageRouter.shutdown();
+    }
+
+    public void send()
+    throws IOException {
+        byte[] payload = new byte[4096];
+        random.nextBytes(payload);
+
+        pt.start();
+        messageRouter.sendMessage(netDest, new GalileoMessage(payload));
+    }
+
+    @Override
+    public void onConnect(NetworkDestination endpoint) { }
+
+    @Override
+    public void onDisconnect(NetworkDestination endpoint) { }
+
+    @Override
+    public void onMessage(GalileoMessage message) {
+        pt.stopAndPrint();
+        try {
+            Thread.sleep(1000);
+            send();
+        } catch (Exception e) { }
+    }
+
+    @Override
+    public void run() {
+        try {
+            send();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -54,14 +96,14 @@ public class EchoTestClient {
         }
 
         String hostname = args[0];
-        int size = Integer.parseInt(args[1]);
-        int messages = Integer.parseInt(args[2]);
+        int threads = Integer.parseInt(args[1]);
 
-        NetworkDestination netDest = new NetworkDestination(
-                hostname, EchoTestServer.PORT);
-        EchoTestClient etc = new EchoTestClient(netDest);
+        for (int i = 0; i < threads; ++i) {
+            NetworkDestination netDest = new NetworkDestination(
+                    hostname, EchoTestServer.PORT);
 
-        System.out.println("Test complete");
-        etc.disconnect();
+            EchoTestClient etc = new EchoTestClient(netDest);
+            new Thread(etc).start();
+        }
     }
 }

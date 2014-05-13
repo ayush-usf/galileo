@@ -27,19 +27,23 @@ package galileo.test.net;
 
 import java.io.IOException;
 
-import galileo.event.EventContainer;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
 import galileo.net.ServerMessageRouter;
-import galileo.serialization.Serializer;
 
 public class EchoTestServer implements MessageListener {
 
     protected static final int PORT = 5050;
 
-    private long counter;
+    private int connections;
+
     private ServerMessageRouter messageRouter;
+    private BlockingQueue<GalileoMessage> eventQueue
+        = new LinkedBlockingQueue<>();
 
     public void listen()
     throws IOException {
@@ -50,17 +54,37 @@ public class EchoTestServer implements MessageListener {
     }
 
     @Override
-    public void onConnect(NetworkDestination endpoint) { }
+    public void onConnect(NetworkDestination endpoint) {
+        System.out.println("Connections: " + ++connections);
+    }
 
     @Override
     public void onDisconnect(NetworkDestination endpoint) { }
 
     @Override
     public void onMessage(GalileoMessage message) {
+        try {
+            eventQueue.put(message);
+        } catch (InterruptedException e) {
+            Thread.interrupted();
+            e.printStackTrace();
+        }
+    }
+
+    public void processMessages() throws Exception {
+        while (true) {
+            GalileoMessage message = eventQueue.take();
+
+            messageRouter.sendMessage(
+                    message.getSelectionKey(),
+                    new GalileoMessage(new byte[1]));
+        }
     }
 
     public static void main(String[] args) throws Exception {
         EchoTestServer ets = new EchoTestServer();
         ets.listen();
+
+        ets.processMessages();
     }
 }
