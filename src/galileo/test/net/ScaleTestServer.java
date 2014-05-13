@@ -35,9 +35,11 @@ import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
 import galileo.net.ServerMessageRouter;
 
-public class EchoTestServer implements MessageListener {
+public class ScaleTestServer implements MessageListener {
 
     protected static final int PORT = 5050;
+
+    protected static final int REPLY_SIZE = 4096;
 
     private int connections;
 
@@ -55,11 +57,13 @@ public class EchoTestServer implements MessageListener {
 
     @Override
     public void onConnect(NetworkDestination endpoint) {
-        System.out.println("Connections: " + ++connections);
+        System.out.println("Connections: " + (++connections));
     }
 
     @Override
-    public void onDisconnect(NetworkDestination endpoint) { }
+    public void onDisconnect(NetworkDestination endpoint) {
+        System.out.println("Connections: " + (--connections));
+    }
 
     @Override
     public void onMessage(GalileoMessage message) {
@@ -77,14 +81,14 @@ public class EchoTestServer implements MessageListener {
 
             messageRouter.sendMessage(
                     message.getSelectionKey(),
-                    new GalileoMessage(new byte[1]));
+                    new GalileoMessage(new byte[4096]));
         }
     }
 
     public static void main(String[] args) throws Exception {
-        EchoTestServer ets = new EchoTestServer();
-        ets.listen();
+        ScaleTestServer sts = new ScaleTestServer();
+        sts.listen();
 
-        ets.processMessages();
+        sts.processMessages();
     }
 }

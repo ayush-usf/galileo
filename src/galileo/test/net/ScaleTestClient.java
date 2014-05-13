@@ -26,24 +26,22 @@ software, even if advised of the possibility of such damage.
 package galileo.test.net;
 
 import java.io.IOException;
-import java.util.Random;
 
-import galileo.client.EventPublisher;
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
 import galileo.util.PerformanceTimer;
 
-public class EchoTestClient implements MessageListener, Runnable {
+public class ScaleTestClient implements MessageListener, Runnable {
 
-    private int counter;
+    private static boolean verbose = false;
+
     private ClientMessageRouter messageRouter;
     private NetworkDestination netDest;
     private PerformanceTimer pt = new PerformanceTimer("response");
-    private Random random = new Random();
 
-    public EchoTestClient(NetworkDestination netDest) throws Exception {
+    public ScaleTestClient(NetworkDestination netDest) throws Exception {
         this.netDest = netDest;
         messageRouter = new ClientMessageRouter();
 
@@ -51,59 +49,64 @@ public class EchoTestClient implements MessageListener, Runnable {
         messageRouter.connectTo(netDest.getHostname(), netDest.getPort());
     }
 
-    public void disconnect() {
-        messageRouter.shutdown();
-    }
-
-    public void send()
-    throws IOException {
-        byte[] payload = new byte[4096];
-        random.nextBytes(payload);
-
-        pt.start();
-        messageRouter.sendMessage(netDest, new GalileoMessage(payload));
-    }
-
     @Override
     public void onConnect(NetworkDestination endpoint) { }
 
     @Override
-    public void onDisconnect(NetworkDestination endpoint) { }
-
-    @Override
-    public void onMessage(GalileoMessage message) {
-        pt.stopAndPrint();
-        try {
-            Thread.sleep(1000);
-            send();
-        } catch (Exception e) { }
+    public void onDisconnect(NetworkDestination endpoint) {
+        System.out.println("bye :(");
+        System.exit(1);
     }
 
     @Override
     public void run() {
         try {
-            send();
-        } catch (IOException e) {
+            while (true) {
+                send();
+                Thread.sleep(1000);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return;
         }
     }
 
+    public void send()
+    throws IOException {
+        byte[] payload = new byte[64];
+        if (verbose) {
+            pt.start();
+        }
+        messageRouter.sendMessage(netDest, new GalileoMessage(payload));
+    }
+
+    @Override
+    public void onMessage(GalileoMessage message) {
+        if (verbose) {
+            pt.stopAndPrint();
+        }
+    }
+
     public static void main(String[] args) throws Exception {
-        if (args.length < 3) {
-            //TODO usage
+        if (args.length < 2) {
+            System.out.println("galileo.test.net.ScaleTestClient "
+                    + "host num-threads");
+            System.out.println("Add a 3rd parameter to turn on verbose mode.");
             return;
         }
 
         String hostname = args[0];
         int threads = Integer.parseInt(args[1]);
+        if (args.length >= 3) {
+            ScaleTestClient.verbose = true;
+        }
 
         for (int i = 0; i < threads; ++i) {
             NetworkDestination netDest = new NetworkDestination(
-                    hostname, EchoTestServer.PORT);
+                    hostname, ScaleTestServer.PORT);
 
-            EchoTestClient etc = new EchoTestClient(netDest);
-            new Thread(etc).start();
+            ScaleTestClient stc = new ScaleTestClient(netDest);
+            new Thread(stc).start();
         }
     }
 }
