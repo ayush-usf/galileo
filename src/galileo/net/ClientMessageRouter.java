@@ -142,7 +142,6 @@ public class ClientMessageRouter extends MessageRouter {
         while (online) {
             try {
                 processPendingRegistrations();
-                processPendingWriters();
                 processSelectionKeys();
             } catch (IOException e) {
                 e.printStackTrace();
