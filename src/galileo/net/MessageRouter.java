@@ -74,6 +74,9 @@ public abstract class MessageRouter implements Runnable {
     public static final String WRITE_QUEUE_PROPERTY
         = "galileo.net.MessageRouter.writeQueueSize";
 
+    private static final int OP_RW
+        = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
+
     protected boolean online;
 
     private List<MessageListener> listeners = new ArrayList<>();
@@ -117,25 +120,9 @@ public abstract class MessageRouter implements Runnable {
     public void run() {
         while (online) {
             try {
-                processPendingWriters();
                 processSelectionKeys();
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Error in selector thread", e);
-            }
-        }
-    }
-
-    protected void processPendingWriters() {
-        synchronized (pendingWriters) {
-            Iterator<SelectionKey> it = pendingWriters.iterator();
-            while (it.hasNext()) {
-                SelectionKey key = it.next();
-                TransmissionTracker tracker = TransmissionTracker.fromKey(key);
-                if (tracker.getPendingWriteQueue().isEmpty() == true) {
-                    continue;
-                }
-
-                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
             }
         }
     }
@@ -170,12 +157,12 @@ public abstract class MessageRouter implements Runnable {
                     continue;
                 }
 
-                if (key.isWritable()) {
-                    write(key);
-                }
-
                 if (key.isReadable()) {
                     read(key);
+                }
+
+                if (key.isWritable()) {
+                    write(key);
                 }
 
             } catch (CancelledKeyException e) {
@@ -296,6 +283,8 @@ public abstract class MessageRouter implements Runnable {
             if (readBuffer.hasRemaining()) {
                 /* There is another payload to read */
                 processIncomingMessage(key);
+                /* Note: this process continues until we reach the end of the
+                 * buffer.  Not doing so would cause us to lose data. */
             }
         }
     }
@@ -368,14 +357,13 @@ public abstract class MessageRouter implements Runnable {
             pendingWriteQueue.put(payload);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IOException("Sender thread interrupted");
+            throw new IOException("Interrupted while waiting to queue data");
         }
 
-        pendingWriters.add(key);
+        key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 
         selector.wakeup();
         return;
-
     }
 
 
@@ -392,6 +380,7 @@ public abstract class MessageRouter implements Runnable {
         BlockingQueue<ByteBuffer> pendingWrites
             = tracker.getPendingWriteQueue();
 
+        key.interestOps(SelectionKey.OP_READ);
 
         while (pendingWrites.isEmpty() == false) {
             ByteBuffer buffer = pendingWrites.peek();
@@ -415,6 +404,7 @@ public abstract class MessageRouter implements Runnable {
                 }
 
                 if (written == 0) {
+                    key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                     /* Return now, to keep our OP_WRITE interest op set. */
                     return;
                 }
@@ -422,7 +412,6 @@ public abstract class MessageRouter implements Runnable {
         }
 
         /* At this point, the queue is empty. */
-        key.interestOps(SelectionKey.OP_READ);
         return;
     }
 
