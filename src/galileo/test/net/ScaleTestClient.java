@@ -27,42 +27,44 @@ package galileo.test.net;
 
 import java.io.IOException;
 
+import java.net.Socket;
+
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
+import galileo.serialization.Serializer;
 import galileo.util.PerformanceTimer;
 
-public class ScaleTestClient implements MessageListener, Runnable {
+public class ScaleTestClient implements Runnable {
 
     private static boolean verbose = false;
 
     private ClientMessageRouter messageRouter;
     private NetworkDestination netDest;
     private PerformanceTimer pt = new PerformanceTimer("response");
+    private Socket socket;
 
     public ScaleTestClient(NetworkDestination netDest) throws Exception {
-        this.netDest = netDest;
-        messageRouter = new ClientMessageRouter();
-
-        messageRouter.addListener(this);
-        messageRouter.connectTo(netDest.getHostname(), netDest.getPort());
-    }
-
-    @Override
-    public void onConnect(NetworkDestination endpoint) { }
-
-    @Override
-    public void onDisconnect(NetworkDestination endpoint) {
-        System.out.println("bye :(");
-        System.exit(1);
+        socket = new Socket(netDest.getHostname(), netDest.getPort());
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                send();
+                byte[] payload = new byte[64];
+                GalileoMessage msg = new GalileoMessage(payload);
+                byte[] data = Serializer.serialize(msg);
+                if (verbose) {
+                    pt.start();
+                }
+                socket.getOutputStream().write(data);
+                byte[] reply = new byte[4096];
+                socket.getInputStream().read(reply);
+                if (verbose) {
+                    pt.stopAndPrint();
+                }
                 Thread.sleep(1000);
             }
         } catch (Exception e) {
@@ -71,21 +73,6 @@ public class ScaleTestClient implements MessageListener, Runnable {
         }
     }
 
-    public void send()
-    throws IOException {
-        byte[] payload = new byte[64];
-        if (verbose) {
-            pt.start();
-        }
-        messageRouter.sendMessage(netDest, new GalileoMessage(payload));
-    }
-
-    @Override
-    public void onMessage(GalileoMessage message) {
-        if (verbose) {
-            pt.stopAndPrint();
-        }
-    }
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
