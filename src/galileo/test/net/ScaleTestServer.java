@@ -81,7 +81,7 @@ public class ScaleTestServer implements MessageListener {
 
             messageRouter.sendMessage(
                     message.getSelectionKey(),
-                    new GalileoMessage(new byte[4096]));
+                    new GalileoMessage(new byte[REPLY_SIZE]));
         }
     }
 
