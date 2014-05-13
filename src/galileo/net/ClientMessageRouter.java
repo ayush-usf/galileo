@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+import galileo.serialization.Serializer;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -34,10 +36,13 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,10 +62,10 @@ public class ClientMessageRouter extends MessageRouter {
     protected Map<NetworkDestination, SocketChannel> connectedHosts
         = new HashMap<>();
 
-    protected BlockingQueue<SocketChannel> pendingRegistrations
-        = new LinkedBlockingQueue<>();
-    protected Map<SocketChannel, BlockingQueue<SelectionKey>> waitingKeys
-        = new ConcurrentHashMap<>();
+    protected Map<SocketChannel, TransmissionTracker> tt = new HashMap<>();
+
+    protected Queue<SocketChannel> pendingRegistrations
+        = new ConcurrentLinkedQueue<>();
 
     public ClientMessageRouter()
     throws IOException {
@@ -110,10 +115,10 @@ public class ClientMessageRouter extends MessageRouter {
                 destination.getHostname(), destination.getPort());
         channel.connect(address);
 
+        tt.put(channel, new TransmissionTracker(writeQueueSize));
         pendingRegistrations.offer(channel);
-        waitingKeys.put(channel, new LinkedBlockingQueue<SelectionKey>());
+
         connectedHosts.put(destination, channel);
-        connections.put(channel, destination);
         return destination;
     }
 
@@ -122,17 +127,11 @@ public class ClientMessageRouter extends MessageRouter {
      */
     private void processPendingRegistrations()
     throws ClosedChannelException {
-        if (pendingRegistrations.size() == 0) {
-            return;
-        }
-
-        List<SocketChannel> registrations = new ArrayList<>();
-        pendingRegistrations.drainTo(registrations);
-
-        for (SocketChannel channel : registrations) {
-            TransmissionTracker tracker
-                = new TransmissionTracker(writeQueueSize);
-
+        Iterator<SocketChannel> it = pendingRegistrations.iterator();
+        while (it.hasNext() == true) {
+            SocketChannel channel = it.next();
+            it.remove();
+            TransmissionTracker tracker = tt.get(channel);
             channel.register(selector, SelectionKey.OP_CONNECT, tracker);
         }
     }
@@ -149,11 +148,11 @@ public class ClientMessageRouter extends MessageRouter {
         }
     }
 
-    @Override
-    protected void connect(SelectionKey key) {
-        super.connect(key);
-        waitingKeys.get((SocketChannel) key.channel()).offer(key);
-    }
+//    @Override
+//    protected void connect(SelectionKey key) {
+//        super.connect(key);
+//        waitingKeys.get((SocketChannel) key.channel()).offer(key);
+//    }
 
     /**
      * Forcibly shuts down the message processor and disconnects from any
@@ -273,25 +272,33 @@ public class ClientMessageRouter extends MessageRouter {
 
         SelectionKey key = channel.keyFor(this.selector);
         if (key == null) {
-            if (!pendingRegistrations.contains(channel)) {
-                throw new IOException("Not connected to destination: "
-                        + destination);
-            } else {
-                this.selector.wakeup();
-
-                try {
-                    key = waitingKeys.get(channel).take();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new IOException("Sender thread interrupted.");
-                }
-
-                if (!key.isValid()) {
-                    throw new IOException("Connection refused.");
-                }
-            }
+            ByteBuffer payload
+                = ByteBuffer.wrap(Serializer.serialize(message));
+            try {
+            tt.get(channel).getPendingWriteQueue().put(payload);
+            } catch (InterruptedException e) { }
+            selector.wakeup();
+            return;
         }
-
+//            if (!pendingRegistrations.contains(channel)) {
+//                throw new IOException("Not connected to destination: "
+//                        + destination);
+//            } else {
+//                this.selector.wakeup();
+//
+//                try {
+//                    key = waitingKeys.get(channel).take();
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                    throw new IOException("Sender thread interrupted.");
+//                }
+//
+//                if (!key.isValid()) {
+//                    throw new IOException("Connection refused.");
+//                }
+//            }
+//        }
+//
         super.sendMessage(key, message);
     }
 

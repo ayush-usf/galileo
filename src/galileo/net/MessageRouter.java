@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,21 +75,17 @@ public abstract class MessageRouter implements Runnable {
     public static final String WRITE_QUEUE_PROPERTY
         = "galileo.net.MessageRouter.writeQueueSize";
 
-    private static final int OP_RW
-        = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
-
     protected boolean online;
 
     private List<MessageListener> listeners = new ArrayList<>();
 
     protected Selector selector;
 
-    private Set<SelectionKey> pendingWriters
-        = Collections.synchronizedSet(new HashSet<SelectionKey>());
-
     protected int readBufferSize;
     protected int writeQueueSize;
     private ByteBuffer readBuffer;
+
+    private ConcurrentHashMap<SelectionKey, Integer> chm = new ConcurrentHashMap<>();
 
     public MessageRouter() {
         this(DEFAULT_READ_BUFFER_SIZE, DEFAULT_WRITE_QUEUE_SIZE);
@@ -133,8 +130,17 @@ public abstract class MessageRouter implements Runnable {
      */
     protected void processSelectionKeys()
     throws IOException {
+        Iterator<SelectionKey> it = chm.keySet().iterator();
+        while (it.hasNext()) {
+            SelectionKey s = it.next();
+            s.interestOps(chm.get(s));
+            chm.remove(s);
+        }
 
-        selector.select();
+        int i = selector.select();
+//    if (i ==0 ) {
+//    System.out.println("Selecting: " + i);
+//    }
 
         Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
         while (keys.hasNext()) {
@@ -157,12 +163,12 @@ public abstract class MessageRouter implements Runnable {
                     continue;
                 }
 
-                if (key.isReadable()) {
-                    read(key);
-                }
-
                 if (key.isWritable()) {
                     write(key);
+                }
+
+                if (key.isReadable()) {
+                    read(key);
                 }
 
             } catch (CancelledKeyException e) {
@@ -199,7 +205,12 @@ public abstract class MessageRouter implements Runnable {
             SocketChannel channel = (SocketChannel) key.channel();
 
             if (channel.finishConnect()) {
-                key.interestOps(SelectionKey.OP_READ);
+                TransmissionTracker t = TransmissionTracker.fromKey(key);
+                if (t.getPendingWriteQueue().isEmpty() == false) {
+                    chm.put(key, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                } else {
+                    chm.put(key, SelectionKey.OP_READ);
+                }
             }
 
             dispatchConnect(getDestination(channel));
@@ -228,6 +239,7 @@ public abstract class MessageRouter implements Runnable {
             }
         } catch (IOException e) {
             /* Abnormal termination */
+            e.printStackTrace();
             disconnect(key);
             return;
         } catch (BufferUnderflowException e) {
@@ -237,6 +249,7 @@ public abstract class MessageRouter implements Runnable {
 
         if (bytesRead == -1) {
             /* Connection was terminated by the client. */
+            System.out.println("Disconnected by client");
             disconnect(key);
             return;
         }
@@ -360,7 +373,8 @@ public abstract class MessageRouter implements Runnable {
             throw new IOException("Interrupted while waiting to queue data");
         }
 
-        key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+        chm.put(key, SelectionKey.OP_WRITE);
+        //key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 
         selector.wakeup();
         return;
@@ -379,8 +393,6 @@ public abstract class MessageRouter implements Runnable {
         SocketChannel channel = (SocketChannel) key.channel();
         BlockingQueue<ByteBuffer> pendingWrites
             = tracker.getPendingWriteQueue();
-
-        key.interestOps(SelectionKey.OP_READ);
 
         while (pendingWrites.isEmpty() == false) {
             ByteBuffer buffer = pendingWrites.peek();
@@ -404,7 +416,6 @@ public abstract class MessageRouter implements Runnable {
                 }
 
                 if (written == 0) {
-                    key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                     /* Return now, to keep our OP_WRITE interest op set. */
                     return;
                 }
@@ -412,6 +423,7 @@ public abstract class MessageRouter implements Runnable {
         }
 
         /* At this point, the queue is empty. */
+        key.interestOps(SelectionKey.OP_READ);
         return;
     }
 
