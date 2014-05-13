@@ -27,8 +27,8 @@ package galileo.net;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Tracks transmission processing operations; helps convert TCP streams into
@@ -58,7 +58,7 @@ public class TransmissionTracker {
     public int expectedBytes;
 
     public TransmissionTracker(int writeQueueSize) {
-        pendingWrites = new LinkedBlockingQueue<>(writeQueueSize);
+        pendingWrites = new ArrayBlockingQueue<>(writeQueueSize);
     }
 
     /**
