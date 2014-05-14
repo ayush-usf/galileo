@@ -25,8 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
-import galileo.serialization.Serializer;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -176,7 +174,7 @@ public class ClientMessageRouter extends MessageRouter {
         TransmissionTracker tracker = ensureConnected(destination);
 
         /* Queue the data to be written */
-        ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
+        ByteBuffer payload = wrapWithPrefix(message);
         try {
             tracker.getPendingWriteQueue().put(payload);
         } catch (InterruptedException e) {
