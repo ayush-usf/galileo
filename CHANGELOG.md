@@ -1,3 +1,9 @@
+**0.9 : 2014/05/14 ---- Network subsystem improvements**
+- Includes several new network tests
+- c10k benchmarks: ~50,000 simultaneous client connections on our test hardware
+- ClientMessageRouter thread safety
+- event and net package improvements
+
 **0.8 : 2014/05/08 ---- Event handling subsystem updates**
 - Implementation of the reactor pattern for event handling
 - Automatic annotation-based event mapping
