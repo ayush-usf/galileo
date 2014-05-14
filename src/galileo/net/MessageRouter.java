@@ -53,6 +53,9 @@ public abstract class MessageRouter implements Runnable {
 
     protected static final Logger logger = Logger.getLogger("galileo");
 
+    /** The size (in bytes) of the message prefix used in the system. */
+    public static final int PREFIX_SZ = Integer.SIZE / Byte.SIZE;
+
     /** The default read buffer size is 8 MB. */
     public static final int DEFAULT_READ_BUFFER_SIZE = 8388608;
 
@@ -148,6 +151,7 @@ public abstract class MessageRouter implements Runnable {
      */
     protected void processSelectionKeys()
     throws IOException {
+
         selector.select();
 
         Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
