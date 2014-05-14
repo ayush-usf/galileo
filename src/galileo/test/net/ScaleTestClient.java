@@ -44,9 +44,7 @@ public class ScaleTestClient implements MessageListener, Runnable {
     public ScaleTestClient(NetworkDestination netDest) throws Exception {
         this.netDest = netDest;
         messageRouter = new ClientMessageRouter();
-
         messageRouter.addListener(this);
-        messageRouter.connectTo(netDest.getHostname(), netDest.getPort());
     }
 
     @Override

@@ -72,11 +72,6 @@ public class RandomBlocks implements MessageListener {
         messageRouter.addListener(this);
     }
 
-    public NetworkDestination connect(String hostname, int port)
-    throws UnknownHostException, IOException {
-        return messageRouter.connectTo(hostname, port);
-    }
-
     public void disconnect() {
         messageRouter.shutdown();
     }
@@ -209,7 +204,8 @@ public class RandomBlocks implements MessageListener {
         int num = Integer.parseInt(args[2]);
 
         RandomBlocks client = new RandomBlocks();
-        NetworkDestination server = client.connect(serverHostName, serverPort);
+        NetworkDestination server
+            = new NetworkDestination(serverHostName, serverPort);
 
         System.out.println("Sending " + num + " blocks...");
         PerformanceTimer pt = new PerformanceTimer("Send operation time");

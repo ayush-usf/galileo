@@ -52,8 +52,6 @@ public class BufferTestClient {
         this.netDest = netDest;
         messageRouter = new ClientMessageRouter();
         publisher = new EventPublisher(messageRouter);
-
-        messageRouter.connectTo(netDest.getHostname(), netDest.getPort());
     }
 
     public void disconnect() {

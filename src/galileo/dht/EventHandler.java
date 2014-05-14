@@ -86,7 +86,6 @@ public abstract class EventHandler implements ProcessingUnit {
     protected void publishEvent(GalileoEvent event, NodeInfo destination)
     throws IOException {
         GalileoMessage message = EventPublisher.wrapEvent(event);
-        connectionPool.connectTo(destination);
         connectionPool.sendMessage(destination, message);
     }
 

@@ -27,7 +27,6 @@ package galileo.samples;
 
 import java.io.IOException;
 
-import java.net.UnknownHostException;
 import java.util.Map;
 
 import galileo.client.EventPublisher;
@@ -49,11 +48,6 @@ public class StoreNetCDF implements MessageListener {
         publisher = new EventPublisher(messageRouter);
 
         messageRouter.addListener(this);
-    }
-
-    public NetworkDestination connect(String hostname, int port)
-    throws UnknownHostException, IOException {
-        return messageRouter.connectTo(hostname, port);
     }
 
     public void disconnect() {
@@ -85,7 +79,8 @@ public class StoreNetCDF implements MessageListener {
         String fileName = args[2];
 
         StoreNetCDF client = new StoreNetCDF();
-        NetworkDestination server = client.connect(serverHostName, serverPort);
+        NetworkDestination server
+            = new NetworkDestination(serverHostName, serverPort);
 
         Map<String, Metadata> metas = ConvertNetCDF.readFile(fileName);
         for (Map.Entry<String, Metadata> entry : metas.entrySet()) {

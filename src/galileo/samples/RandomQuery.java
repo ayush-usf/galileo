@@ -96,7 +96,6 @@ public class RandomQuery {
         ClientMessageRouter messageRouter = new ClientMessageRouter();
         NetworkDestination server = new NetworkDestination(
                 serverHostName, serverPort);
-        messageRouter.connectTo(server);
 
         class Listener implements MessageListener {
 
