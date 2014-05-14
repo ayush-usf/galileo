@@ -85,7 +85,8 @@ public abstract class MessageRouter implements Runnable {
     protected int writeQueueSize;
     private ByteBuffer readBuffer;
 
-    private ConcurrentHashMap<SelectionKey, Integer> chm = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<SelectionKey, Integer> changeInterest
+        = new ConcurrentHashMap<>();
 
     public MessageRouter() {
         this(DEFAULT_READ_BUFFER_SIZE, DEFAULT_WRITE_QUEUE_SIZE);
@@ -117,10 +118,32 @@ public abstract class MessageRouter implements Runnable {
     public void run() {
         while (online) {
             try {
+                updateInterestOps();
                 processSelectionKeys();
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Error in selector thread", e);
             }
+        }
+    }
+
+    /**
+     * Updates interest sets for any SelectionKey instances that require
+     * changes.  This allows external threads to queue up changes to the
+     * interest sets that will be fulfilled by the selector thread.
+     */
+    protected void updateInterestOps() {
+        Iterator<SelectionKey> it = changeInterest.keySet().iterator();
+        while (it.hasNext()) {
+            SelectionKey key = it.next();
+            if (key.isValid()) {
+                SocketChannel channel = (SocketChannel) key.channel();
+                if (channel.isConnected() == false
+                        || channel.isRegistered() == false) {
+                    continue;
+                }
+                key.interestOps(changeInterest.get(key));
+            }
+            changeInterest.remove(key);
         }
     }
 
@@ -130,17 +153,7 @@ public abstract class MessageRouter implements Runnable {
      */
     protected void processSelectionKeys()
     throws IOException {
-        Iterator<SelectionKey> it = chm.keySet().iterator();
-        while (it.hasNext()) {
-            SelectionKey s = it.next();
-            s.interestOps(chm.get(s));
-            chm.remove(s);
-        }
-
-        int i = selector.select();
-//    if (i ==0 ) {
-//    System.out.println("Selecting: " + i);
-//    }
+        selector.select();
 
         Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
         while (keys.hasNext()) {
@@ -187,8 +200,9 @@ public abstract class MessageRouter implements Runnable {
     throws IOException {
         ServerSocketChannel servSocket = (ServerSocketChannel) key.channel();
         SocketChannel channel = servSocket.accept();
-        TransmissionTracker tracker = new TransmissionTracker(writeQueueSize);
         logger.info("Accepted connection: " + getClientString(channel));
+
+        TransmissionTracker tracker = new TransmissionTracker(writeQueueSize);
         channel.configureBlocking(false);
         channel.register(selector, SelectionKey.OP_READ, tracker);
 
@@ -205,11 +219,13 @@ public abstract class MessageRouter implements Runnable {
             SocketChannel channel = (SocketChannel) key.channel();
 
             if (channel.finishConnect()) {
-                TransmissionTracker t = TransmissionTracker.fromKey(key);
-                if (t.getPendingWriteQueue().isEmpty() == false) {
-                    chm.put(key, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                TransmissionTracker tracker = TransmissionTracker.fromKey(key);
+                if (tracker.getPendingWriteQueue().isEmpty() == true) {
+                    changeInterest.put(key, SelectionKey.OP_READ);
                 } else {
-                    chm.put(key, SelectionKey.OP_READ);
+                    /* Data has already been queued up; start writing */
+                    changeInterest.put(key,
+                            SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                 }
             }
 
@@ -238,8 +254,7 @@ public abstract class MessageRouter implements Runnable {
                 processIncomingMessage(key);
             }
         } catch (IOException e) {
-            /* Abnormal termination */
-            e.printStackTrace();
+            logger.log(Level.FINE, "Abnormal remote termination", e);
             disconnect(key);
             return;
         } catch (BufferUnderflowException e) {
