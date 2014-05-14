@@ -36,17 +36,12 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import galileo.serialization.Serializer;
 
 /**
  * Provides an abstract implementation for consuming and publishing messages on
@@ -361,6 +356,20 @@ public abstract class MessageRouter implements Runnable {
     }
 
     /**
+     * Wraps a given message in a {@link ByteBuffer}, including the payload size
+     * prefix.  Data produced by this method will be subsequently read by the
+     * readPrefix() method.
+     */
+    protected static ByteBuffer wrapWithPrefix(GalileoMessage message) {
+        int messageSize = message.getPayload().length;
+        ByteBuffer buffer = ByteBuffer.allocate(messageSize + 4);
+        buffer.putInt(messageSize);
+        buffer.put(message.getPayload());
+        buffer.flip();
+        return buffer;
+    }
+
+    /**
      * Attempts to write out directly on a SocketChannel, and, if unsuccessful,
      * registers the OP_WRITE interest op to tell the Selector to deal with the
      * write.  When letting the Selector deal with the write, pending data is
@@ -377,7 +386,7 @@ public abstract class MessageRouter implements Runnable {
         }
 
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
-        ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
+        ByteBuffer payload = wrapWithPrefix(message);
         BlockingQueue<ByteBuffer> pendingWriteQueue
             = tracker.getPendingWriteQueue();
 
