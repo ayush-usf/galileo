@@ -50,7 +50,7 @@ public class Bitmap implements Iterable<Integer> {
     /**
      * Sets the specified bit(s) in the index.
      *
-     * @param bits list of bits to set (as in, set to 1).
+     * @param bit bit to set (to 1, 'on', etc.)
      *
      * @return true if the bit could be set, false otherwise.  In some cases,
      * the underlying bitmap implementation may disallow updates, causing this

@@ -58,7 +58,7 @@ public class FeaturePath<V> extends Path<Feature, V> {
 
     /**
      * Evaluates this path against a provided {@link Query} instance.  If any of
-     * the {@link Operations} in the Query are satisfied by this Path instance,
+     * the {@link Operation}s in the Query are satisfied by this Path instance,
      * this method will return true.
      *
      * @param query Query to evaluate against this Path instance
