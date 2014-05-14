@@ -34,16 +34,12 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,12 +53,12 @@ public class ClientMessageRouter extends MessageRouter {
 
     protected static final Logger logger = Logger.getLogger("galileo");
 
-    protected Map<SocketChannel, NetworkDestination> connections
+    protected Map<NetworkDestination, SocketChannel> destinationToSocket
         = new HashMap<>();
-    protected Map<NetworkDestination, SocketChannel> connectedHosts
+    protected Map<SocketChannel, NetworkDestination> socketToDestination
         = new HashMap<>();
-
-    protected Map<SocketChannel, TransmissionTracker> tt = new HashMap<>();
+    protected Map<SocketChannel, TransmissionTracker> socketToTracker
+        = new HashMap<>();
 
     protected Queue<SocketChannel> pendingRegistrations
         = new ConcurrentLinkedQueue<>();
@@ -87,38 +83,15 @@ public class ClientMessageRouter extends MessageRouter {
         selectorThread.start();
     }
 
-    /**
-     * Connects to a server.
-     *
-     * @param hostname name of the host to connect to
-     * @param port port on the destination host to connect to
-     */
+    @Deprecated
     public NetworkDestination connectTo(String hostname, int port)
     throws IOException {
         return connectTo(new NetworkDestination(hostname, port));
     }
 
-    /**
-     * Connects to a server at the specified network destination.
-     *
-     * @param destination NetworkDestination to connect to.
-     */
+    @Deprecated
     public NetworkDestination connectTo(NetworkDestination destination)
     throws IOException {
-        if (connectedHosts.containsKey(destination)) {
-            return destination;
-        }
-
-        SocketChannel channel = SocketChannel.open();
-        channel.configureBlocking(false);
-        InetSocketAddress address = new InetSocketAddress(
-                destination.getHostname(), destination.getPort());
-        channel.connect(address);
-
-        tt.put(channel, new TransmissionTracker(writeQueueSize));
-        pendingRegistrations.offer(channel);
-
-        connectedHosts.put(destination, channel);
         return destination;
     }
 
@@ -131,7 +104,8 @@ public class ClientMessageRouter extends MessageRouter {
         while (it.hasNext() == true) {
             SocketChannel channel = it.next();
             it.remove();
-            TransmissionTracker tracker = tt.get(channel);
+
+            TransmissionTracker tracker = socketToTracker.get(channel);
             channel.register(selector, SelectionKey.OP_CONNECT, tracker);
         }
     }
@@ -141,6 +115,7 @@ public class ClientMessageRouter extends MessageRouter {
         while (online) {
             try {
                 processPendingRegistrations();
+                updateInterestOps();
                 processSelectionKeys();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -148,11 +123,91 @@ public class ClientMessageRouter extends MessageRouter {
         }
     }
 
-//    @Override
-//    protected void connect(SelectionKey key) {
-//        super.connect(key);
-//        waitingKeys.get((SocketChannel) key.channel()).offer(key);
-//    }
+    /**
+     * Broadcasts a message to the connected servers.
+     */
+    public void broadcastMessage(GalileoMessage message)
+    throws IOException {
+        for (NetworkDestination dest : destinationToSocket.keySet()) {
+            this.sendMessage(dest, message);
+        }
+    }
+
+    /**
+     * Ensures that a particular {@link NetworkDestination} has been connected
+     * to, and retrieves its relevant {@link TransmissionTracker} instance.
+     *
+     * @param destination The NetworkDestination to ensure this MessageRouter is
+     * connected to
+     *
+     * @return The TransmissionTracker associated with the NetworkDestination.
+     */
+    private TransmissionTracker ensureConnected(NetworkDestination destination)
+    throws IOException {
+        SocketChannel channel = destinationToSocket.get(destination);
+        if (channel != null) {
+            return socketToTracker.get(channel);
+        }
+
+        channel = SocketChannel.open();
+        channel.configureBlocking(false);
+        InetSocketAddress address = new InetSocketAddress(
+                destination.getHostname(), destination.getPort());
+        channel.connect(address);
+        destinationToSocket.put(destination, channel);
+        socketToDestination.put(channel, destination);
+        pendingRegistrations.add(channel);
+
+        TransmissionTracker tracker = new TransmissionTracker(writeQueueSize);
+        socketToTracker.put(channel, tracker);
+        return tracker;
+    }
+
+    /**
+     * Sends a message to the specified network destination.  Connections are
+     * completed during the first send operation.
+     */
+    public void sendMessage(NetworkDestination destination,
+            GalileoMessage message)
+    throws IOException {
+
+        /* Make sure this destination has been connected.  If not, this kicks
+         * off the connection process. */
+        TransmissionTracker tracker = ensureConnected(destination);
+
+        /* Queue the data to be written */
+        ByteBuffer payload = ByteBuffer.wrap(Serializer.serialize(message));
+        try {
+            tracker.getPendingWriteQueue().put(payload);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /* Request for interestOps change. */
+        SocketChannel channel = destinationToSocket.get(destination);
+        if (channel.isRegistered() && channel.isConnected()) {
+            changeInterest.put(channel.keyFor(this.selector),
+                    SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+        }
+
+        selector.wakeup();
+    }
+
+    /**
+     * Inform subscribed MessageListener instances that the connection to the
+     * remote server has been terminated.
+     *
+     * @param key SelectionKey for the SocketChannel that was disconnected.
+     */
+    @Override
+    protected void disconnect(SelectionKey key) {
+        SocketChannel channel = (SocketChannel) key.channel();
+        NetworkDestination destination = socketToDestination.get(channel);
+        destinationToSocket.remove(destination);
+        socketToDestination.remove(channel);
+        socketToTracker.remove(channel);
+        super.disconnect(key);
+    }
 
     /**
      * Forcibly shuts down the message processor and disconnects from any
@@ -179,7 +234,7 @@ public class ClientMessageRouter extends MessageRouter {
      * messages).
      */
     private void shutdown(boolean forcible) {
-        for (SocketChannel channel : connectedHosts.values()) {
+        for (SocketChannel channel : destinationToSocket.values()) {
             SelectionKey key = channel.keyFor(this.selector);
 
             /* If this is not a forcible shutdown, then we need to check each
@@ -244,76 +299,5 @@ public class ClientMessageRouter extends MessageRouter {
 
             } while (pendingWrites.isEmpty() == false);
         }
-    }
-
-    /**
-     * Broadcasts a message to the connected servers.
-     */
-    public void broadcastMessage(GalileoMessage message)
-    throws IOException {
-        for (NetworkDestination dest : connections.values()) {
-            this.sendMessage(dest, message);
-        }
-    }
-
-    /**
-     * Sends a message to the specified network destination.  Connections are
-     * completed lazily during the first send operation.
-     */
-    public void sendMessage(NetworkDestination destination,
-            GalileoMessage message)
-    throws IOException {
-
-        SocketChannel channel = connectedHosts.get(destination);
-        if (channel == null) {
-            throw new IOException("Not connected to destination: "
-                    + destination);
-        }
-
-        SelectionKey key = channel.keyFor(this.selector);
-        if (key == null) {
-            ByteBuffer payload
-                = ByteBuffer.wrap(Serializer.serialize(message));
-            try {
-            tt.get(channel).getPendingWriteQueue().put(payload);
-            } catch (InterruptedException e) { }
-            selector.wakeup();
-            return;
-        }
-//            if (!pendingRegistrations.contains(channel)) {
-//                throw new IOException("Not connected to destination: "
-//                        + destination);
-//            } else {
-//                this.selector.wakeup();
-//
-//                try {
-//                    key = waitingKeys.get(channel).take();
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                    throw new IOException("Sender thread interrupted.");
-//                }
-//
-//                if (!key.isValid()) {
-//                    throw new IOException("Connection refused.");
-//                }
-//            }
-//        }
-//
-        super.sendMessage(key, message);
-    }
-
-    /**
-     * Inform subscribed MessageListener instances that the connection to the
-     * remote server has been terminated.
-     *
-     * @param key SelectionKey for the SocketChannel that was disconnected.
-     */
-    @Override
-    protected void disconnect(SelectionKey key) {
-        SocketChannel channel = (SocketChannel) key.channel();
-        NetworkDestination destination = connections.get(channel);
-        connectedHosts.remove(destination);
-        connections.remove(channel);
-        super.disconnect(key);
     }
 }
