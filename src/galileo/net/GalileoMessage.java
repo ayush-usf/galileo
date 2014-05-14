@@ -25,13 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
-import java.io.IOException;
-
 import java.nio.channels.SelectionKey;
-
-import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
 
 /**
  * The unit of data transmission in the Galileo DHT.  These packets are simple
@@ -39,7 +33,7 @@ import galileo.serialization.SerializationOutputStream;
  *
  * @author malensek
  */
-public class GalileoMessage implements ByteSerializable {
+public class GalileoMessage {
 
     private byte[] payload;
 
@@ -97,22 +91,5 @@ public class GalileoMessage implements ByteSerializable {
     @Deprecated
     public SelectionKey getSelectionKey() {
         return key;
-    }
-
-    /**
-     * Constructs a new GalileoMessage from a serialization stream.
-     */
-    public GalileoMessage(SerializationInputStream in)
-    throws IOException {
-        int dataSize = in.readInt();
-        payload = new byte[dataSize];
-        in.read(payload);
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(payload.length);
-        out.write(payload);
     }
 }
