@@ -264,7 +264,7 @@ public abstract class MessageRouter implements Runnable {
 
         if (bytesRead == -1) {
             /* Connection was terminated by the client. */
-            System.out.println("Disconnected by client");
+            logger.fine("Reached EOF in channel input stream");
             disconnect(key);
             return;
         }
