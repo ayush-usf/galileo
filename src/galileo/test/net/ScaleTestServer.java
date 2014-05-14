@@ -39,7 +39,8 @@ public class ScaleTestServer implements MessageListener {
 
     protected static final int PORT = 5050;
 
-    protected static final int REPLY_SIZE = 4096;
+    protected static final int QUERY_SIZE = 64;
+    protected static final int REPLY_SIZE = 8192;
 
     private int connections;
 
