@@ -397,9 +397,7 @@ public abstract class MessageRouter implements Runnable {
             throw new IOException("Interrupted while waiting to queue data");
         }
 
-        chm.put(key, SelectionKey.OP_WRITE);
-        //key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-
+        changeInterest.put(key, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         selector.wakeup();
         return;
     }
