@@ -27,9 +27,10 @@ package galileo.test.net;
 
 import java.net.Socket;
 
-import galileo.net.GalileoMessage;
+import java.nio.ByteBuffer;
+
+import galileo.net.MessageRouter;
 import galileo.net.NetworkDestination;
-import galileo.serialization.Serializer;
 import galileo.util.PerformanceTimer;
 
 public class BlockingScaleTestClient implements Runnable {
@@ -48,8 +49,14 @@ public class BlockingScaleTestClient implements Runnable {
         try {
             while (true) {
                 byte[] payload = new byte[ScaleTestServer.QUERY_SIZE];
-                GalileoMessage msg = new GalileoMessage(payload);
-                byte[] data = Serializer.serialize(msg);
+
+                ByteBuffer buffer = ByteBuffer.allocate(
+                        payload.length + MessageRouter.PREFIX_SZ);
+                buffer.putInt(ScaleTestServer.QUERY_SIZE);
+                buffer.put(payload);
+                buffer.flip();
+                byte[] data = buffer.array();
+
                 if (verbose) {
                     pt.start();
                 }
