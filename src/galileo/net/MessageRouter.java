@@ -330,16 +330,18 @@ public abstract class MessageRouter implements Runnable {
             return true;
         }
 
-        /* Can we determine the payload size in one shot? (1 int = 4 bytes) */
-        if (transmission.prefixPointer == 0 && buffer.remaining() >= 4) {
+        /* Can we determine the payload size in one shot? (we must read at least
+         * PREFIX_SZ bytes) */
+        if (transmission.prefixPointer == 0
+                && buffer.remaining() >= PREFIX_SZ) {
             transmission.expectedBytes = buffer.getInt();
             transmission.allocatePayload();
             return true;
         } else {
-            /* Keep reading until we have at least 4 bytes to determine the
-             * payload size.  */
+            /* Keep reading until we have at least PREFIX_SZ bytes to determine
+             * the payload size.  */
 
-            int prefixLeft = 4 - transmission.prefixPointer;
+            int prefixLeft = PREFIX_SZ - transmission.prefixPointer;
             if (buffer.remaining() < prefixLeft) {
                 prefixLeft = buffer.remaining();
             }
@@ -348,7 +350,7 @@ public abstract class MessageRouter implements Runnable {
                     transmission.prefixPointer, prefixLeft);
             transmission.prefixPointer += prefixLeft;
 
-            if (transmission.prefixPointer >= 4) {
+            if (transmission.prefixPointer >= PREFIX_SZ) {
                 ByteBuffer buf = ByteBuffer.wrap(transmission.prefix);
                 transmission.expectedBytes = buf.getInt();
                 transmission.allocatePayload();
