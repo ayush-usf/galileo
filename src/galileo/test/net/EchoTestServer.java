@@ -71,8 +71,8 @@ public class EchoTestServer implements MessageListener {
         while (true) {
             GalileoMessage message = eventQueue.take();
 
-            messageRouter.sendMessage(
-                    message.getSelectionKey(),
+            /* Send the same thing right back */
+            message.getContext().sendMessage(
                     new GalileoMessage(message.getPayload()));
         }
     }
