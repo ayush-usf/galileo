@@ -27,6 +27,7 @@ package galileo.net;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 
 /**
  * Contains connection-specific information about the source of a
@@ -42,6 +43,14 @@ public class MessageContext {
     public MessageContext(MessageRouter router, SelectionKey key) {
         this.router = router;
         this.key = key;
+    }
+
+    /**
+     * Retrieves the originating endpoint that sent the message associated with
+     * this context.
+     */
+    public NetworkDestination getNetworkDestination() {
+        return MessageRouter.getDestination((SocketChannel) key.channel());
     }
 
     public MessageRouter getMessageRouter() {
