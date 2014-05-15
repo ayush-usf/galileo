@@ -273,7 +273,8 @@ public class StorageNode implements MessageListener {
             queryNodes.addAll(network.getAllNodes());
 
             /* Set up QueryTracker for this request */
-            QueryTracker tracker = new QueryTracker(message.getSelectionKey());
+            QueryTracker tracker = new QueryTracker(
+                    message.getContext().getSelectionKey());
             String clientId = tracker.getIdString(sessionId);
             queryTrackers.put(clientId, tracker);
 
@@ -327,7 +328,7 @@ public class StorageNode implements MessageListener {
                         response.getId());
                 return;
             }
-            sendMessage(message, tracker.getSelectionKey());
+            sendMessage(tracker.getSelectionKey(), message);
         }
     }
 
