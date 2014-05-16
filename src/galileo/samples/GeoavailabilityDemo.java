@@ -36,8 +36,6 @@ import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
 import galileo.dataset.feature.Feature;
 import galileo.fs.GeospatialFileSystem;
-import galileo.graph.FeaturePath;
-import galileo.graph.MetadataGraph;
 import galileo.graph.Path;
 import galileo.query.Expression;
 import galileo.query.Operation;
@@ -165,7 +163,7 @@ public class GeoavailabilityDemo {
         PayloadFilter<String> pf = new PayloadFilter<>(false, files);
 
         List<Path<Feature, String>> result
-            = gfs.getMetadataGraph().evaluateQueryAsPaths(q, pf);
+            = gfs.getMetadataGraph().evaluateQuery(q, pf);
         /* Alternatively, get a Metadata graph back: */
         //MetadataGraph mdg = gfs.getMetadataGraph().evaluateQuery(q, pf);
         /* See the graph: */
