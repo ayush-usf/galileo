@@ -369,8 +369,6 @@ public class HierarchicalGraph<T> {
      * @param path Path to remove null Features from.
      */
     private void removeNullFeatures(Path<Feature, T> path) {
-//        List<Vertex<Feature, T>> removals = new ArrayList<>();
-
         Iterator<Vertex<Feature, T>> it = path.iterator();
         while (it.hasNext()) {
             Feature f = it.next().getLabel();
@@ -378,16 +376,6 @@ public class HierarchicalGraph<T> {
                 it.remove();
             }
         }
-//        for (Vertex<Feature, T> v : path) {
-//            Feature f = v.getLabel();
-//            if (f == null || f.getType() == FeatureType.NULL) {
-//                removals.add(v);
-//            }
-//        }
-//
-//        for (Vertex<Feature, T> v : removals) {
-//            path.remove(v);
-//        }
     }
 
     private boolean applyPayloadFilter(Path<Feature, T> path,
