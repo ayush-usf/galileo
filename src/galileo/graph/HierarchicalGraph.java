@@ -25,7 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.graph;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -184,7 +183,14 @@ public class HierarchicalGraph<T> {
             switch (expression.getOperator()) {
                 case EQUAL:
                     /* Select a particular neighboring vertex */
-                    evalSet.add(vertex.getNeighbor(value));
+                    Vertex<Feature, T> equalTo = vertex.getNeighbor(value);
+
+                    if (equalTo == null) {
+                        /* There was no Vertex that matched the value given. */
+                        break;
+                    }
+
+                    evalSet.add(equalTo);
                     break;
 
                 case NOTEQUAL:
