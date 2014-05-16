@@ -75,15 +75,13 @@ public class MetadataGraph implements ByteSerializable {
         }
     }
 
-    public MetadataGraph evaluateQuery(Query query) {
-        List<Path<Feature, String>> paths = graph.evaluateQuery(query);
-        return MetadataGraph.fromPaths(paths);
+    public List<Path<Feature, String>> evaluateQuery(Query query) {
+        return graph.evaluateQuery(query);
     }
 
-    public MetadataGraph evaluateQuery(Query query,
+    public List<Path<Feature, String>> evaluateQuery(Query query,
             PayloadFilter<String> filter) {
-        List<Path<Feature, String>> paths = graph.evaluateQuery(query, filter);
-        return MetadataGraph.fromPaths(paths);
+        return graph.evaluateQuery(query, filter);
     }
 
     public static MetadataGraph fromPaths(List<Path<Feature, String>> paths) {
