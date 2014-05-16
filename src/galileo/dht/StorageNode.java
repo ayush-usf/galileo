@@ -77,7 +77,7 @@ public class StorageNode implements MessageListener {
 
     private File pidFile;
 
-    private int threads = 4;
+    private int threads = 1;
 
     private NetworkInfo network;
 
@@ -200,7 +200,6 @@ public class StorageNode implements MessageListener {
             handler.connectionPool = connectionPool;
 
             scheduler.schedule(handler);
-            System.out.println("poop!");
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to process incoming message", e);
