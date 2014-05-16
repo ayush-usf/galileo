@@ -77,7 +77,7 @@ public class StorageNode implements MessageListener {
 
     private File pidFile;
 
-    private int threads = 1;
+    private int threads = 4;
 
     private NetworkInfo network;
 
@@ -200,6 +200,7 @@ public class StorageNode implements MessageListener {
             handler.connectionPool = connectionPool;
 
             scheduler.schedule(handler);
+            System.out.println("poop!");
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to process incoming message", e);
@@ -308,8 +309,10 @@ public class StorageNode implements MessageListener {
         @Override
         public void handleEvent() throws Exception {
             QueryEvent query = deserializeEvent(QueryEvent.class);
+            logger.info(query.getQuery().toString());
 
-            MetadataGraph results = fs.query(query.getQuery());
+            MetadataGraph results = MetadataGraph.fromPaths(
+                    fs.query(query.getQuery()));
             logger.info("Got " + results.numVertices() + "results");
             QueryResponse response
                 = new QueryResponse(query.getQueryId(), results);

@@ -33,7 +33,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,9 +41,10 @@ import galileo.dataset.Block;
 import galileo.dataset.Coordinates;
 import galileo.dataset.Metadata;
 import galileo.dataset.SpatialProperties;
+import galileo.dataset.feature.Feature;
 import galileo.graph.FeaturePath;
-import galileo.graph.FeatureTypeMismatchException;
 import galileo.graph.MetadataGraph;
+import galileo.graph.Path;
 import galileo.query.Query;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
@@ -240,7 +240,7 @@ public class GeospatialFileSystem extends FileSystem {
         return metadataGraph;
     }
 
-    public MetadataGraph query(Query query) {
+    public List<Path<Feature, String>> query(Query query) {
         return metadataGraph.evaluateQuery(query);
     }
 
