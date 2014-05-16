@@ -97,16 +97,6 @@ public class MetadataGraph implements ByteSerializable {
         return m;
     }
 
-    public List<Path<Feature, String>> evaluateQueryAsPaths(Query query) {
-        return graph.evaluateQuery(query);
-    }
-
-    public List<Path<Feature, String>> evaluateQueryAsPaths(
-            Query query, PayloadFilter<String> filter) {
-
-        return graph.evaluateQuery(query, filter);
-    }
-
     public List<Path<Feature, String>> getAllPaths() {
         return graph.getAllPaths();
     }
