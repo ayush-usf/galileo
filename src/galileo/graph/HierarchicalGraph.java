@@ -226,7 +226,11 @@ public class HierarchicalGraph<T> {
 
                 case UNKNOWN:
                 default:
-                    //TODO throw new Exception();
+                    logger.log(java.util.logging.Level.WARNING,
+                            "Invalid operator ({0}) in expression: {1}",
+                            new Object[] {
+                                expression.getOperator(),
+                                expression.toString()} );
             }
 
             if (firstResult) {
