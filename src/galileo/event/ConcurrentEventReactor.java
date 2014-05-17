@@ -25,6 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.event;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Extends the single-threaded reactor implementation defined by
  * {@link EventReactor} to enable multiple worker threads for processing events
@@ -39,7 +42,24 @@ package galileo.event;
  */
 public class ConcurrentEventReactor extends EventReactor {
 
+    private static final Logger logger = Logger.getLogger("galileo");
+
+    private boolean running;
     private int poolSize;
+    private Thread[] threads;
+
+    private class EventThread implements Runnable {
+        @Override
+        public void run() {
+            while (Thread.interrupted() == false) {
+                try {
+                    processNextEvent();
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Error processing event", e);
+                }
+            }
+        }
+    }
 
     /**
      * @param handlerObject an Object instance that contains the implementations
@@ -54,5 +74,31 @@ public class ConcurrentEventReactor extends EventReactor {
             Object handlerObject, EventMap eventMap, int poolSize) {
         super(handlerObject, eventMap);
         this.poolSize = poolSize;
+    }
+
+    /**
+     * Initializes the event reactor by creating worker threads and having them
+     * block on the event queue.
+     */
+    public void start() {
+        if (running) {
+            return;
+        }
+
+        running = true;
+        threads = new Thread[poolSize];
+        for (int i = 0; i < poolSize; ++i) {
+            logger.log(Level.INFO, "Starting worker thread {0}", i);
+            threads[i] = new Thread(new EventThread());
+        }
+    }
+
+    public void stop() throws InterruptedException {
+        for (int i = 0; i < threads.length; ++i) {
+            Thread t = threads[i];
+            logger.log(Level.INFO, "Shutting down worker thread {0}", i);
+            t.interrupt();
+            t.join();
+        }
     }
 }
