@@ -48,6 +48,11 @@ public class ConcurrentEventReactor extends EventReactor {
     private int poolSize;
     private Thread[] threads;
 
+    /**
+     * Worker thread that will be used to invoke handler methods as events
+     * arrive.  Each worker simply calls the processNextEvent() method to either
+     * handle an incoming message or block until one is available.
+     */
     private class EventThread implements Runnable {
         @Override
         public void run() {
@@ -93,12 +98,18 @@ public class ConcurrentEventReactor extends EventReactor {
         }
     }
 
-    public void stop() throws InterruptedException {
+    public void stop() {
         for (int i = 0; i < threads.length; ++i) {
             Thread t = threads[i];
             logger.log(Level.INFO, "Shutting down worker thread {0}", i);
-            t.interrupt();
-            t.join();
+
+            try {
+                t.interrupt();
+                t.join();
+            } catch (InterruptedException e) {
+                logger.warning("Interrupted while shutting down worker thread");
+                Thread.interrupted();
+            }
         }
     }
 }
