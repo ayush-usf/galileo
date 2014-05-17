@@ -98,6 +98,10 @@ public class ConcurrentEventReactor extends EventReactor {
         }
     }
 
+    /**
+     * Gracefully shuts down all the worker threads being maintained by this
+     * event reactor.
+     */
     public void stop() {
         for (int i = 0; i < threads.length; ++i) {
             Thread t = threads[i];
