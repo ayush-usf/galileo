@@ -152,12 +152,16 @@ public class ClientMessageRouter extends MessageRouter {
         InetSocketAddress address = new InetSocketAddress(
                 destination.getHostname(), destination.getPort());
         channel.connect(address);
+
+        /* Update data structures for mapping between sockets/keys/trackers */
         destinationToSocket.put(destination, channel);
         socketToDestination.put(channel, destination);
-        pendingRegistrations.add(channel);
-
         TransmissionTracker tracker = new TransmissionTracker(writeQueueSize);
         socketToTracker.put(channel, tracker);
+
+        /* Finally, put this registration in the pending queue */
+        pendingRegistrations.add(channel);
+
         return tracker;
     }
 
