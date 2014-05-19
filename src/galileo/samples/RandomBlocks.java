@@ -27,7 +27,6 @@ package galileo.samples;
 
 import java.io.IOException;
 
-import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -130,7 +129,7 @@ public class RandomBlocks implements MessageListener {
         return randomGenerator.nextFloat();
     }
 
-    private Block generateData() {
+    public static Block generateData() {
         /* First, a temporal range for this data "sample" */
         Calendar calendar = Calendar.getInstance();
         int year, month, day;
@@ -211,7 +210,7 @@ public class RandomBlocks implements MessageListener {
         PerformanceTimer pt = new PerformanceTimer("Send operation time");
         pt.start();
         for (int i = 0; i < num; ++i) {
-            Block block = client.generateData();
+            Block block = RandomBlocks.generateData();
             client.store(server, block);
         }
         pt.stopAndPrint();
