@@ -44,8 +44,9 @@ import galileo.query.Operator;
 import galileo.query.Query;
 import galileo.util.PerformanceTimer;
 
-public class RandomQuery {
+public class RandomQuery implements MessageListener, Runnable {
 
+    public static int clients;
 //    private static final double STORAGE_RATIO = 0.25;
     private static boolean noNotEqual = true;
     private static boolean reverseBigRanges = true;
@@ -100,6 +101,76 @@ public class RandomQuery {
         return q;
     }
 
+    /*--------------------------------------------------------------------*/
+
+    private ClientMessageRouter messageRouter;
+    private NetworkDestination server;
+    private PerformanceTimer resp = new PerformanceTimer("ResponseTime");
+    private boolean responded;
+
+    public RandomQuery(String serverHostName, int serverPort)
+    throws Exception {
+        clients++;
+
+        messageRouter = new ClientMessageRouter();
+        messageRouter.addListener(this);
+        server = new NetworkDestination(serverHostName, serverPort);
+
+        /* Sleep for a random amount of time */
+        Thread.sleep(random.nextInt(3000));
+    }
+
+    public void run() {
+        while (true) {
+            try {
+                send();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void send()
+    throws Exception {
+        byte[] id = new byte[1024];
+        random.nextBytes(id);
+        BigInteger bi = new BigInteger(id);
+
+        Query q = randomQuery();
+        QueryEvent qe = new QueryEvent(bi.toString(16), q);
+
+        resp.start();
+        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
+        responded = false;
+
+        /* Sleep for ~1s. */
+        Thread.sleep(1000);
+        while (responded == false) {
+            Thread.sleep(100);
+        }
+
+        for (int s = 0; s < 3; ++s) {
+            messageRouter.sendMessage(server, EventPublisher.wrapEvent(
+                        new StorageRequest(RandomBlocks.generateData())));
+        }
+    }
+
+    @Override
+    public void onConnect(NetworkDestination endpoint) { }
+
+    @Override
+    public void onDisconnect(NetworkDestination endpoint) {
+        System.out.println("Disconnected from the server.  Goodbye!");
+        System.exit(0);
+    }
+
+    @Override
+    public void onMessage(GalileoMessage message) {
+        resp.stop();
+        System.out.println(clients + "    " + resp.getLastResult());
+        responded = true;
+    }
+
     public static void main(String[] args)
     throws Exception {
         if (args.length < 2) {
@@ -109,46 +180,14 @@ public class RandomQuery {
         String serverHostName = args[0];
         int serverPort = Integer.parseInt(args[1]);
 
-        ClientMessageRouter messageRouter = new ClientMessageRouter();
-        NetworkDestination server = new NetworkDestination(
-                serverHostName, serverPort);
-
-        class Listener implements MessageListener {
-
-            private int counter;
-            private PerformanceTimer pt = new PerformanceTimer();
-
-            @Override
-            public void onConnect(NetworkDestination endpoint) { }
-
-            @Override
-            public void onDisconnect(NetworkDestination endpoint) { }
-
-            @Override
-            public void onMessage(GalileoMessage message) {
-                if (counter == 0) {
-                    pt.start();
-                }
-                counter++;
-                if (counter == 10000) {
-                    pt.stopAndPrint();
-                    System.exit(0);
-                }
-                //System.out.println(counter++);
-            }
+        int threads = 1;
+        if (args.length >= 3) {
+            threads = Integer.parseInt(args[2]);
         }
-        messageRouter.addListener(new Listener());
 
-        for (int i = 0; i < 10000; ++i) {
-            byte[] id = new byte[1024];
-            random.nextBytes(id);
-            BigInteger bi = new BigInteger(id);
-
-            Query q = randomQuery();
-            QueryEvent qe = new QueryEvent(bi.toString(16), q);
-            messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
+        for (int t = 0; t < threads; ++t) {
+            RandomQuery rq = new RandomQuery(serverHostName, serverPort);
+            new Thread(rq).start();
         }
-        System.out.println("Test complete.");
-        messageRouter.shutdown();
     }
 }
