@@ -47,7 +47,7 @@ import galileo.util.PerformanceTimer;
 public class RandomQuery implements MessageListener, Runnable {
 
     public static int clients;
-//    private static final double STORAGE_RATIO = 0.25;
+    private static int storageOps = 3;
     private static boolean noNotEqual = true;
     private static boolean reverseBigRanges = true;
 
@@ -149,7 +149,7 @@ public class RandomQuery implements MessageListener, Runnable {
             Thread.sleep(100);
         }
 
-        for (int s = 0; s < 3; ++s) {
+        for (int s = 0; s < storageOps; ++s) {
             messageRouter.sendMessage(server, EventPublisher.wrapEvent(
                         new StorageRequest(RandomBlocks.generateData())));
         }
