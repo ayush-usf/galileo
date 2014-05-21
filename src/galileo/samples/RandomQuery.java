@@ -32,6 +32,7 @@ import java.util.Random;
 
 import galileo.client.EventPublisher;
 import galileo.comm.QueryEvent;
+import galileo.comm.StorageRequest;
 import galileo.dataset.feature.Feature;
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
@@ -46,6 +47,8 @@ import galileo.util.PerformanceTimer;
 public class RandomQuery {
 
 //    private static final double STORAGE_RATIO = 0.25;
+    private static boolean noNotEqual = true;
+    private static boolean reverseBigRanges = true;
 
     public static Random random = new Random();
 
@@ -70,10 +73,23 @@ public class RandomQuery {
         features.add(randomFeature("condensation", 1, 100));
         features.add(randomFeature("temperature", 1, 100));
 
-
         List<Expression> expressions = new ArrayList<>();
         for (Feature f : features) {
-            expressions.add(new Expression(randomOperator(), f));
+            Operator op = randomOperator();
+            if (noNotEqual == true && op == Operator.NOTEQUAL) {
+                op = Operator.EQUAL;
+            }
+            if (reverseBigRanges == true) {
+                if ((op == Operator.GREATER || op == Operator.GREATEREQUAL)
+                        && f.getFloat() <= 35.0f) {
+                    op = Operator.LESS;
+                }
+                if ((op == Operator.LESS || op == Operator.LESSEQUAL)
+                        && f.getFloat() >= 65.0f) {
+                    op = Operator.GREATER;
+                }
+            }
+            expressions.add(new Expression(op, f));
         }
 
         Operation op = new Operation(expressions.toArray(
