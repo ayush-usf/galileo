@@ -197,6 +197,8 @@ public class ClientMessageRouter extends MessageRouter {
 
     @Override
     protected void disconnect(SelectionKey key) {
+        /* Update our ClientMessageRouter-specific data structures when
+         * disconnected. */
         SocketChannel channel = (SocketChannel) key.channel();
         NetworkDestination destination = socketToDestination.get(channel);
         destinationToSocket.remove(destination);
