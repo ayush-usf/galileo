@@ -195,12 +195,6 @@ public class ClientMessageRouter extends MessageRouter {
         selector.wakeup();
     }
 
-    /**
-     * Inform subscribed MessageListener instances that the connection to the
-     * remote server has been terminated.
-     *
-     * @param key SelectionKey for the SocketChannel that was disconnected.
-     */
     @Override
     protected void disconnect(SelectionKey key) {
         SocketChannel channel = (SocketChannel) key.channel();
