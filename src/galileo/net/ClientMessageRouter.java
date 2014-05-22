@@ -156,6 +156,17 @@ public class ClientMessageRouter extends MessageRouter {
     }
 
     /**
+     * Sends a message to multiple network destinations.
+     */
+    public void broadcastMessage(Iterable<NetworkDestination> destinations,
+            GalileoMessage message)
+    throws IOException {
+        for (NetworkDestination destination : destinations) {
+            sendMessage(destination, message);
+        }
+    }
+
+    /**
      * Sends a message to the specified network destination.  Connections are
      * completed during the first send operation.
      */
