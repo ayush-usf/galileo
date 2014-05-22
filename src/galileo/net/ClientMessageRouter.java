@@ -93,21 +93,6 @@ public class ClientMessageRouter extends MessageRouter {
         return destination;
     }
 
-    /**
-     * Handles pending registration operations on the Selector thread.
-     */
-    private void processPendingRegistrations()
-    throws ClosedChannelException {
-        Iterator<SocketChannel> it = pendingRegistrations.iterator();
-        while (it.hasNext() == true) {
-            SocketChannel channel = it.next();
-            it.remove();
-
-            TransmissionTracker tracker = socketToTracker.get(channel);
-            channel.register(selector, SelectionKey.OP_CONNECT, tracker);
-        }
-    }
-
     @Override
     public void run() {
         while (online) {
@@ -122,12 +107,17 @@ public class ClientMessageRouter extends MessageRouter {
     }
 
     /**
-     * Broadcasts a message to the connected servers.
+     * Handles pending registration operations on the Selector thread.
      */
-    public void broadcastMessage(GalileoMessage message)
-    throws IOException {
-        for (NetworkDestination dest : destinationToSocket.keySet()) {
-            this.sendMessage(dest, message);
+    private void processPendingRegistrations()
+    throws ClosedChannelException {
+        Iterator<SocketChannel> it = pendingRegistrations.iterator();
+        while (it.hasNext() == true) {
+            SocketChannel channel = it.next();
+            it.remove();
+
+            TransmissionTracker tracker = socketToTracker.get(channel);
+            channel.register(selector, SelectionKey.OP_CONNECT, tracker);
         }
     }
 
