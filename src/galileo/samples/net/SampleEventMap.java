@@ -8,6 +8,7 @@ public class SampleEventMap extends EventMap {
         /* Here we give our events identification numbers */
         addMapping(1, GoodEvent.class);
         addMapping(2, BadEvent.class);
-        addMapping(3, UglyEvent.class);
+        addMapping(3, BadReplyEvent.class);
+        addMapping(4, UglyEvent.class);
     }
 }
