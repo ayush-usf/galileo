@@ -72,6 +72,24 @@ public class EventServer {
         System.out.println("Contents: " + event.getData());
     }
 
+    @EventHandler
+    public void processBadEvent(BadEvent event, EventContext context) {
+        System.out.println("We got a BadEvent! Oh no.");
+        System.out.println("Badness level: " + event.getBadness());
+        System.out.println("We'll send a reply.");
+    }
+
+    @EventHandler
+    public void processUglyEvent(UglyEvent event, EventContext context) {
+        System.out.println("An ugly event! Let's shut down.");
+        System.out.println("----");
+        System.out.println(event.getFirstString());
+        System.out.println(event.getSecondString());
+        System.out.println("----");
+        System.out.println("Bye!");
+        System.exit(0);
+    }
+
     public static void main(String[] args)
     throws IOException {
         EventServer server = new EventServer(LISTEN_PORT);
