@@ -57,7 +57,6 @@ public class EventReactor implements MessageListener {
     private Class<?> handlerClass;
     private Object handlerObject;
 
-    private EventMap eventMap;
     private EventWrapper eventWrapper;
 
     private Map<Class<?>, Method> classToMethod = new HashMap<>();
@@ -78,8 +77,7 @@ public class EventReactor implements MessageListener {
     public EventReactor(Object handlerObject, EventMap eventMap) {
         this.handlerClass = handlerObject.getClass();
         this.handlerObject = handlerObject;
-        this.eventMap = eventMap;
-        this.eventWrapper = new BasicEventWrapper(this.eventMap);
+        this.eventWrapper = new BasicEventWrapper(eventMap);
     }
 
     /**
@@ -87,15 +85,11 @@ public class EventReactor implements MessageListener {
      *
      * @param handlerObject an Object instance that contains the implementations
      * for event handlers, denoted by the {@link EventHandler} annotation.
-     * @param eventMap a EventMap implementation that provides a mapping from
-     * integer identification numbers to specific classes that represent an
-     * event.
+     * @param wrapper A problem-specific {@link EventWrapper} implementation.
      */
-    public EventReactor(Object handlerObject,
-            EventMap eventMap, EventWrapper wrapper) {
+    public EventReactor(Object handlerObject, EventWrapper wrapper) {
         this.handlerClass = handlerObject.getClass();
         this.handlerObject = handlerObject;
-        this.eventMap = eventMap;
         this.eventWrapper = wrapper;
     }
 
