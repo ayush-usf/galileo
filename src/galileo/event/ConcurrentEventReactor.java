@@ -81,6 +81,23 @@ public class ConcurrentEventReactor extends EventReactor {
         this.poolSize = poolSize;
     }
 
+
+    /**
+     * Creates a ConcurrentEventReactor with a custom EventWrapper
+     * implementation.
+     *
+     * @param handlerObject an Object instance that contains the implementations
+     * for event handlers, denoted by the {@link EventHandler} annotation.
+     * @param wrapper A problem-specific {@link EventWrapper} implementation.
+     * @param poolSize the number of worker threads this concurrent event mapper
+     * should maintain.
+     */
+    public ConcurrentEventReactor(Object handlerObject, EventWrapper wrapper,
+            int poolSize) {
+        super(handlerObject, wrapper);
+        this.poolSize = poolSize;
+    }
+
     /**
      * Initializes the event reactor by creating worker threads and having them
      * block on the event queue.
