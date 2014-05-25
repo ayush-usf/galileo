@@ -216,4 +216,13 @@ public class EventReactor implements MessageListener {
             Thread.currentThread().interrupt();
         }
     }
+
+    /**
+     * Convenience function for wrapping an outgoing event with this
+     * EventReactor's {@link EventWrapper} implementation.
+     */
+    public GalileoMessage wrapEvent(Event e)
+    throws IOException {
+        return eventWrapper.wrap(e);
+    }
 }
