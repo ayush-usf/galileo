@@ -203,12 +203,12 @@ public class EventReactor implements MessageListener {
 
     @Override
     public void onConnect(NetworkDestination endpoint) {
-
+        //TODO full implementation
     }
 
     @Override
     public void onDisconnect(NetworkDestination endpoint) {
-
+        //TODO full implementation
     }
 
     @Override
