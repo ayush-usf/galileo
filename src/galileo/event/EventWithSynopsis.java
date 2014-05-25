@@ -23,6 +23,14 @@ public class EventWithSynopsis implements Event {
         this.data = data;
     }
 
+    public String getSynopsis() {
+        return this.synopsis;
+    }
+
+    public byte[] getPayload() {
+        return this.data;
+    }
+
     /**
      * Enables compression when serializing this event.  When deserializing,
      * this setting has no effect.
