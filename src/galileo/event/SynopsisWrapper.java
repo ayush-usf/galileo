@@ -14,6 +14,7 @@ import galileo.serialization.Serializer;
  */
 public class SynopsisWrapper implements EventWrapper {
 
+    @Override
     public GalileoMessage wrap(Event e)
     throws IOException {
         if (e instanceof EventWithSynopsis == false) {
@@ -25,6 +26,7 @@ public class SynopsisWrapper implements EventWrapper {
         return new GalileoMessage(rawMessage);
     }
 
+    @Override
     public Event unwrap(GalileoMessage msg)
     throws IOException, SerializationException {
 
