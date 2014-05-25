@@ -78,6 +78,7 @@ public class EventReactor implements MessageListener {
         this.handlerClass = handlerObject.getClass();
         this.handlerObject = handlerObject;
         this.eventWrapper = new BasicEventWrapper(eventMap);
+        linkEventHandlers();
     }
 
     /**
@@ -91,6 +92,7 @@ public class EventReactor implements MessageListener {
         this.handlerClass = handlerObject.getClass();
         this.handlerObject = handlerObject;
         this.eventWrapper = wrapper;
+        linkEventHandlers();
     }
 
     /**
