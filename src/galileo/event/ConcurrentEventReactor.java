@@ -67,6 +67,9 @@ public class ConcurrentEventReactor extends EventReactor {
     }
 
     /**
+     * Creates a ConcurrentEventReactor with the default
+     * {@link BasicEventWrapper} EventWrapper implementation.
+     *
      * @param handlerObject an Object instance that contains the implementations
      * for event handlers, denoted by the {@link EventReactor} annotation.
      * @param eventMap a EventMap implementation that provides a mapping from
