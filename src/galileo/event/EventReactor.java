@@ -99,7 +99,7 @@ public class EventReactor implements MessageListener {
      * This method links incoming event types to their relevant event handlers
      * found in the handlerObject.
      */
-    public void linkEventHandlers() {
+    protected void linkEventHandlers() {
         classToMethod.clear();
 
         for (Method m : handlerClass.getMethods()) {
