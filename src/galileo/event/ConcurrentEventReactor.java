@@ -95,6 +95,7 @@ public class ConcurrentEventReactor extends EventReactor {
         for (int i = 0; i < poolSize; ++i) {
             logger.log(Level.INFO, "Starting worker thread {0}", i);
             threads[i] = new Thread(new EventThread());
+            threads[i].start();
         }
     }
 
