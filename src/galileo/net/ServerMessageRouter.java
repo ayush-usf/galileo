@@ -49,6 +49,12 @@ public class ServerMessageRouter extends MessageRouter {
         this.port = port;
     }
 
+    public ServerMessageRouter(int port,
+            int readBufferSize, int maxWriteQueueSize) {
+        super(readBufferSize, maxWriteQueueSize);
+        this.port = port;
+    }
+
     /**
      * Initializes the server socket channel for incoming client connections and
      * begins listening for messages.
