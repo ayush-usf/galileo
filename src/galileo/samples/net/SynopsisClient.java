@@ -60,11 +60,16 @@ public class SynopsisClient {
             = new EventWithSynopsis("SynopsisC", new byte[1]);
         messageClient.sendMessage(server, eventReactor.wrapEvent(event4));
 
+        /* How about a synopsis the server won't know about? */
+        EventWithSynopsis event5
+            = new EventWithSynopsis("BlahSynopsis", new byte[1]);
+        messageClient.sendMessage(server, eventReactor.wrapEvent(event5));
+
         /* Send something on a special synopsis, 'ShutdownRequest'.  This will
          * make the server send us a 'Shutdown' reply that we will obey */
-        EventWithSynopsis event5
+        EventWithSynopsis event6
             = new EventWithSynopsis("ShutdownRequest", new byte[1]);
-        messageClient.sendMessage(server, eventReactor.wrapEvent(event5));
+        messageClient.sendMessage(server, eventReactor.wrapEvent(event6));
     }
 
     @EventHandler
