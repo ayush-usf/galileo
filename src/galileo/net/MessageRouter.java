@@ -387,6 +387,7 @@ public abstract class MessageRouter implements Runnable {
      */
     public void sendMessage(SelectionKey key, GalileoMessage message)
     throws IOException {
+        //TODO reduce the visibility of this method to protected
         if (this.isOnline() == false) {
             throw new IOException("MessageRouter is not online.");
         }
