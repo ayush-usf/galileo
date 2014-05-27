@@ -81,18 +81,6 @@ public class ClientMessageRouter extends MessageRouter {
         selectorThread.start();
     }
 
-    @Deprecated
-    public NetworkDestination connectTo(String hostname, int port)
-    throws IOException {
-        return connectTo(new NetworkDestination(hostname, port));
-    }
-
-    @Deprecated
-    public NetworkDestination connectTo(NetworkDestination destination)
-    throws IOException {
-        return destination;
-    }
-
     @Override
     public void run() {
         while (online) {
