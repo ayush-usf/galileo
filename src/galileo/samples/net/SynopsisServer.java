@@ -75,7 +75,7 @@ public class SynopsisServer {
         String synopsis = event.getSynopsis();
         byte[] payload = event.getPayload();
 
-        System.out.println("Got an event! Synopsis: " + synopsis);
+        System.out.println("Got an event. Synopsis: " + synopsis);
 
         if (synopsis.equals("SynopsisA")) {
 
