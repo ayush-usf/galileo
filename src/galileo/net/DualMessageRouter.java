@@ -40,7 +40,15 @@ public class DualMessageRouter {
     private ServerMessageRouter serverRouter;
     private ClientMessageRouter clientRouter;
 
-    public DualMessageRouter() { }
+    public DualMessageRouter(int port) {
+
+    }
+
+    public DualMessageRouter(int port,
+            int readBufferSize, int maxWriteQueueSize) {
+
+    }
+
     public void listen()
     throws IOException {
         serverRouter.listen();
