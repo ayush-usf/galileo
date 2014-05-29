@@ -73,6 +73,15 @@ public class ServerMessageRouter extends MessageRouter {
     }
 
     /**
+     * Initializes the server socket channel for incoming client connections and
+     * begins listening for messages.
+     */
+    public void listen(int port)
+    throws IOException {
+        //TODO: should be able to listen on multiple ports with this method
+    }
+
+    /**
      * Closes the server socket channel and stops processing incoming
      * messages.
      */
