@@ -59,6 +59,7 @@ public class ServerMessageRouter extends MessageRouter {
      * Initializes the server socket channel for incoming client connections and
      * begins listening for messages.
      */
+    @Deprecated
     public void listen()
     throws IOException {
         this.selector = Selector.open();
