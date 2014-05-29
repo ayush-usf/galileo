@@ -41,6 +41,10 @@ public class DualMessageRouter {
     private ClientMessageRouter clientRouter;
 
     public DualMessageRouter() { }
+    public void listen()
+    throws IOException {
+        serverRouter.listen();
+    }
 
     public void sendMessage(NetworkDestination destination,
             GalileoMessage message)
