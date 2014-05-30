@@ -47,6 +47,13 @@ public class EventContext {
     }
 
     /**
+     * @return Server port number that this event was sent to.
+     */
+    public int getDestinationPort() {
+        return message.getContext().getDestinationPort();
+    }
+
+    /**
      * @return NetworkDestination of the client that generated the event.
      */
     public NetworkDestination getSource() {
