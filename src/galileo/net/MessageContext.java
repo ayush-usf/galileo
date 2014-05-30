@@ -72,6 +72,10 @@ public class MessageContext {
     public int getDestinationPort() {
         return getSocketChannel().socket().getLocalPort();
     }
+
+    /**
+     * @return NetworkDestination of the client that generated the message.
+     */
     public NetworkDestination getSource() {
         return NetworkDestination.fromSocketChannel(getSocketChannel());
     }
