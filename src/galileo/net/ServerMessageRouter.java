@@ -55,6 +55,13 @@ public class ServerMessageRouter extends MessageRouter {
         this.port = port;
     }
 
+    private void initialize()
+    throws IOException {
+        this.selector = Selector.open();
+        Thread selectorThread = new Thread(this);
+        selectorThread.start();
+    }
+
     /**
      * Initializes the server socket channel for incoming client connections and
      * begins listening for messages.
