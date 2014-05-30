@@ -61,6 +61,10 @@ public class MessageContext {
         return key;
     }
 
+    public SocketChannel getSocketChannel() {
+        return (SocketChannel) key.channel();
+    }
+
     /**
      * Sends a message back to the originator of the message this context
      * belongs to.
