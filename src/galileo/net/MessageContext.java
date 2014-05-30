@@ -65,6 +65,10 @@ public class MessageContext {
         return (SocketChannel) key.channel();
     }
 
+    public NetworkDestination getSource() {
+        return NetworkDestination.fromSocketChannel(getSocketChannel());
+    }
+
     /**
      * Sends a message back to the originator of the message this context
      * belongs to.
