@@ -65,6 +65,13 @@ public class MessageContext {
         return (SocketChannel) key.channel();
     }
 
+    /**
+     * @return Server port number that this MessageContext's parent
+     * message was sent to.
+     */
+    public int getDestinationPort() {
+        return getSocketChannel().socket().getLocalPort();
+    }
     public NetworkDestination getSource() {
         return NetworkDestination.fromSocketChannel(getSocketChannel());
     }
