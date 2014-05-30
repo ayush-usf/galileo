@@ -69,7 +69,7 @@ public class MessageContext {
      * @return Server port number that this MessageContext's parent
      * message was sent to.
      */
-    public int getDestinationPort() {
+    public int getServerPort() {
         return getSocketChannel().socket().getLocalPort();
     }
 
