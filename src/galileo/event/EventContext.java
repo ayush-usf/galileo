@@ -46,6 +46,9 @@ public class EventContext {
         this.message.getContext().sendMessage(m);
     }
 
+    /**
+     * @return NetworkDestination of the client that generated the event.
+     */
     public NetworkDestination getSource() {
         return message.getContext().getSource();
     }
