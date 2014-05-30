@@ -27,8 +27,6 @@ package galileo.event;
 
 import java.io.IOException;
 
-import java.nio.channels.SocketChannel;
-
 import galileo.net.GalileoMessage;
 import galileo.net.NetworkDestination;
 
@@ -49,8 +47,6 @@ public class EventContext {
     }
 
     public NetworkDestination getSource() {
-        SocketChannel channel
-            = (SocketChannel) message.getContext().getSelectionKey().channel();
-        return NetworkDestination.fromSocketChannel(channel);
+        return message.getContext().getSource();
     }
 }
