@@ -55,11 +55,9 @@ public class ServerMessageRouter extends MessageRouter {
         this.port = port;
     }
 
-    private void initialize()
+    private synchronized void initializeSelector()
     throws IOException {
         this.selector = Selector.open();
-        Thread selectorThread = new Thread(this);
-        selectorThread.start();
     }
 
     /**
@@ -69,7 +67,7 @@ public class ServerMessageRouter extends MessageRouter {
     @Deprecated
     public void listen()
     throws IOException {
-        this.selector = Selector.open();
+        initializeSelector();
         serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
         serverChannel.socket().bind(new InetSocketAddress(this.port));
