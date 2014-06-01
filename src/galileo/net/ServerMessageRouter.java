@@ -32,6 +32,8 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handles message routing on a {@link java.nio.channels.ServerSocketChannel}.
@@ -44,6 +46,8 @@ public class ServerMessageRouter extends MessageRouter {
 
     private int port;
     private ServerSocketChannel serverChannel;
+    private Thread selectorThread;
+    private Map<Integer, ServerSocketChannel> channels = new HashMap<>();
 
     public ServerMessageRouter(int port) {
         this.port = port;
