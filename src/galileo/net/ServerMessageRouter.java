@@ -26,9 +26,7 @@ software, even if advised of the possibility of such damage.
 package galileo.net;
 
 import java.io.IOException;
-
 import java.net.InetSocketAddress;
-
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -66,6 +64,14 @@ public class ServerMessageRouter extends MessageRouter {
         }
     }
 
+    private synchronized void startSelectorThread() {
+        if (selectorThread == null || this.online == false) {
+            selectorThread = new Thread(this);
+            selectorThread.start();
+            this.online = true;
+        }
+    }
+
     /**
      * Initializes the server socket channel for incoming client connections and
      * begins listening for messages.
@@ -74,6 +80,7 @@ public class ServerMessageRouter extends MessageRouter {
     public void listen()
     throws IOException {
         initializeSelector();
+
         serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
         serverChannel.socket().bind(new InetSocketAddress(this.port));
