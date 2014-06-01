@@ -102,4 +102,13 @@ public class ServerMessageRouter extends MessageRouter {
         this.online = false;
         selector.wakeup();
     }
+
+    public void shutdown(int port) throws IOException {
+        ServerSocketChannel channel = channels.get(port);
+        if (channel == null) {
+            return;
+        }
+
+        channel.close();
+    }
 }
