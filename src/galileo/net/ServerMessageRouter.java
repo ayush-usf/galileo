@@ -57,7 +57,9 @@ public class ServerMessageRouter extends MessageRouter {
 
     private synchronized void initializeSelector()
     throws IOException {
-        this.selector = Selector.open();
+        if (this.selector == null) {
+            this.selector = Selector.open();
+        }
     }
 
     /**
