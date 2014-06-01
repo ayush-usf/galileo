@@ -114,13 +114,16 @@ public class ServerMessageRouter extends MessageRouter {
      */
     public void shutdown() throws IOException {
         for (int port : channels.keySet()) {
-            shutdown(port);
+            close(port);
         }
         this.online = false;
         selector.wakeup();
     }
 
-    public void shutdown(int port) throws IOException {
+    /**
+     * @param port Port number to stop listening on.
+     */
+    public void close(int port) throws IOException {
         ServerSocketChannel channel = channels.get(port);
         if (channel == null) {
             return;
