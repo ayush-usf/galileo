@@ -113,7 +113,9 @@ public class ServerMessageRouter extends MessageRouter {
      * messages.
      */
     public void shutdown() throws IOException {
-        serverChannel.close();
+        for (int port : channels.keySet()) {
+            shutdown(port);
+        }
         this.online = false;
         selector.wakeup();
     }
