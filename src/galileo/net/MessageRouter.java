@@ -376,11 +376,13 @@ public abstract class MessageRouter implements Runnable {
     }
 
     /**
-     * Attempts to write out directly on a SocketChannel, and, if unsuccessful,
-     * registers the OP_WRITE interest op to tell the Selector to deal with the
-     * write.  When letting the Selector deal with the write, pending data is
-     * added to a blocking queue.  This means that if the queue reaches a set
-     * limit, this function may block to prevent queuing too much data.
+     * Adds a message to the pending write queue for a particular SelectionKey
+     * and submits a change request for its interest set. Pending data is placed
+     * in a blocking queue, so this function may block to prevent queueing an
+     * excessive amount of data.
+     * <p>
+     * The system property <em>galileo.net.MessageRouter.writeQueueSize</em>
+     * tunes the maximum amount of data that can be queued.
      *
      * @param key SelectionKey for the channel.
      * @param message GalileoMessage to publish on the channel.
