@@ -73,6 +73,7 @@ public abstract class MessageRouter implements Runnable {
     public static final String WRITE_QUEUE_PROPERTY
         = "galileo.net.MessageRouter.writeQueueSize";
 
+    /** Flag used to determine whether the Selector thread should run */
     protected boolean online;
 
     private List<MessageListener> listeners = new ArrayList<>();
