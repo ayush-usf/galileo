@@ -90,7 +90,15 @@ public class ServerMessageRouter extends MessageRouter {
      */
     public void listen(int port)
     throws IOException {
-        //TODO: should be able to listen on multiple ports with this method
+        initializeSelector();
+
+        ServerSocketChannel channel = ServerSocketChannel.open();
+        channel.configureBlocking(false);
+        channel.socket().bind(new InetSocketAddress(port));
+        channel.register(selector, SelectionKey.OP_ACCEPT);
+        channels.put(port, channel);
+
+        startSelectorThread();
     }
 
     /**
