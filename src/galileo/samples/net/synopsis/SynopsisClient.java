@@ -1,4 +1,4 @@
-package galileo.samples.net;
+package galileo.samples.net.synopsis;
 
 import java.io.IOException;
 
@@ -7,7 +7,6 @@ import java.util.Random;
 import galileo.event.ConcurrentEventReactor;
 import galileo.event.EventContext;
 import galileo.event.EventHandler;
-import galileo.event.EventReactor;
 import galileo.event.EventWithSynopsis;
 import galileo.event.SynopsisWrapper;
 import galileo.net.ClientMessageRouter;
