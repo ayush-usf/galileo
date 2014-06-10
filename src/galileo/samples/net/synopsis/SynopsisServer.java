@@ -53,9 +53,9 @@ public class SynopsisServer {
     throws IOException {
         System.out.println("Starting up.");
         eventReactor = new EventReactor(this, new SynopsisWrapper());
-        messageRouter = new ServerMessageRouter(this.port);
+        messageRouter = new ServerMessageRouter();
         messageRouter.addListener(eventReactor);
-        messageRouter.listen();
+        messageRouter.listen(this.port);
         System.out.println("Listening on port " + this.port);
 
         /* Process events as they come in */
