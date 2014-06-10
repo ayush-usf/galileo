@@ -51,9 +51,9 @@ public class EventServer {
     throws IOException {
         eventMap = new SampleEventMap();
         eventReactor = new EventReactor(this, this.eventMap);
-        messageRouter = new ServerMessageRouter(this.port);
+        messageRouter = new ServerMessageRouter();
         messageRouter.addListener(eventReactor);
-        messageRouter.listen();
+        messageRouter.listen(this.port);
 
         while (true) {
             try {
