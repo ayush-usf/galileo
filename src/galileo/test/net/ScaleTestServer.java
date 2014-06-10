@@ -31,7 +31,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import galileo.net.GalileoMessage;
-import galileo.net.MessageContext;
 import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
 import galileo.net.ServerMessageRouter;
@@ -51,9 +50,9 @@ public class ScaleTestServer implements MessageListener {
 
     public void listen()
     throws IOException {
-        messageRouter = new ServerMessageRouter(PORT);
+        messageRouter = new ServerMessageRouter();
         messageRouter.addListener(this);
-        messageRouter.listen();
+        messageRouter.listen(PORT);
         System.out.println("Listening...");
     }
 
