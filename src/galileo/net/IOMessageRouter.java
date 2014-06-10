@@ -28,30 +28,36 @@ package galileo.net;
 import java.io.IOException;
 
 /**
- * A "dual" MessageRouter instance that can act as both a server and a client.
+ * A MessageRouter instance that can act as both a server and a client.
  * This implementation is made up of a {@link ClientMessageRouter} and a
  * {@link ServerMessageRouter} instance, meaning outgoing and incoming messages
  * are processed by separate threads.
  *
  * @author malensek
  */
-public class DualMessageRouter {
+public class IOMessageRouter {
 
     private ServerMessageRouter serverRouter;
     private ClientMessageRouter clientRouter;
 
-    public DualMessageRouter(int port) {
-
-    }
-
-    public DualMessageRouter(int port,
-            int readBufferSize, int maxWriteQueueSize) {
-
-    }
-
-    public void listen()
+    public IOMessageRouter()
     throws IOException {
-        serverRouter.listen();
+        clientRouter = new ClientMessageRouter();
+        serverRouter = new ServerMessageRouter();
+    }
+
+    public IOMessageRouter(int readBufferSize, int maxWriteQueueSize)
+    throws IOException {
+        clientRouter = new ClientMessageRouter(
+                readBufferSize, maxWriteQueueSize);
+
+        serverRouter = new ServerMessageRouter(
+                readBufferSize, maxWriteQueueSize);
+    }
+
+    public void listen(int port)
+    throws IOException {
+        serverRouter.listen(port);
     }
 
     public void sendMessage(NetworkDestination destination,
