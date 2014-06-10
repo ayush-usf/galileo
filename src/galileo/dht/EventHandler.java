@@ -69,7 +69,6 @@ public abstract class EventHandler implements ProcessingUnit {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to process exchange packet!", e);
         }
-        logger.info("Finished executing");
     }
 
     /**
