@@ -85,10 +85,8 @@ public class ServerMessageRouter extends MessageRouter {
         serverChannel.configureBlocking(false);
         serverChannel.socket().bind(new InetSocketAddress(this.port));
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-        this.online = true;
 
-        Thread selectorThread = new Thread(this);
-        selectorThread.start();
+        startSelectorThread();
     }
 
     /**
