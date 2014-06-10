@@ -41,7 +41,6 @@ public class EventServer {
     private ServerMessageRouter messageRouter;
 
     private EventReactor eventReactor;
-    private SampleEventMap eventMap;
 
     public EventServer(int port) {
         this.port = port;
@@ -49,8 +48,7 @@ public class EventServer {
 
     public void start()
     throws IOException {
-        eventMap = new SampleEventMap();
-        eventReactor = new EventReactor(this, this.eventMap);
+        eventReactor = new EventReactor(this, SampleEventMap.instance());
         messageRouter = new ServerMessageRouter();
         messageRouter.addListener(eventReactor);
         messageRouter.listen(this.port);
@@ -76,7 +74,13 @@ public class EventServer {
     public void processBadEvent(BadEvent event, EventContext context) {
         System.out.println("We got a BadEvent! Oh no.");
         System.out.println("Badness level: " + event.getBadness());
+
         System.out.println("We'll send a reply.");
+        try {
+            context.write(new BadReplyEvent());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @EventHandler
