@@ -27,6 +27,10 @@ package galileo.samples.net.event;
 
 import galileo.event.EventMap;
 
+/**
+ * An example {@link EventMap} implementation that links events to
+ * integer-based IDs.
+ */
 public class SampleEventMap extends EventMap {
 
     private static SampleEventMap instance = null;
