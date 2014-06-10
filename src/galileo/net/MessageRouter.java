@@ -415,8 +415,7 @@ public abstract class MessageRouter implements Runnable {
 
     /**
      * When a {@link SelectionKey} is writable, push as much pending data
-     * out on the channel as possible.  This method is called when a message
-     * couldn't be published directly by its originating thread.
+     * out on the channel as possible.
      *
      * @param key {@link SelectionKey} of the channel to write to.
      */
