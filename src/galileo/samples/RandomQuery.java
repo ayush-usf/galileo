@@ -47,7 +47,7 @@ import galileo.util.PerformanceTimer;
 public class RandomQuery implements MessageListener, Runnable {
 
     public static int clients;
-    private static int storageOps = 3;
+    private static int storageOps = 1;
     private static boolean noNotEqual = true;
     private static boolean reverseBigRanges = true;
 
