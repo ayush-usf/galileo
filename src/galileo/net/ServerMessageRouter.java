@@ -49,6 +49,10 @@ public class ServerMessageRouter extends MessageRouter {
 
     public ServerMessageRouter() { }
 
+    public ServerMessageRouter(int readBufferSize, int maxWriteQueueSize) {
+        super(readBufferSize, maxWriteQueueSize);
+    }
+
     public ServerMessageRouter(int port) {
         this.port = port;
     }
