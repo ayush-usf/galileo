@@ -47,6 +47,8 @@ public class ServerMessageRouter extends MessageRouter {
     private Thread selectorThread;
     private Map<Integer, ServerSocketChannel> channels = new HashMap<>();
 
+    public ServerMessageRouter() { }
+
     public ServerMessageRouter(int port) {
         this.port = port;
     }
