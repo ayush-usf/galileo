@@ -1,4 +1,4 @@
-package galileo.samples.net;
+package galileo.samples.net.event;
 
 import java.io.IOException;
 
