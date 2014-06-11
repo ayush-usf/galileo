@@ -154,9 +154,9 @@ public class StorageNode implements MessageListener {
         scheduler = new QueueScheduler(threads);
 
         /* Start listening for incoming messages. */
-        messageRouter = new ServerMessageRouter(port);
+        messageRouter = new ServerMessageRouter();
         messageRouter.addListener(this);
-        messageRouter.listen();
+        messageRouter.listen(port);
         nodeStatus.set("Online");
     }
 

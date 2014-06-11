@@ -50,9 +50,9 @@ public class HashTestServer implements MessageListener {
 
     public void listen()
     throws IOException {
-        messageRouter = new ServerMessageRouter(PORT);
+        messageRouter = new ServerMessageRouter();
         messageRouter.addListener(this);
-        messageRouter.listen();
+        messageRouter.listen(PORT);
         System.out.println("Listening...");
     }
 
