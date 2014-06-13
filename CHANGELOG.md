@@ -1,3 +1,7 @@
+**1.0 : 2014/06/12 ---- First stable release**
+- More updates to the net framework
+- Additional samples for networking: events, synopsis, basic echo server
+
 **0.9 : 2014/05/14 ---- Network subsystem improvements**
 - Includes several new network tests
 - c10k benchmarks: ~50,000 simultaneous client connections on our test hardware
