@@ -51,6 +51,9 @@ public class ServerMessageRouter extends MessageRouter {
         super(readBufferSize, maxWriteQueueSize);
     }
 
+    /**
+     * Initializes (opens) this MessageRouter's {@link Selector} instance.
+     */
     private synchronized void initializeSelector()
     throws IOException {
         if (this.selector == null) {
@@ -58,6 +61,10 @@ public class ServerMessageRouter extends MessageRouter {
         }
     }
 
+    /**
+     * Starts the selector thread loop and sets this MessageRouter status to
+     * online.
+     */
     private synchronized void startSelectorThread() {
         if (selectorThread == null || this.online == false) {
             selectorThread = new Thread(this);
@@ -69,11 +76,8 @@ public class ServerMessageRouter extends MessageRouter {
     /**
      * Initializes the server socket channel for incoming client connections and
      * begins listening for messages.
-     */
-
-    /**
-     * Initializes the server socket channel for incoming client connections and
-     * begins listening for messages.
+     *
+     * @param port The port to listen for messages on.
      */
     public void listen(int port)
     throws IOException {
