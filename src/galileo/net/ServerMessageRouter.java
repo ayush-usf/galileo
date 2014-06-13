@@ -42,8 +42,6 @@ import java.util.Map;
  */
 public class ServerMessageRouter extends MessageRouter {
 
-    private int port;
-    private ServerSocketChannel serverChannel;
     private Thread selectorThread;
     private Map<Integer, ServerSocketChannel> channels = new HashMap<>();
 
@@ -51,16 +49,6 @@ public class ServerMessageRouter extends MessageRouter {
 
     public ServerMessageRouter(int readBufferSize, int maxWriteQueueSize) {
         super(readBufferSize, maxWriteQueueSize);
-    }
-
-    public ServerMessageRouter(int port) {
-        this.port = port;
-    }
-
-    public ServerMessageRouter(int port,
-            int readBufferSize, int maxWriteQueueSize) {
-        super(readBufferSize, maxWriteQueueSize);
-        this.port = port;
     }
 
     private synchronized void initializeSelector()
