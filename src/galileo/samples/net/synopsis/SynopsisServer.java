@@ -92,13 +92,13 @@ public class SynopsisServer {
             System.out.println("We will send a reply.");
             EventWithSynopsis reply = new EventWithSynopsis(
                     "ReplySynopsis", "Hello World!".getBytes());
-            context.write(reply);
+            context.sendReply(reply);
 
         } else if (synopsis.equals("ShutdownRequest")) {
 
             EventWithSynopsis reply = new EventWithSynopsis(
                     "Shutdown", new byte[0]);
-            context.write(reply);
+            context.sendReply(reply);
 
         } else {
             System.out.println("I don't know what to do with this "
