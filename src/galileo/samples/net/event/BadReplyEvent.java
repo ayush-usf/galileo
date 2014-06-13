@@ -44,6 +44,10 @@ public class BadReplyEvent implements Event {
         }
     }
 
+    public List<String> getStringList() {
+        return stringList;
+    }
+
     @Deserialize
     public BadReplyEvent(SerializationInputStream in)
     throws IOException {
