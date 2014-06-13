@@ -77,7 +77,10 @@ public class EventServer {
 
         System.out.println("We'll send a reply.");
         try {
-            context.sendReply(new BadReplyEvent());
+            context.sendReply(new BadReplyEvent(
+                        "Lorem ipsum",
+                        "Dolor sit amet",
+                        "Consectetur adipiscing elit"));
         } catch (IOException e) {
             e.printStackTrace();
         }
