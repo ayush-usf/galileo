@@ -43,6 +43,14 @@ public class EventClient {
     }
 
     public static void main(String[] args) {
+    @EventHandler
+    public void processReply(BadReplyEvent event, EventContext context) {
+        List<String> strings = event.getStringList();
+        System.out.println("Reply contents:");
+        for (String s : strings) {
+            System.out.println("'" + s + "'");
+        }
+    }
 
 
     }
