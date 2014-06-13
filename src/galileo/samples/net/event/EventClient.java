@@ -27,22 +27,40 @@ package galileo.samples.net.event;
 
 import java.io.IOException;
 
+import java.util.List;
+
+import galileo.event.EventContext;
+import galileo.event.EventHandler;
+import galileo.event.EventProducer;
 import galileo.event.EventReactor;
 import galileo.net.ClientMessageRouter;
+import galileo.net.NetworkDestination;
 
 public class EventClient {
 
+    private NetworkDestination server;
+
     private ClientMessageRouter messageRouter;
     private EventReactor eventReactor;
+    private EventProducer eventProducer;
 
-    public EventClient()
+    public EventClient(NetworkDestination server)
     throws IOException {
+        this.server = server;
+
         eventReactor = new EventReactor(this, SampleEventMap.instance());
         messageRouter = new ClientMessageRouter();
+        eventProducer = new EventProducer(messageRouter, eventReactor);
+
         messageRouter.addListener(eventReactor);
     }
 
-    public static void main(String[] args) {
+    public void generateEvents()
+    throws IOException {
+        GoodEvent ge = new GoodEvent();
+        eventProducer.publishEvent(server, ge);
+    }
+
     @EventHandler
     public void processReply(BadReplyEvent event, EventContext context) {
         List<String> strings = event.getStringList();
@@ -52,6 +70,18 @@ public class EventClient {
         }
     }
 
+    public static void main(String[] args)
+    throws Exception {
+        if (args.length < 1) {
+            System.out.println("Usage: galileo.samples.net.event.EventClient "
+                    + "<server hostname>");
+            System.exit(1);
+        }
 
+        NetworkDestination server = new NetworkDestination(
+                args[0], EventServer.LISTEN_PORT);
+
+        EventClient ec = new EventClient(server);
+        ec.generateEvents();
     }
 }
