@@ -37,8 +37,9 @@ public class EventClient {
 
     public EventClient()
     throws IOException {
-        messageRouter = new ClientMessageRouter();
         eventReactor = new EventReactor(this, SampleEventMap.instance());
+        messageRouter = new ClientMessageRouter();
+        messageRouter.addListener(eventReactor);
     }
 
     public static void main(String[] args) {
