@@ -40,10 +40,10 @@ public class EventContext {
         this.wrapper = wrapper;
     }
 
-    public void write(Event e)
     /**
      * Send a reply back to the source that created the original event.
      */
+    public void sendReply(Event e)
     throws IOException {
         GalileoMessage m = wrapper.wrap(e);
         this.message.getContext().sendMessage(m);
