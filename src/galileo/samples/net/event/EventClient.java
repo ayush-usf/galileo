@@ -56,16 +56,22 @@ public class EventClient {
     }
 
     public void generateEvents()
-    throws IOException {
+    throws Exception {
         GoodEvent ge = new GoodEvent();
         eventProducer.publishEvent(server, ge);
 
         BadEvent be = new BadEvent();
         eventProducer.publishEvent(server, be);
+
+        /* Have the EventReactor wait for a reply.  Note that this behavior is
+         * only shown to simplify the flow of events; normally, an event loop
+         * should be processing the next event. */
+        eventReactor.processNextEvent();
     }
 
     @EventHandler
     public void processReply(BadReplyEvent event, EventContext context) {
+        System.out.println("A BadReply has been received!");
         List<String> strings = event.getStringList();
         System.out.println("Reply contents:");
         for (String s : strings) {
