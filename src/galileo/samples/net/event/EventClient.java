@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.List;
 
 import galileo.event.EventContext;
-import galileo.event.EventException;
 import galileo.event.EventHandler;
 import galileo.event.EventProducer;
 import galileo.event.EventReactor;
