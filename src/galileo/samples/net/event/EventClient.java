@@ -59,6 +59,9 @@ public class EventClient {
     throws IOException {
         GoodEvent ge = new GoodEvent();
         eventProducer.publishEvent(server, ge);
+
+        BadEvent be = new BadEvent();
+        eventProducer.publishEvent(server, be);
     }
 
     @EventHandler
