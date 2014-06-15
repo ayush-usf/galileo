@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.List;
 
 import galileo.event.EventContext;
+import galileo.event.EventException;
 import galileo.event.EventHandler;
 import galileo.event.EventProducer;
 import galileo.event.EventReactor;
@@ -67,6 +68,9 @@ public class EventClient {
          * only shown to simplify the flow of events; normally, an event loop
          * should be processing the next event. */
         eventReactor.processNextEvent();
+
+        UglyEvent ue = new UglyEvent("Hello", "World");
+        eventProducer.publishEvent(server, ue);
     }
 
     @EventHandler
