@@ -28,6 +28,18 @@ package galileo.net;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Represents the transmission of one unit of data ({@link GalileoMessage}).
+ * Apart from managing the data associated with a network transmission, this
+ * class also acts like a Future: the finish() method will cause the calling
+ * thread to block until the transmission has been completed (either
+ * successfully or unsuccessfully).  This allows transmissions to be carried out
+ * asynchronously, but gives clients a means to ensure the transmission
+ * finished.  This class also allows clients to retrieve Exceptions that may
+ * have occurred while sending the message.
+ *
+ * @author malensek
+ */
 public class Transmission {
 
     private static final Object lock = new Object();
