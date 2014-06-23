@@ -42,6 +42,9 @@ public class TransmissionTracker {
     /** Contains a list of pending write operations for this client. */
     private BlockingQueue<ByteBuffer> pendingWrites;
 
+    //TODO this will replace pendingWrites
+    private BlockingQueue<Transmission> pendingTransmissions;
+
     /** Read pointer for the message size prefix */
     public int prefixPointer;
 
