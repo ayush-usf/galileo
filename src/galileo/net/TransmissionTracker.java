@@ -39,8 +39,6 @@ import java.util.concurrent.BlockingQueue;
  */
 class TransmissionTracker {
 
-    /** Contains a list of pending write operations for this client. */
-    private BlockingQueue<ByteBuffer> pendingWrites;
 
     //TODO this will replace pendingWrites
     private BlockingQueue<Transmission> pendingTransmissions;
@@ -61,7 +59,7 @@ class TransmissionTracker {
     public int expectedBytes;
 
     public TransmissionTracker(int writeQueueSize) {
-        pendingWrites = new ArrayBlockingQueue<>(writeQueueSize);
+        pendingTransmissions = new ArrayBlockingQueue<>(writeQueueSize);
     }
 
     /**
@@ -89,8 +87,8 @@ class TransmissionTracker {
         return trans;
     }
 
-    public BlockingQueue<ByteBuffer> getPendingWriteQueue() {
-        return pendingWrites;
+    public boolean hasPendingData() {
+        return pendingTransmissions.isEmpty() == false;
     }
 
     /**
