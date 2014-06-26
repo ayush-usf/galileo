@@ -91,6 +91,14 @@ class TransmissionTracker {
         return pendingTransmissions.isEmpty() == false;
     }
 
+    public Transmission getNextTransmission() {
+        return pendingTransmissions.peek();
+    }
+
+    public void transmissionFinished() {
+        pendingTransmissions.remove();
+    }
+
     /**
      * Retrieves a TransmissionTracker attachment from a SelectionKey.
      */
