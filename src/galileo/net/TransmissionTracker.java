@@ -85,14 +85,24 @@ class TransmissionTracker {
         return trans;
     }
 
+    /**
+     * Determines whether the SocketChannel associated with this
+     * TransmissionTracker has pending transmissions.
+     */
     public boolean hasPendingData() {
         return pendingTransmissions.isEmpty() == false;
     }
 
+    /**
+     * Retrieves the currently-pending Transmission.
+     */
     public Transmission getNextTransmission() {
         return pendingTransmissions.peek();
     }
 
+    /**
+     * Marks the current Transmission as finished.
+     */
     public void transmissionFinished() {
         pendingTransmissions.remove();
     }
