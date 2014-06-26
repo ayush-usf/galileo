@@ -54,6 +54,10 @@ public class Transmission {
         this.payload = payload;
     }
 
+    protected ByteBuffer getPayload() {
+        return payload;
+    }
+
     /**
      * Causes the calling thread to wait until this transmission has completed.
      *
