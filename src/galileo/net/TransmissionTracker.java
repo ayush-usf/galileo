@@ -82,6 +82,13 @@ class TransmissionTracker {
         expectedBytes = 0;
     }
 
+    public Transmission queueOutgoingData(ByteBuffer payload)
+    throws InterruptedException {
+        Transmission trans = new Transmission(payload);
+        pendingTransmissions.put(trans);
+        return trans;
+    }
+
     public BlockingQueue<ByteBuffer> getPendingWriteQueue() {
         return pendingWrites;
     }
