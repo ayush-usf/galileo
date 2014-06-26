@@ -39,8 +39,6 @@ import java.util.concurrent.BlockingQueue;
  */
 class TransmissionTracker {
 
-
-    //TODO this will replace pendingWrites
     private BlockingQueue<Transmission> pendingTransmissions;
 
     /** Read pointer for the message size prefix */
