@@ -32,8 +32,10 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -146,12 +148,15 @@ public class ClientMessageRouter extends MessageRouter {
     /**
      * Sends a message to multiple network destinations.
      */
-    public void broadcastMessage(Iterable<NetworkDestination> destinations,
-            GalileoMessage message)
+    public List<Transmission> broadcastMessage(
+            Iterable<NetworkDestination> destinations, GalileoMessage message)
     throws IOException {
+        List<Transmission> transmissions = new ArrayList<>();
         for (NetworkDestination destination : destinations) {
-            sendMessage(destination, message);
+            Transmission trans = sendMessage(destination, message);
+            transmissions.add(trans);
         }
+        return transmissions;
     }
 
     /**
