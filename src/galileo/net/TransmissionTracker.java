@@ -37,7 +37,7 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author malensek
  */
-public class TransmissionTracker {
+class TransmissionTracker {
 
     /** Contains a list of pending write operations for this client. */
     private BlockingQueue<ByteBuffer> pendingWrites;
