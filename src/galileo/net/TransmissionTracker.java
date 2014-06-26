@@ -104,7 +104,8 @@ class TransmissionTracker {
      * Marks the current Transmission as finished.
      */
     public void transmissionFinished() {
-        pendingTransmissions.remove();
+        Transmission trans = pendingTransmissions.remove();
+        trans.setFinished();
     }
 
     /**
