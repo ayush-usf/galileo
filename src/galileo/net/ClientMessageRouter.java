@@ -158,7 +158,7 @@ public class ClientMessageRouter extends MessageRouter {
      * Sends a message to the specified network destination.  Connections are
      * completed during the first send operation.
      */
-    public void sendMessage(NetworkDestination destination,
+    public Transmission sendMessage(NetworkDestination destination,
             GalileoMessage message)
     throws IOException {
 
@@ -167,9 +167,10 @@ public class ClientMessageRouter extends MessageRouter {
         TransmissionTracker tracker = ensureConnected(destination);
 
         /* Queue the data to be written */
+        Transmission trans = null;
         ByteBuffer payload = wrapWithPrefix(message);
         try {
-            tracker.getPendingWriteQueue().put(payload);
+            trans = tracker.queueOutgoingData(payload);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -182,6 +183,7 @@ public class ClientMessageRouter extends MessageRouter {
         }
 
         selector.wakeup();
+        return trans;
     }
 
     @Override
