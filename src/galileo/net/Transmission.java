@@ -25,6 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -46,6 +47,12 @@ public class Transmission {
     private boolean finished = false;
 
     private Queue<Exception> exceptions = new LinkedList<>();
+
+    private ByteBuffer payload;
+
+    protected Transmission(ByteBuffer payload) {
+        this.payload = payload;
+    }
 
     /**
      * Causes the calling thread to wait until this transmission has completed.
