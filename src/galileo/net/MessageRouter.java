@@ -220,7 +220,7 @@ public abstract class MessageRouter implements Runnable {
 
             if (channel.finishConnect()) {
                 TransmissionTracker tracker = TransmissionTracker.fromKey(key);
-                if (tracker.getPendingWriteQueue().isEmpty() == true) {
+                if (tracker.hasPendingData() == false) {
                     changeInterest.put(key, SelectionKey.OP_READ);
                 } else {
                     /* Data has already been queued up; start writing */
@@ -387,8 +387,10 @@ public abstract class MessageRouter implements Runnable {
      *
      * @param key SelectionKey for the channel.
      * @param message GalileoMessage to publish on the channel.
+     *
+     * @return {@link Transmission} instance representing the send operation.
      */
-    public void sendMessage(SelectionKey key, GalileoMessage message)
+    public Transmission sendMessage(SelectionKey key, GalileoMessage message)
     throws IOException {
         //TODO reduce the visibility of this method to protected
         if (this.isOnline() == false) {
@@ -397,11 +399,10 @@ public abstract class MessageRouter implements Runnable {
 
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         ByteBuffer payload = wrapWithPrefix(message);
-        BlockingQueue<ByteBuffer> pendingWriteQueue
-            = tracker.getPendingWriteQueue();
 
+        Transmission trans = null;
         try {
-            pendingWriteQueue.put(payload);
+            tracker.queueOutgoingData(payload);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted while waiting to queue data");
@@ -409,9 +410,8 @@ public abstract class MessageRouter implements Runnable {
 
         changeInterest.put(key, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         selector.wakeup();
-        return;
+        return trans;
     }
-
 
     /**
      * When a {@link SelectionKey} is writable, push as much pending data
@@ -422,11 +422,10 @@ public abstract class MessageRouter implements Runnable {
     private void write(SelectionKey key) {
         TransmissionTracker tracker = TransmissionTracker.fromKey(key);
         SocketChannel channel = (SocketChannel) key.channel();
-        BlockingQueue<ByteBuffer> pendingWrites
-            = tracker.getPendingWriteQueue();
 
-        while (pendingWrites.isEmpty() == false) {
-            ByteBuffer buffer = pendingWrites.peek();
+        while (tracker.hasPendingData() == true) {
+            Transmission trans = tracker.getNextTransmission();
+            ByteBuffer buffer = trans.getPayload();
             if (buffer == null) {
                 break;
             }
@@ -443,7 +442,7 @@ public abstract class MessageRouter implements Runnable {
 
                 if (buffer.hasRemaining() == false) {
                     /* Done writing */
-                    pendingWrites.remove();
+                    tracker.transmissionFinished();
                 }
 
                 if (written == 0) {
