@@ -22,11 +22,11 @@ public class TransmissionTest {
     }
 
     public TransmissionTest() throws Exception {
-        Transmission t = new Transmission();
-        OtherThread ot = new OtherThread(t);
-        new Thread(ot).start();
-        t.finish();
-        System.out.println("Transmission complete");
+//        Transmission t = new Transmission();
+//        OtherThread ot = new OtherThread(t);
+//        new Thread(ot).start();
+//        t.finish();
+//        System.out.println("Transmission complete");
     }
 
     public static void main(String[] args) throws Exception {
