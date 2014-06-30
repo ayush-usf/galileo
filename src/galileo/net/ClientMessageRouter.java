@@ -38,9 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -235,7 +233,7 @@ public class ClientMessageRouter extends MessageRouter {
              * TransmissionTracker's pending write queue, and make sure the
              * items in the queues get sent before shutdown happens. */
             if (forcible == false) {
-                //safeShutdown(key);
+                safeShutdown(key);
             }
 
             if (key != null) {
@@ -246,56 +244,22 @@ public class ClientMessageRouter extends MessageRouter {
         selector.wakeup();
     }
 
-//    /**
-//     * This method checks a given SelectionKey's write queue for pending
-//     * writes, and then does a series of sleep-checks until the queue is empty.
-//     *
-//     * @param key SelectionKey to monitor for pending writes.
-//     */
-//    private void safeShutdown(SelectionKey key) {
-//        final int initialWait = 1000;
-//        final int longestWait = 5000;
-//
-//        if (key == null) {
-//            return;
-//        }
-//
-//        TransmissionTracker tracker = TransmissionTracker.fromKey(key);
-//        BlockingQueue<ByteBuffer> pendingWrites
-//            = tracker.getPendingWriteQueue();
-//
-//        int wait = initialWait;
-//        int size = pendingWrites.size();
-//        if (pendingWrites.isEmpty() == false) {
-//            do {
-//                try {
-//                    Thread.sleep(wait);
-//                } catch (InterruptedException e) {
-//                    logger.log(Level.WARNING, "Received interrupt "
-//                            + "during safe shutdown.", e);
-//                }
-//
-//                if (pendingWrites.isEmpty() == false) {
-//                    /* Still not empty; we'll log something now. */
-//                    logger.info("Waiting to shut down; " + pendingWrites.size()
-//                            + " items remaining in write queue.");
-//
-//                    /* If the queue didn't get any smaller, increase the amount
-//                     * of time we'll wait before polling. */
-//                    if (pendingWrites.size() >= size && wait < longestWait) {
-//                        wait += initialWait;
-//                    }
-//                    size = pendingWrites.size();
-//
-//                    /* Make sure the SelectionKey is still valid. */
-//                    if (key.isValid() == false) {
-//                        logger.severe("Connection terminated while emptying "
-//                                + "send buffer!");
-//                        return;
-//                    }
-//                }
-//
-//            } while (pendingWrites.isEmpty() == false);
-//        }
-//    }
+    /**
+     * This method checks a given SelectionKey's write queue for pending
+     * writes, and then does a series of sleep-checks until the queue is empty.
+     *
+     * @param key SelectionKey to monitor for pending writes.
+     */
+    private void safeShutdown(SelectionKey key) {
+        TransmissionTracker tracker = TransmissionTracker.fromKey(key);
+        Iterator<Transmission> it = tracker.pendingTransmissionIterator();
+        while (it.hasNext()) {
+            Transmission t = it.next();
+            try {
+                t.finish();
+            } catch (InterruptedException e) {
+                logger.warning("Interrupted during safe shutdown");
+            }
+        }
+    }
 }
