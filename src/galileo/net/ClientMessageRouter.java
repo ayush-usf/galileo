@@ -226,6 +226,8 @@ public class ClientMessageRouter extends MessageRouter {
      * messages).
      */
     private void shutdown(boolean forcible) {
+        //TODO we need to start refusing send operations here (before doing a
+        //final flush of the outgoing queues)
         for (SocketChannel channel : destinationToSocket.values()) {
             SelectionKey key = channel.keyFor(this.selector);
 
