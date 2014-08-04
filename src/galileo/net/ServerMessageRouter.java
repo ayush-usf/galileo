@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+import galileo.util.StackTraceToString;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -80,7 +82,9 @@ public class ServerMessageRouter extends MessageRouter {
      * @param port The port to listen for messages on.
      */
     public void listen(int port)
-    throws IOException {
+    {
+        System.out.println("Listening on port " + port);
+        try {
         initializeSelector();
 
         ServerSocketChannel channel = ServerSocketChannel.open();
@@ -88,6 +92,9 @@ public class ServerMessageRouter extends MessageRouter {
         channel.socket().bind(new InetSocketAddress(port));
         channel.register(selector, SelectionKey.OP_ACCEPT);
         channels.put(port, channel);
+        } catch (Exception e) {
+            System.out.println("Error listening on port " + port + ", info: " + StackTraceToString.convert(e));
+        }
 
         startSelectorThread();
     }

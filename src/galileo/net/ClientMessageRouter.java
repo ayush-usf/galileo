@@ -208,6 +208,7 @@ public class ClientMessageRouter extends MessageRouter {
             } catch (Exception e) {
                 String info = StackTraceToString.convert(e);
                 System.out.println("SEND FAILED. INFO: " + info);
+                System.out.println("---> Send was going to " + destination.getHostname() + " port " + destination.getPort());
                 //e.printStackTrace();
                 return;
             }
