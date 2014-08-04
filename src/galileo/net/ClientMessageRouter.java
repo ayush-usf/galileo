@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+import galileo.util.StackTraceToString;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -204,8 +206,9 @@ public class ClientMessageRouter extends MessageRouter {
             try {
             s = new Socket(destination.getHostname(), destination.getPort());
             } catch (Exception e) {
-                System.out.println("SEND FAILED");
-                e.printStackTrace();
+                String info = StackTraceToString.convert(e);
+                System.out.println("SEND FAILED. INFO: " + info);
+                //e.printStackTrace();
                 return;
             }
             simonSockets.put(destination, s);
