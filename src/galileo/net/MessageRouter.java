@@ -25,8 +25,9 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
-import java.io.IOException;
+import galileo.util.StackTraceToString;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -121,6 +122,7 @@ public abstract class MessageRouter implements Runnable {
                 processSelectionKeys();
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Error in selector thread", e);
+                System.out.println("Error in selector thread" + StackTraceToString.convert(e));
             }
         }
     }
@@ -201,6 +203,7 @@ public abstract class MessageRouter implements Runnable {
         ServerSocketChannel servSocket = (ServerSocketChannel) key.channel();
         SocketChannel channel = servSocket.accept();
         logger.info("Accepted connection: " + getClientString(channel));
+        System.out.println("Accepted connection: " + getClientString(channel));
 
         TransmissionTracker tracker = new TransmissionTracker(writeQueueSize);
         channel.configureBlocking(false);
@@ -232,6 +235,7 @@ public abstract class MessageRouter implements Runnable {
             dispatchConnect(getDestination(channel));
         } catch (IOException e) {
             logger.log(Level.INFO, "Connection finalization failed", e);
+            System.out.println("Connection finalization failed"+ StackTraceToString.convert(e));
             disconnect(key);
         }
     }
@@ -255,16 +259,19 @@ public abstract class MessageRouter implements Runnable {
             }
         } catch (IOException e) {
             logger.log(Level.FINE, "Abnormal remote termination", e);
+            System.out.println("Abnormal remote termination"+ StackTraceToString.convert(e));
             disconnect(key);
             return;
         } catch (BufferUnderflowException e) {
             /* Incoming packets lied about their size! */
             logger.log(Level.WARNING, "Incoming packet size mismatch", e);
+            System.out.println("Incoming packet size mismatch"+ StackTraceToString.convert(e));
         }
 
         if (bytesRead == -1) {
             /* Connection was terminated by the client. */
             logger.fine("Reached EOF in channel input stream");
+            System.out.println("Reached EOF in channel input stream");
             disconnect(key);
             return;
         }
@@ -470,12 +477,14 @@ public abstract class MessageRouter implements Runnable {
         SocketChannel channel = (SocketChannel) key.channel();
         NetworkDestination destination = getDestination(channel);
         logger.info("Terminating connection: " + destination.toString());
+        System.out.println("Terminating connection: " + destination.toString());
 
         try {
             key.cancel();
             key.channel().close();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to disconnect channel", e);
+            System.out.println("Failed to disconnect channel"+ StackTraceToString.convert(e));
         }
 
         dispatchDisconnect(destination);
