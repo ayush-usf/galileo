@@ -25,8 +25,12 @@ software, even if advised of the possibility of such damage.
 
 package galileo.net;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -56,6 +60,9 @@ public class ClientMessageRouter extends MessageRouter {
     protected Map<SocketChannel, NetworkDestination> socketToDestination
         = new HashMap<>();
     protected Map<SocketChannel, TransmissionTracker> socketToTracker
+        = new HashMap<>();
+
+    protected Map<NetworkDestination, Socket> simonSockets
         = new HashMap<>();
 
     protected Queue<SocketChannel> pendingRegistrations
@@ -187,6 +194,34 @@ public class ClientMessageRouter extends MessageRouter {
 
         selector.wakeup();
         return trans;
+    }
+
+    public synchronized void sendMessageSimon(NetworkDestination destination,
+            GalileoMessage message) {
+
+        Socket s = simonSockets.get(destination);
+        if (s == null) {
+            try {
+            s = new Socket(destination.getHostname(), destination.getPort());
+            } catch (Exception e) {
+                System.out.println("SEND FAILED");
+                e.printStackTrace();
+                return;
+            }
+            simonSockets.put(destination, s);
+        }
+        try {
+        ByteBuffer payload = wrapWithPrefix(message);
+
+        OutputStream out = s.getOutputStream();
+        BufferedOutputStream buffOut = new BufferedOutputStream(out);
+
+        buffOut.write(payload.array());
+        buffOut.flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
