@@ -51,6 +51,26 @@ clean_children() {
 }
 trap clean_children SIGINT SIGTERM
 
+thread_done() {
+    (( active_threads-- ))
+}
+trap thread_done SIGUSR1
+
+scp_host() {
+    local_file=${1}
+    remote_file=${2}
+
+    output=$(scp ${ssh_opts} ${local_file} ${remote_file} 2>&1)
+    exit_code=${?}
+
+    # scp defines nonzero exit code as error state
+    [[ ${exit_code} -gt 0 ]] && error=true
+
+    echo "${2}"
+
+    kill -s SIGUSR1 $$
+}
+
 while getopts "cf:l:o:pqu:t:" flag; do
     case ${flag} in
         c) color=true ;;
@@ -83,7 +103,7 @@ hosts="${hosts} ${host_list}"
 
 set -f # Temporarily disable pathname expansion
 for host in ${hosts}; do
-    scp ${1} ${host}:${2} &
+    scp_host "${1}" "${host}:${2}" &
 done
 set +f
 
