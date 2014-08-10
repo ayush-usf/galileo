@@ -83,6 +83,8 @@ hosts="${hosts} ${host_list}"
 
 set -f # Temporarily disable pathname expansion
 for host in ${hosts}; do
-    scp ${1} ${host}:${2}
+    scp ${1} ${host}:${2} &
 done
 set +f
+
+until wait; do :; done
