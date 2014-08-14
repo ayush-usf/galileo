@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="yes"?>
 
-<project name="Galileo" basedir="." default="jar">
+<project name="galileo" basedir="." default="jar">
     <!-- Build properties -->
     <property name="project.version" value="0.6"/>
     <property name="project.url" value="http://galileo.cs.colostate.edu"/>
