@@ -15,4 +15,4 @@ docs/api
 .DS_Store
 
 # Binaries
-lib/Galileo-*.jar
+lib/galileo-[0-9].[0-9].jar
