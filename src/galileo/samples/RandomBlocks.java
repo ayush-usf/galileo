@@ -42,6 +42,7 @@ import galileo.dataset.feature.Feature;
 import galileo.dataset.feature.FeatureSet;
 import galileo.event.EventContainer;
 import galileo.event.EventType;
+import galileo.graph.Path;
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.MessageListener;
@@ -101,7 +102,10 @@ public class RandomBlocks implements MessageListener {
                 QueryResponse response = Serializer.deserialize(
                         QueryResponse.class, container.getEventPayload());
 
-                System.out.println(response.getMetadata());
+                System.out.println(response.getResults().size());
+                for (Path<Feature, String> p : response.getResults()) {
+                    System.out.println(p);
+                }
             }
 
         } catch (Exception e) {
