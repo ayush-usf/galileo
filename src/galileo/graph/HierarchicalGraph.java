@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Queue;
@@ -100,14 +101,21 @@ public class HierarchicalGraph<T> {
     }
 
     public List<Path<Feature, T>> evaluateQuery(Query query) {
-        HierarchicalQueryTracker<T> tracker
-            = new HierarchicalQueryTracker<>(root, features.size());
+        List<Path<Feature, T>> paths = null;
 
         for (Operation operation : query.getOperations()) {
+            HierarchicalQueryTracker<T> tracker
+                = new HierarchicalQueryTracker<>(root, features.size());
             evaluateOperation(operation, tracker);
+            List<Path<Feature, T>> opResult = tracker.getQueryResults();
+
+            if (paths == null) {
+                paths = opResult;
+            } else {
+                paths.addAll(opResult);
+            }
         }
 
-        List<Path<Feature, T>> paths = tracker.getQueryResults();
         for (Path<Feature, T> path : paths) {
             removeNullFeatures(path);
         }
