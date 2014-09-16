@@ -102,7 +102,7 @@ public class QueryDemo implements MessageListener {
         Query q3 = new Query();
         Operation op = new Operation();
         Expression e1 = new Expression(
-                "==", new Feature("temperature", 0.94320774f));
+                ">", new Feature("temperature", 32.0f));
         Expression e2 = new Expression(
                 "<=", new Feature("condensation", 50.0f));
         op.addExpressions(e1, e2);
