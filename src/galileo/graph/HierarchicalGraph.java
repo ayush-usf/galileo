@@ -281,8 +281,12 @@ public class HierarchicalGraph<T> {
      * modifications are made to the map.
      */
     private void removeWildcard(NavigableMap<Feature, Vertex<Feature, T>> map) {
+        if (map.size() <= 0) {
+            return;
+        }
+
         Feature first = map.firstKey();
-        if (map.size() > 0 && first.getType() == FeatureType.NULL) {
+        if (first.getType() == FeatureType.NULL) {
             map.remove(first);
         }
     }
