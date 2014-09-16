@@ -250,6 +250,23 @@ public class HierarchicalGraph<T> {
     }
 
     /**
+     * When a path does not contain a particular Feature, we use a null feature
+     * (FeatureType.NULL) to act as a "wildcard" in the graph so that the path
+     * stays linked together. The side effect of this is that 'less than'
+     * comparisons may return wildcards, which are removed with this method.
+     *
+     * @param map The map to remove the first NULL element from. If the map has
+     * no elements or the first element is not a NULL FeatureType, then no
+     * modifications are made to the map.
+     */
+    private void removeWildcard(NavigableMap<Feature, Vertex<Feature, T>> map) {
+        Feature first = map.firstKey();
+        if (map.size() > 0 && first.getType() == FeatureType.NULL) {
+            map.remove(first);
+        }
+    }
+
+    /**
      * Adds a new {@link Path} to the Hierarchical Graph.
      */
     public void addPath(Path<Feature, T> path)
