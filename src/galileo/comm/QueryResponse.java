@@ -27,10 +27,17 @@ package galileo.comm;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import galileo.dataset.feature.Feature;
 import galileo.event.EventType;
 import galileo.event.GalileoEvent;
+import galileo.graph.FeaturePath;
 import galileo.graph.GraphException;
-import galileo.graph.MetadataGraph;
+import galileo.graph.Path;
+import galileo.graph.Vertex;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
@@ -38,19 +45,19 @@ import galileo.serialization.SerializationOutputStream;
 public class QueryResponse implements GalileoEvent {
 
     private String id;
-    private MetadataGraph metadata;
+    private List<Path<Feature, String>> results;
 
-    public QueryResponse(String id, MetadataGraph metadata) {
+    public QueryResponse(String id, List<Path<Feature, String>> results) {
         this.id = id;
-        this.metadata = metadata;
+        this.results = results;
     }
 
     public String getId() {
         return id;
     }
 
-    public MetadataGraph getMetadata() {
-        return metadata;
+    public List<Path<Feature, String>> getResults() {
+        return results;
     }
 
     @Override
@@ -61,13 +68,44 @@ public class QueryResponse implements GalileoEvent {
     public QueryResponse(SerializationInputStream in)
     throws IOException, SerializationException, GraphException {
         id = in.readString();
-        metadata = new MetadataGraph(in);
+        int numResults = in.readInt();
+        results = new ArrayList<>(numResults);
+        for (int i = 0; i < numResults; ++i) {
+            FeaturePath<String> p = new FeaturePath<>();
+            int numVertices = in.readInt();
+            for (int vertex = 0; vertex < numVertices; ++vertex) {
+                Feature f = new Feature(in);
+                Vertex<Feature, String> v = new Vertex<>(f);
+                p.add(v);
+            }
+
+            int numPayloads = in.readInt();
+            for (int payload = 0; payload < numPayloads; ++payload) {
+                String pay = in.readString();
+                p.addPayload(pay);
+            }
+
+            results.add(p);
+        }
     }
 
     @Override
     public void serialize(SerializationOutputStream out)
     throws IOException {
         out.writeString(id);
-        out.writeSerializable(metadata);
+        out.writeInt(results.size());
+        for (Path<Feature, String> path : results) {
+            List<Vertex<Feature, String>> vertices = path.getVertices();
+            out.writeInt(vertices.size());
+            for (Vertex<Feature, String> v : vertices) {
+                out.writeSerializable(v.getLabel());
+            }
+
+            Collection<String> payload = path.getPayload();
+            out.writeInt(payload.size());
+            for (String item : payload) {
+                out.writeString(item);
+            }
+        }
     }
 }

@@ -42,13 +42,14 @@ import galileo.comm.StorageRequest;
 import galileo.config.SystemConfig;
 import galileo.dataset.Block;
 import galileo.dataset.Metadata;
+import galileo.dataset.feature.Feature;
 import galileo.dht.hash.HashException;
 import galileo.dht.hash.HashTopologyException;
 import galileo.event.EventContainer;
 import galileo.event.EventType;
 import galileo.fs.FileSystemException;
 import galileo.fs.GeospatialFileSystem;
-import galileo.graph.MetadataGraph;
+import galileo.graph.Path;
 import galileo.net.ClientConnectionPool;
 import galileo.net.GalileoMessage;
 import galileo.net.HostIdentifier;
@@ -310,11 +311,11 @@ public class StorageNode implements MessageListener {
             QueryEvent query = deserializeEvent(QueryEvent.class);
             logger.info(query.getQuery().toString());
 
-            MetadataGraph results = MetadataGraph.fromPaths(
-                    fs.query(query.getQuery()));
-            logger.info("Got " + results.numVertices() + "results");
-            QueryResponse response
-                = new QueryResponse(query.getQueryId(), results);
+            List<Path<Feature, String>> results = fs.query(query.getQuery());
+            logger.info("Got " + results.size() + " results");
+
+            QueryResponse response = new QueryResponse(
+                    query.getQueryId(), results);
             publishResponse(response);
         }
     }
