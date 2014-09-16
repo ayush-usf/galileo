@@ -181,7 +181,7 @@ public class HierarchicalGraph<T> {
             Feature value = expression.getValue();
 
             switch (expression.getOperator()) {
-                case EQUAL:
+                case EQUAL: {
                     /* Select a particular neighboring vertex */
                     Vertex<Feature, T> equalTo = vertex.getNeighbor(value);
 
@@ -192,13 +192,17 @@ public class HierarchicalGraph<T> {
 
                     evalSet.add(equalTo);
                     break;
+                }
 
-                case NOTEQUAL:
+                case NOTEQUAL: {
                     /* Add all the neighboring vertices, and then remove the
                      * particular value specified. */
                     evalSet.addAll(vertex.getAllNeighbors());
                     evalSet.remove(vertex.getNeighbor(value));
+
                     break;
+                }
+
                 case LESS: {
                     NavigableMap<Feature, Vertex<Feature, T>> neighbors
                         = vertex.getNeighborsLessThan(value, false);
@@ -217,17 +221,21 @@ public class HierarchicalGraph<T> {
                     break;
                 }
 
-                case GREATER:
+                case GREATER: {
                     evalSet.addAll(
                             vertex.getNeighborsGreaterThan(value, false)
                             .values());
-                    break;
 
-                case GREATEREQUAL:
+                    break;
+                }
+
+                case GREATEREQUAL: {
                     evalSet.addAll(
                             vertex.getNeighborsGreaterThan(value, true)
                             .values());
+
                     break;
+                }
 
                 case UNKNOWN:
                 default:
