@@ -199,18 +199,23 @@ public class HierarchicalGraph<T> {
                     evalSet.addAll(vertex.getAllNeighbors());
                     evalSet.remove(vertex.getNeighbor(value));
                     break;
+                case LESS: {
+                    NavigableMap<Feature, Vertex<Feature, T>> neighbors
+                        = vertex.getNeighborsLessThan(value, false);
+                    removeWildcard(neighbors);
+                    evalSet.addAll(neighbors.values());
 
-                case LESS:
-                    evalSet.addAll(
-                            vertex.getNeighborsLessThan(value, false)
-                            .values());
                     break;
+                }
 
-                case LESSEQUAL:
-                    evalSet.addAll(
-                            vertex.getNeighborsLessThan(value, true)
-                            .values());
+                case LESSEQUAL: {
+                    NavigableMap<Feature, Vertex<Feature, T>> neighbors
+                        = vertex.getNeighborsLessThan(value, true);
+                    removeWildcard(neighbors);
+                    evalSet.addAll(neighbors.values());
+
                     break;
+                }
 
                 case GREATER:
                     evalSet.addAll(
