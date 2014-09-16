@@ -1,8 +1,6 @@
 
 package galileo.samples;
 
-import java.awt.Container;
-
 import java.util.List;
 
 import galileo.client.EventPublisher;
@@ -119,8 +117,8 @@ public class QueryDemo implements MessageListener {
         QueryEvent qe2 = new QueryEvent("query2", q2);
         QueryEvent qe3 = new QueryEvent("query3", q3);
 
-//        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe1));
-//        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe2));
+        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe1));
+        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe2));
         messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe3));
     }
 }
