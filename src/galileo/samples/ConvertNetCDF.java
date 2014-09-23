@@ -240,6 +240,7 @@ public class ConvertNetCDF {
         Variable timeVar = n.findVariable("time");
         String timeStr = timeVar.getUnitsString().toUpperCase();
         timeStr = timeStr.replace("HOURS SINCE ", "");
+        timeStr = timeStr.replace("HOUR SINCE ", "");
 
         /* Find the base date (the day) the reading was taken */
         Date baseDate
