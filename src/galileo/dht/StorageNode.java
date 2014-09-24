@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import galileo.comm.GalileoEventMap;
 import galileo.comm.QueryEvent;
 import galileo.comm.QueryPreamble;
 import galileo.comm.QueryRequest;
@@ -45,8 +46,9 @@ import galileo.dataset.Metadata;
 import galileo.dataset.feature.Feature;
 import galileo.dht.hash.HashException;
 import galileo.dht.hash.HashTopologyException;
-import galileo.event.EventContainer;
-import galileo.event.EventType;
+import galileo.event.Event;
+import galileo.event.EventContext;
+import galileo.event.EventReactor;
 import galileo.fs.FileSystemException;
 import galileo.fs.GeospatialFileSystem;
 import galileo.graph.Path;
@@ -68,7 +70,7 @@ import galileo.util.Version;
  *
  * @author malensek
  */
-public class StorageNode implements MessageListener {
+public class StorageNode {
 
     private static final Logger logger = Logger.getLogger("galileo");
     private StatusLine nodeStatus;
@@ -78,14 +80,14 @@ public class StorageNode implements MessageListener {
 
     private File pidFile;
 
-    private int threads = 1;
-
     private NetworkInfo network;
 
     private ServerMessageRouter messageRouter;
     private ClientConnectionPool connectionPool;
-    private Scheduler scheduler;
     private GeospatialFileSystem fs;
+
+    private GalileoEventMap eventMap = new GalileoEventMap();
+    private EventReactor eventReactor = new EventReactor(this, eventMap);
 
     private Partitioner<Metadata> partitioner;
 
@@ -148,15 +150,15 @@ public class StorageNode implements MessageListener {
 
         /* Pre-scheduler setup tasks */
         connectionPool = new ClientConnectionPool();
-        connectionPool.addListener(this);
+        connectionPool.addListener(eventReactor);
         configurePartitioner();
 
-        /* Initialize the Scheduler */
-        scheduler = new QueueScheduler(threads);
+//        /* Initialize the Scheduler */
+//        scheduler = new QueueScheduler(threads);
 
         /* Start listening for incoming messages. */
         messageRouter = new ServerMessageRouter();
-        messageRouter.addListener(this);
+        messageRouter.addListener(eventReactor);
         messageRouter.listen(port);
         nodeStatus.set("Online");
     }
@@ -175,55 +177,60 @@ public class StorageNode implements MessageListener {
         partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
     }
 
-    @Override
-    public void onConnect(NetworkDestination endpoint) { }
+//    @Override
+//    public void onConnect(NetworkDestination endpoint) { }
+//
+//    @Override
+//    public void onDisconnect(NetworkDestination endpoint) { }
+//
+//    @Override
+//    public void onMessage(GalileoMessage message) {
+//        try {
+//            EventContainer container = Serializer.deserialize(
+//                    EventContainer.class, message.getPayload());
+//
+//            EventHandler handler = getHandler(container);
+//            if (handler == null) {
+//                EventType type = container.getEventType();
+//                logger.log(Level.WARNING,
+//                        "No handler found for event type " + type.toInt());
+//                return;
+//            }
+//
+//            handler.message = message;
+//            handler.eventContainer = container;
+//            handler.router = messageRouter;
+//            handler.connectionPool = connectionPool;
+//
+//            scheduler.schedule(handler);
+//
+//        } catch (Exception e) {
+//            logger.log(Level.WARNING, "Failed to process incoming message", e);
+//        }
+//    }
 
-    @Override
-    public void onDisconnect(NetworkDestination endpoint) { }
+//    /**
+//     * Provides a mapping between events (implementations of
+//     * {@link GalileoEvent}) and their respective {@link EventHandler}s.
+//     */
+//    private EventHandler getHandler(EventContainer container) {
+//        EventType type = container.getEventType();
+//
+//        logger.log(Level.INFO, "Processing event type: {0}", type);
+//
+//        switch (type) {
+//            case STORAGE: return new storageHandler();
+//            case STORAGE_REQUEST: return new storageRequestHandler();
+//            case QUERY: return new queryHandler();
+//            case QUERY_REQUEST: return new queryRequestHandler();
+//            case QUERY_RESPONSE: return new queryResponseHandler();
+//            default: return null;
+//        }
+//    }
 
-    @Override
-    public void onMessage(GalileoMessage message) {
-        try {
-            EventContainer container = Serializer.deserialize(
-                    EventContainer.class, message.getPayload());
-
-            EventHandler handler = getHandler(container);
-            if (handler == null) {
-                EventType type = container.getEventType();
-                logger.log(Level.WARNING,
-                        "No handler found for event type " + type.toInt());
-                return;
-            }
-
-            handler.message = message;
-            handler.eventContainer = container;
-            handler.router = messageRouter;
-            handler.connectionPool = connectionPool;
-
-            scheduler.schedule(handler);
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to process incoming message", e);
-        }
-    }
-
-    /**
-     * Provides a mapping between events (implementations of
-     * {@link GalileoEvent}) and their respective {@link EventHandler}s.
-     */
-    private EventHandler getHandler(EventContainer container) {
-        EventType type = container.getEventType();
-
-        logger.log(Level.INFO, "Processing event type: {0}", type);
-
-        switch (type) {
-            case STORAGE: return new storageHandler();
-            case STORAGE_REQUEST: return new storageRequestHandler();
-            case QUERY: return new queryHandler();
-            case QUERY_REQUEST: return new queryRequestHandler();
-            case QUERY_RESPONSE: return new queryResponseHandler();
-            default: return null;
-        }
+    private void sendEvent(NodeInfo node, Event event)
+    throws IOException {
+        connectionPool.sendMessage(node, eventReactor.wrapEvent(event));
     }
 
     /**
@@ -231,108 +238,99 @@ public class StorageNode implements MessageListener {
      * the data belongs via a {@link Partitioner} implementation and then
      * forwarding the data on to its destination.
      */
-    private class storageRequestHandler extends EventHandler {
-        @Override
-        public void handleEvent() throws Exception {
-            StorageRequest request = deserializeEvent(StorageRequest.class);
+    @galileo.event.EventHandler
+    private void handleStorageRequest(
+            StorageRequest request, EventContext context)
+    throws HashException, IOException, PartitionException {
 
-            /* Determine where this block goes. */
-            Block file = request.getBlock();
-            Metadata metadata = file.getMetadata();
-            NodeInfo node = partitioner.locateData(metadata);
+        /* Determine where this block goes. */
+        Block file = request.getBlock();
+        Metadata metadata = file.getMetadata();
+        NodeInfo node = partitioner.locateData(metadata);
 
-            logger.log(Level.INFO, "Storage destination: {0}", node);
-            StorageEvent store = new StorageEvent(file);
-            publishEvent(store, node);
-        }
+        logger.log(Level.INFO, "Storage destination: {0}", node);
+        StorageEvent store = new StorageEvent(file);
+        sendEvent(node, store);
     }
 
-    private class storageHandler extends EventHandler {
-        @Override
-        public void handleEvent() throws Exception {
-            StorageEvent store = deserializeEvent(StorageEvent.class);
-
-            logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
-            fs.storeBlock(store.getBlock());
-        }
+    @galileo.event.EventHandler
+    private void handleStorage(StorageEvent store, EventContext context)
+    throws FileSystemException, IOException {
+        logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
+        fs.storeBlock(store.getBlock());
     }
 
     /**
      * Handles a query request from a client.  Query requests result in a number
      * of subqueries being performed across the Galileo network.
      */
-    private class queryRequestHandler extends EventHandler {
-        @Override
-        public void handleEvent() throws Exception {
-            QueryRequest request = deserializeEvent(QueryRequest.class);
-            String queryString = request.getQueryString();
-            logger.log(Level.INFO, "Query request: {0}", queryString);
+    @galileo.event.EventHandler
+    private void handleQueryRequest(QueryRequest request, EventContext context)
+    throws IOException {
+        String queryString = request.getQueryString();
+        logger.log(Level.INFO, "Query request: {0}", queryString);
 
-            /* Determine StorageNodes that contain relevant data. */
-            //featureGraph.query(
-            List<NodeInfo> queryNodes = new ArrayList<>();
-            queryNodes.addAll(network.getAllNodes());
+        /* Determine StorageNodes that contain relevant data. */
+        //featureGraph.query(
+        List<NodeInfo> queryNodes = new ArrayList<>();
+        queryNodes.addAll(network.getAllNodes());
 
-            /* Set up QueryTracker for this request */
-            QueryTracker tracker = new QueryTracker(
-                    message.getContext().getSelectionKey());
-            String clientId = tracker.getIdString(sessionId);
-            queryTrackers.put(clientId, tracker);
-
-            /* Send a Query Preamble to the client */
-            QueryPreamble preamble = new QueryPreamble(
-                    clientId, queryString, queryNodes);
-            publishResponse(preamble);
-
-            /* Optionally write out where this query is going */
-            if (logger.isLoggable(Level.INFO)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Forwarding Query to nodes: ");
-                for (NodeInfo node : queryNodes) {
-                    sb.append(node.toString() + " ");
-                }
-                logger.info(sb.toString());
-            }
-
-            QueryEvent query = new QueryEvent(tracker.getIdString(sessionId),
-                    request.getQuery());
-            for (NodeInfo node : queryNodes) {
-                publishEvent(query, node);
-            }
-        }
+        /* Set up QueryTracker for this request */
+//        QueryTracker tracker = new QueryTracker(
+//                message.getContext().getSelectionKey());
+//        String clientId = tracker.getIdString(sessionId);
+//        queryTrackers.put(clientId, tracker);
+//
+//        /* Send a Query Preamble to the client */
+//        QueryPreamble preamble = new QueryPreamble(
+//                clientId, queryString, queryNodes);
+//        publishResponse(preamble);
+//
+//        /* Optionally write out where this query is going */
+//        if (logger.isLoggable(Level.INFO)) {
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("Forwarding Query to nodes: ");
+//            for (NodeInfo node : queryNodes) {
+//                sb.append(node.toString() + " ");
+//            }
+//            logger.info(sb.toString());
+//        }
+//
+//        QueryEvent query = new QueryEvent(tracker.getIdString(sessionId),
+//                request.getQuery());
+//        for (NodeInfo node : queryNodes) {
+//            publishEvent(query, node);
+//        }
     }
 
     /**
      * Handles an internal Query request (from another StorageNode)
      */
-    private class queryHandler extends EventHandler {
-        @Override
-        public void handleEvent() throws Exception {
-            QueryEvent query = deserializeEvent(QueryEvent.class);
-            logger.info(query.getQuery().toString());
+    @galileo.event.EventHandler
+    private void handleQuery(QueryEvent query, EventContext context)
+    throws IOException {
+        logger.info(query.getQuery().toString());
 
-            List<Path<Feature, String>> results = fs.query(query.getQuery());
-            logger.info("Got " + results.size() + " results");
+        List<Path<Feature, String>> results = fs.query(query.getQuery());
+        logger.info("Got " + results.size() + " results");
 
-            QueryResponse response = new QueryResponse(
-                    query.getQueryId(), results);
-            publishResponse(response);
-        }
+        QueryResponse response = new QueryResponse(
+                query.getQueryId(), results);
+        context.sendReply(response);
     }
 
-    private class queryResponseHandler extends EventHandler {
-        @Override
-        public void handleEvent() throws Exception {
-            QueryResponse response = deserializeEvent(QueryResponse.class);
-            QueryTracker tracker = queryTrackers.get(response.getId());
-            if (tracker == null) {
-                logger.log(Level.WARNING,
-                        "Unknown query response received: {0}",
-                        response.getId());
-                return;
-            }
-            sendMessage(tracker.getSelectionKey(), message);
+    @galileo.event.EventHandler
+    private void handleQueryResponse(
+            QueryResponse response, EventContext context)
+    throws IOException {
+        QueryTracker tracker = queryTrackers.get(response.getId());
+        if (tracker == null) {
+            logger.log(Level.WARNING,
+                    "Unknown query response received: {0}",
+                    response.getId());
+            return;
         }
+        //sendMessage(tracker.getSelectionKey(), message);
     }
 
     /**
