@@ -239,7 +239,7 @@ public class StorageNode {
      * forwarding the data on to its destination.
      */
     @galileo.event.EventHandler
-    private void handleStorageRequest(
+    public void handleStorageRequest(
             StorageRequest request, EventContext context)
     throws HashException, IOException, PartitionException {
 
@@ -254,7 +254,7 @@ public class StorageNode {
     }
 
     @galileo.event.EventHandler
-    private void handleStorage(StorageEvent store, EventContext context)
+    public void handleStorage(StorageEvent store, EventContext context)
     throws FileSystemException, IOException {
         logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
         fs.storeBlock(store.getBlock());
@@ -265,7 +265,7 @@ public class StorageNode {
      * of subqueries being performed across the Galileo network.
      */
     @galileo.event.EventHandler
-    private void handleQueryRequest(QueryRequest request, EventContext context)
+    public void handleQueryRequest(QueryRequest request, EventContext context)
     throws IOException {
         String queryString = request.getQueryString();
         logger.log(Level.INFO, "Query request: {0}", queryString);
@@ -307,7 +307,7 @@ public class StorageNode {
      * Handles an internal Query request (from another StorageNode)
      */
     @galileo.event.EventHandler
-    private void handleQuery(QueryEvent query, EventContext context)
+    public void handleQuery(QueryEvent query, EventContext context)
     throws IOException {
         logger.info(query.getQuery().toString());
 
@@ -320,7 +320,7 @@ public class StorageNode {
     }
 
     @galileo.event.EventHandler
-    private void handleQueryResponse(
+    public void handleQueryResponse(
             QueryResponse response, EventContext context)
     throws IOException {
         QueryTracker tracker = queryTrackers.get(response.getId());
