@@ -161,6 +161,11 @@ public class StorageNode {
         messageRouter.addListener(eventReactor);
         messageRouter.listen(port);
         nodeStatus.set("Online");
+
+        /* Start processing the message loop */
+        while (true) {
+            eventReactor.processNextEvent();
+        }
     }
 
     private void configurePartitioner()
