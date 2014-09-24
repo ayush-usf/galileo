@@ -4,11 +4,12 @@ package galileo.samples;
 import java.util.List;
 
 import galileo.client.EventPublisher;
+import galileo.comm.GalileoEventMap;
 import galileo.comm.QueryEvent;
 import galileo.comm.QueryResponse;
 import galileo.dataset.feature.Feature;
-import galileo.event.EventContainer;
-import galileo.event.EventType;
+import galileo.event.BasicEventWrapper;
+import galileo.event.EventWrapper;
 import galileo.graph.Path;
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
@@ -17,9 +18,11 @@ import galileo.net.NetworkDestination;
 import galileo.query.Expression;
 import galileo.query.Operation;
 import galileo.query.Query;
-import galileo.serialization.Serializer;
 
 public class QueryDemo implements MessageListener {
+
+    private static GalileoEventMap eventMap = new GalileoEventMap();
+    private static EventWrapper wrapper = new BasicEventWrapper(eventMap);
 
     @Override
     public void onConnect(NetworkDestination endpoint) { }
@@ -30,31 +33,24 @@ public class QueryDemo implements MessageListener {
     @Override
     public void onMessage(GalileoMessage message) {
         try {
-            EventContainer container = null;
-            container = Serializer.deserialize(
-                    EventContainer.class, message.getPayload());
+            QueryResponse response = (QueryResponse) wrapper.unwrap(message);
+            System.out.println(response.getResults().size()
+                    + " results received");
 
-            if (container.getEventType() == EventType.QUERY_RESPONSE) {
-                QueryResponse response = Serializer.deserialize(
-                        QueryResponse.class, container.getEventPayload());
-                System.out.println(response.getResults().size()
-                        + " results received");
-
-                System.out.println("First 5 results:");
-                List<Path<Feature, String>> results = response.getResults();
-                int limit = 5;
-                if (results.size() < 5) {
-                    limit = results.size();
+            System.out.println("First 5 results:");
+            List<Path<Feature, String>> results = response.getResults();
+            int limit = 5;
+            if (results.size() < 5) {
+                limit = results.size();
+            }
+            int counter = 0;
+            for (Path<Feature, String> path : results) {
+                if (path.size() > 1) {
+                    System.out.println(path);
+                    counter++;
                 }
-                int counter = 0;
-                for (Path<Feature, String> path : results) {
-                    if (path.size() > 1) {
-                        System.out.println(path);
-                        counter++;
-                    }
-                    if (counter == limit) {
-                        break;
-                    }
+                if (counter == limit) {
+                    break;
                 }
             }
 
