@@ -27,22 +27,24 @@ package galileo.client;
 
 import java.io.IOException;
 
-import galileo.event.EventContainer;
-import galileo.event.GalileoEvent;
-
+import galileo.comm.GalileoEventMap;
+import galileo.event.BasicEventWrapper;
+import galileo.event.Event;
+import galileo.event.EventWrapper;
 import galileo.net.ClientMessageRouter;
 import galileo.net.GalileoMessage;
 import galileo.net.NetworkDestination;
-
-import galileo.serialization.Serializer;
 
 /**
  * Handles publishing events from a client to a server.
  *
  * @author malensek
  */
+@Deprecated
 public class EventPublisher {
 
+    private static GalileoEventMap eventMap = new GalileoEventMap();
+    private static EventWrapper wrapper = new BasicEventWrapper(eventMap);
     private ClientMessageRouter router;
 
     /**
@@ -59,26 +61,18 @@ public class EventPublisher {
      *
      * @return identification number of the event.
      */
-    public int publish(NetworkDestination destination, GalileoEvent event)
+    public void publish(NetworkDestination destination, Event event)
     throws IOException {
-        EventContainer container = new EventContainer(event);
-        byte[] messagePayload = Serializer.serialize(container);
-        GalileoMessage message = new GalileoMessage(messagePayload);
+        GalileoMessage message = wrapper.wrap(event);
         router.sendMessage(destination, message);
-
-        return container.getEventId();
     }
 
     /**
      * Wraps a GalileoEvent inside an EventContainer, and places the container
      * inside a GalileoMessage, ready to be transmitted across the network.
      */
-    public static GalileoMessage wrapEvent(GalileoEvent event)
+    public static GalileoMessage wrapEvent(Event event)
     throws IOException {
-        EventContainer container = new EventContainer(event);
-        byte[] messagePayload = Serializer.serialize(container);
-        GalileoMessage message = new GalileoMessage(messagePayload);
- 
-        return message;
+        return wrapper.wrap(event);
     }
 }
