@@ -40,7 +40,6 @@ import galileo.net.NetworkDestination;
  *
  * @author malensek
  */
-@Deprecated
 public class EventPublisher {
 
     private static GalileoEventMap eventMap = new GalileoEventMap();
