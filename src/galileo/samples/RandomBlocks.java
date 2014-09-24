@@ -31,8 +31,6 @@ import java.util.Calendar;
 import java.util.Random;
 
 import galileo.client.EventPublisher;
-import galileo.comm.QueryRequest;
-import galileo.comm.QueryResponse;
 import galileo.comm.StorageRequest;
 import galileo.dataset.Block;
 import galileo.dataset.Metadata;
@@ -40,15 +38,8 @@ import galileo.dataset.SpatialProperties;
 import galileo.dataset.TemporalProperties;
 import galileo.dataset.feature.Feature;
 import galileo.dataset.feature.FeatureSet;
-import galileo.event.EventContainer;
-import galileo.event.EventType;
-import galileo.graph.Path;
 import galileo.net.ClientMessageRouter;
-import galileo.net.GalileoMessage;
-import galileo.net.MessageListener;
 import galileo.net.NetworkDestination;
-import galileo.query.Query;
-import galileo.serialization.Serializer;
 import galileo.util.GeoHash;
 import galileo.util.PerformanceTimer;
 
@@ -58,7 +49,7 @@ import galileo.util.PerformanceTimer;
  *
  * @author malensek
  */
-public class RandomBlocks implements MessageListener {
+public class RandomBlocks {
 
     private static Random randomGenerator = new Random(System.nanoTime());
 
@@ -68,61 +59,16 @@ public class RandomBlocks implements MessageListener {
     public RandomBlocks() throws IOException {
         messageRouter = new ClientMessageRouter();
         publisher = new EventPublisher(messageRouter);
-
-        messageRouter.addListener(this);
     }
 
     public void disconnect() {
         messageRouter.shutdown();
     }
 
-    @Override
-    public void onConnect(NetworkDestination endpoint) {
-        System.out.println("Connected to " + endpoint);
-    }
-
-    @Override
-    public void onDisconnect(NetworkDestination endpoint) {
-        System.out.println("Disconnected from " + endpoint);
-    }
-
-    @Override
-    public void onMessage(GalileoMessage message) {
-        if (message == null) {
-            /* Connection was terminated */
-            messageRouter.shutdown();
-            return;
-        }
-
-        try {
-            EventContainer container = Serializer.deserialize(
-                    EventContainer.class, message.getPayload());
-
-            if (container.getEventType() == EventType.QUERY_RESPONSE) {
-                QueryResponse response = Serializer.deserialize(
-                        QueryResponse.class, container.getEventPayload());
-
-                System.out.println(response.getResults().size());
-                for (Path<Feature, String> p : response.getResults()) {
-                    System.out.println(p);
-                }
-            }
-
-        } catch (Exception e) {
-            System.out.println("Could not read event container");
-        }
-    }
-
     public void store(NetworkDestination destination, Block fb)
     throws Exception {
         StorageRequest store = new StorageRequest(fb);
         publisher.publish(destination, store);
-    }
-
-    public void query(NetworkDestination destination, Query query)
-    throws IOException {
-        QueryRequest queryReq = new QueryRequest(query);
-        publisher.publish(destination, queryReq);
     }
 
     public static int randomInt(int start, int end) {
