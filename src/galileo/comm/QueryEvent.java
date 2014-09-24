@@ -27,8 +27,7 @@ package galileo.comm;
 
 import java.io.IOException;
 
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
+import galileo.event.Event;
 import galileo.query.Query;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
@@ -39,7 +38,7 @@ import galileo.serialization.SerializationOutputStream;
  *
  * @author malensek
  */
-public class QueryEvent implements GalileoEvent {
+public class QueryEvent implements Event {
     private String id;
     private Query query;
 
@@ -54,11 +53,6 @@ public class QueryEvent implements GalileoEvent {
 
     public String getQueryId() {
         return id;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.QUERY;
     }
 
     @Deserialize

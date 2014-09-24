@@ -28,8 +28,7 @@ package galileo.comm;
 import java.io.IOException;
 
 import galileo.dataset.Block;
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
+import galileo.event.Event;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
@@ -39,7 +38,7 @@ import galileo.serialization.SerializationOutputStream;
  *
  * @author malensek
  */
-public class StorageEvent implements GalileoEvent {
+public class StorageEvent implements Event {
 
     private Block block;
 
@@ -49,11 +48,6 @@ public class StorageEvent implements GalileoEvent {
 
     public Block getBlock() {
         return block;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.STORAGE;
     }
 
     @Deserialize

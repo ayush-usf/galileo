@@ -26,13 +26,11 @@ software, even if advised of the possibility of such damage.
 package galileo.comm;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import galileo.dht.NodeInfo;
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
+import galileo.event.Event;
 import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
@@ -43,7 +41,7 @@ import galileo.serialization.SerializationOutputStream;
  *
  * @author malensek
  */
-public class QueryPreamble implements GalileoEvent {
+public class QueryPreamble implements Event {
     private String id;
     private String query;
     private List<NodeInfo> nodesInvolved = new ArrayList<>();
@@ -69,11 +67,6 @@ public class QueryPreamble implements GalileoEvent {
      */
     public List<NodeInfo> getNodesInvolved() {
         return nodesInvolved;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.QUERY_PREAMBLE;
     }
 
     @Deserialize

@@ -26,14 +26,12 @@ software, even if advised of the possibility of such damage.
 package galileo.comm;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import galileo.dataset.feature.Feature;
-import galileo.event.EventType;
-import galileo.event.GalileoEvent;
+import galileo.event.Event;
 import galileo.graph.FeaturePath;
 import galileo.graph.GraphException;
 import galileo.graph.Path;
@@ -42,7 +40,7 @@ import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
-public class QueryResponse implements GalileoEvent {
+public class QueryResponse implements Event {
 
     private String id;
     private List<Path<Feature, String>> results;
@@ -58,11 +56,6 @@ public class QueryResponse implements GalileoEvent {
 
     public List<Path<Feature, String>> getResults() {
         return results;
-    }
-
-    @Override
-    public EventType getType() {
-        return EventType.QUERY_RESPONSE;
     }
 
     public QueryResponse(SerializationInputStream in)
