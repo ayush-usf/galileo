@@ -48,6 +48,7 @@ import galileo.dht.hash.HashException;
 import galileo.dht.hash.HashTopologyException;
 import galileo.event.Event;
 import galileo.event.EventContext;
+import galileo.event.EventHandler;
 import galileo.event.EventReactor;
 import galileo.fs.FileSystemException;
 import galileo.fs.GeospatialFileSystem;
