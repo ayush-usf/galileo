@@ -182,57 +182,6 @@ public class StorageNode {
         partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
     }
 
-//    @Override
-//    public void onConnect(NetworkDestination endpoint) { }
-//
-//    @Override
-//    public void onDisconnect(NetworkDestination endpoint) { }
-//
-//    @Override
-//    public void onMessage(GalileoMessage message) {
-//        try {
-//            EventContainer container = Serializer.deserialize(
-//                    EventContainer.class, message.getPayload());
-//
-//            EventHandler handler = getHandler(container);
-//            if (handler == null) {
-//                EventType type = container.getEventType();
-//                logger.log(Level.WARNING,
-//                        "No handler found for event type " + type.toInt());
-//                return;
-//            }
-//
-//            handler.message = message;
-//            handler.eventContainer = container;
-//            handler.router = messageRouter;
-//            handler.connectionPool = connectionPool;
-//
-//            scheduler.schedule(handler);
-//
-//        } catch (Exception e) {
-//            logger.log(Level.WARNING, "Failed to process incoming message", e);
-//        }
-//    }
-
-//    /**
-//     * Provides a mapping between events (implementations of
-//     * {@link GalileoEvent}) and their respective {@link EventHandler}s.
-//     */
-//    private EventHandler getHandler(EventContainer container) {
-//        EventType type = container.getEventType();
-//
-//        logger.log(Level.INFO, "Processing event type: {0}", type);
-//
-//        switch (type) {
-//            case STORAGE: return new storageHandler();
-//            case STORAGE_REQUEST: return new storageRequestHandler();
-//            case QUERY: return new queryHandler();
-//            case QUERY_REQUEST: return new queryRequestHandler();
-//            case QUERY_RESPONSE: return new queryResponseHandler();
-//            default: return null;
-//        }
-//    }
-
     private void sendEvent(NodeInfo node, Event event)
     throws IOException {
         connectionPool.sendMessage(node, eventReactor.wrapEvent(event));
