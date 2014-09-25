@@ -53,13 +53,9 @@ import galileo.fs.FileSystemException;
 import galileo.fs.GeospatialFileSystem;
 import galileo.graph.Path;
 import galileo.net.ClientConnectionPool;
-import galileo.net.GalileoMessage;
 import galileo.net.HostIdentifier;
-import galileo.net.MessageListener;
-import galileo.net.NetworkDestination;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
-import galileo.serialization.Serializer;
 import galileo.util.StatusLine;
 import galileo.util.Version;
 
@@ -152,9 +148,6 @@ public class StorageNode {
         connectionPool = new ClientConnectionPool();
         connectionPool.addListener(eventReactor);
         configurePartitioner();
-
-//        /* Initialize the Scheduler */
-//        scheduler = new QueueScheduler(threads);
 
         /* Start listening for incoming messages. */
         messageRouter = new ServerMessageRouter();
