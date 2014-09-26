@@ -26,7 +26,6 @@ software, even if advised of the possibility of such damage.
 package galileo.bmp;
 
 import java.util.SortedSet;
-
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -242,26 +241,6 @@ public class GeoavailabilityGrid {
         return this.bmp.and(queryBitmap).toArray();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        GeoavailabilityGrid g = (GeoavailabilityGrid) obj;
-        Bitmap b1 = g.getBitmap();
-        Bitmap b2 = this.getBitmap();
-        return b1.equals(b2);
-    }
-
     /**
      * Retrieves the underlying Bitmap instance backing this
      * GeoavailabilityGrid.
@@ -296,4 +275,61 @@ public class GeoavailabilityGrid {
     public SpatialRange getBaseRange() {
         return new SpatialRange(baseRange);
     }
+
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((baseRange == null) ? 0 : baseRange.hashCode());
+		result = prime * result + ((bmp == null) ? 0 : bmp.hashCode());
+		result = prime * result + height;
+		result = prime * result + width;
+		result = prime * result + Float.floatToIntBits(xDegreesPerPixel);
+		result = prime * result + Float.floatToIntBits(yDegreesPerPixel);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		GeoavailabilityGrid other = (GeoavailabilityGrid) obj;
+		if (baseRange == null) {
+			if (other.baseRange != null) {
+				return false;
+			}
+		} else if (!baseRange.equals(other.baseRange)) {
+			return false;
+		}
+		if (bmp == null) {
+			if (other.bmp != null) {
+				return false;
+			}
+		} else if (!bmp.equals(other.bmp)) {
+			return false;
+		}
+		if (height != other.height) {
+			return false;
+		}
+		if (width != other.width) {
+			return false;
+		}
+		if (Float.floatToIntBits(xDegreesPerPixel) != Float
+				.floatToIntBits(other.xDegreesPerPixel)) {
+			return false;
+		}
+		if (Float.floatToIntBits(yDegreesPerPixel) != Float
+				.floatToIntBits(other.yDegreesPerPixel)) {
+			return false;
+		}
+		return true;
+	}
 }
