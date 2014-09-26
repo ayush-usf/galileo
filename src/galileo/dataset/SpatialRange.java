@@ -153,68 +153,68 @@ public class SpatialRange implements ByteSerializable {
     }
 
     @Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (hasElevation ? 1231 : 1237);
-		result = prime * result + Float.floatToIntBits(lowerElevation);
-		result = prime * result + Float.floatToIntBits(lowerLat);
-		result = prime * result + Float.floatToIntBits(lowerLon);
-		result = prime * result + Float.floatToIntBits(upperElevation);
-		result = prime * result + Float.floatToIntBits(upperLat);
-		result = prime * result + Float.floatToIntBits(upperLon);
-		return result;
-	}
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (hasElevation ? 1231 : 1237);
+        result = prime * result + Float.floatToIntBits(lowerElevation);
+        result = prime * result + Float.floatToIntBits(lowerLat);
+        result = prime * result + Float.floatToIntBits(lowerLon);
+        result = prime * result + Float.floatToIntBits(upperElevation);
+        result = prime * result + Float.floatToIntBits(upperLat);
+        result = prime * result + Float.floatToIntBits(upperLon);
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		SpatialRange other = (SpatialRange) obj;
-		if (hasElevation != other.hasElevation) {
-			return false;
-		}
-		if (Float.floatToIntBits(lowerElevation) != Float
-				.floatToIntBits(other.lowerElevation)) {
-			return false;
-		}
-		if (Float.floatToIntBits(lowerLat) != Float
-				.floatToIntBits(other.lowerLat)) {
-			return false;
-		}
-		if (Float.floatToIntBits(lowerLon) != Float
-				.floatToIntBits(other.lowerLon)) {
-			return false;
-		}
-		if (Float.floatToIntBits(upperElevation) != Float
-				.floatToIntBits(other.upperElevation)) {
-			return false;
-		}
-		if (Float.floatToIntBits(upperLat) != Float
-				.floatToIntBits(other.upperLat)) {
-			return false;
-		}
-		if (Float.floatToIntBits(upperLon) != Float
-				.floatToIntBits(other.upperLon)) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        SpatialRange other = (SpatialRange) obj;
+        if (hasElevation != other.hasElevation) {
+            return false;
+        }
+        if (Float.floatToIntBits(lowerElevation) != Float
+                .floatToIntBits(other.lowerElevation)) {
+            return false;
+                }
+        if (Float.floatToIntBits(lowerLat) != Float
+                .floatToIntBits(other.lowerLat)) {
+            return false;
+                }
+        if (Float.floatToIntBits(lowerLon) != Float
+                .floatToIntBits(other.lowerLon)) {
+            return false;
+                }
+        if (Float.floatToIntBits(upperElevation) != Float
+                .floatToIntBits(other.upperElevation)) {
+            return false;
+                }
+        if (Float.floatToIntBits(upperLat) != Float
+                .floatToIntBits(other.upperLat)) {
+            return false;
+                }
+        if (Float.floatToIntBits(upperLon) != Float
+                .floatToIntBits(other.upperLon)) {
+            return false;
+                }
+        return true;
+    }
 
-	@Deserialize
+    @Deserialize
     public SpatialRange(SerializationInputStream in)
     throws IOException {
-        lowerLat = in.readFloat();
-        upperLat = in.readFloat();
-        lowerLon = in.readFloat();
-        upperLon = in.readFloat();
+    lowerLat = in.readFloat();
+    upperLat = in.readFloat();
+    lowerLon = in.readFloat();
+    upperLon = in.readFloat();
 
         hasElevation = in.readBoolean();
         if (hasElevation) {
