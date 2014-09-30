@@ -75,28 +75,34 @@ public class WelfordBench {
                 samples[j] = rand.nextDouble();
             }
 
+            double[] meanResults = new double[values];
+            double[] stdResults = new double[values];
+
             RunningStatistics rs = new RunningStatistics();
+            PerformanceTimer meanpt = new PerformanceTimer("welford-mean");
+            meanpt.start();
             for (int j = 0; j < values; ++j) {
                 rs.put(samples[j]);
+                meanResults[j] = rs.mean();
             }
+            meanpt.stopAndPrint();
 
-            PerformanceTimer pt = new PerformanceTimer("welford-mean");
-            double total = 0;
-            pt.start();
+            rs = new RunningStatistics();
+            PerformanceTimer stdpt = new PerformanceTimer("welford-std");
+            stdpt.start();
             for (int j = 0; j < values; ++j) {
-                total += rs.mean();
+                rs.put(samples[j]);
+                stdResults[j] = rs.std();
             }
-            pt.stopAndPrint();
-            /* Print out a sanity check */
-            System.out.println(total);
+            stdpt.stopAndPrint();
 
-            pt = new PerformanceTimer("welford-std");
-            total = 0;
-            pt.start();
+            /* Sanity check */
+            double meanTot = 0;
+            double stdTot = 0;
             for (int j = 0; j < values; ++j) {
-                total += rs.std();
+                meanTot += meanResults[j];
+                stdTot += stdResults[j];
             }
-            pt.stopAndPrint();
-            System.out.println(total);
+            System.out.println(meanTot + ", " + stdTot);
     }
 }
