@@ -46,7 +46,12 @@ public class WelfordBench {
 
         for (int i = 0; i < iters; ++i) {
             testUpdate(values);
-            testCalc(values);
+        }
+        for (int i = 0; i < iters; ++i) {
+            testMean(values);
+        }
+        for (int i = 0; i < iters; ++i) {
+            testSTD(values);
         }
     }
 
@@ -67,7 +72,7 @@ public class WelfordBench {
             pt.stopAndPrint();
     }
 
-    private static void testCalc(int values) {
+    private static void testMean(int values) {
             /* Generate our incoming samples */
             Random rand = new Random();
             double[] samples = new double[values];
@@ -75,34 +80,49 @@ public class WelfordBench {
                 samples[j] = rand.nextDouble();
             }
 
-            double[] meanResults = new double[values];
-            double[] stdResults = new double[values];
+            double[] results = new double[values];
 
             RunningStatistics rs = new RunningStatistics();
             PerformanceTimer meanpt = new PerformanceTimer("welford-mean");
             meanpt.start();
             for (int j = 0; j < values; ++j) {
                 rs.put(samples[j]);
-                meanResults[j] = rs.mean();
+                results[j] = rs.mean();
             }
             meanpt.stopAndPrint();
 
-            rs = new RunningStatistics();
+            /* Sanity check */
+            double tot = 0;
+            for (int j = 0; j < values; ++j) {
+                tot += results[j];
+            }
+            System.out.println("Mean total: " + tot);
+    }
+
+    private static void testSTD(int values) {
+            /* Generate our incoming samples */
+            Random rand = new Random();
+            double[] samples = new double[values];
+            for (int j = 0; j < values; ++j) {
+                samples[j] = rand.nextDouble();
+            }
+
+            double[] results = new double[values];
+
+            RunningStatistics rs = new RunningStatistics();
             PerformanceTimer stdpt = new PerformanceTimer("welford-std");
             stdpt.start();
             for (int j = 0; j < values; ++j) {
                 rs.put(samples[j]);
-                stdResults[j] = rs.std();
+                results[j] = rs.std();
             }
             stdpt.stopAndPrint();
 
             /* Sanity check */
-            double meanTot = 0;
-            double stdTot = 0;
+            double tot = 0;
             for (int j = 0; j < values; ++j) {
-                meanTot += meanResults[j];
-                stdTot += stdResults[j];
+                tot += results[j];
             }
-            System.out.println(meanTot + ", " + stdTot);
+            System.out.println("STD total: " + tot);
     }
 }
