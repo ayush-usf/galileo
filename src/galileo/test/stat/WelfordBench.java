@@ -31,8 +31,7 @@ import galileo.stat.RunningStatistics;
 import galileo.util.PerformanceTimer;
 
 /**
- * Tests the RunningStatistics implementation based on the algorithm outlined by
- * B P Welford.
+ * Benchmarks the Welford running statistics tracker.
  */
 public class WelfordBench {
 
