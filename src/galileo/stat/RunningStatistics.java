@@ -131,6 +131,16 @@ public class RunningStatistics {
         return Math.sqrt(var(ddof));
     }
 
+    /**
+     * Retrieves the number of samples submitted to the RunningStatistics
+     * instance so far.
+     *
+     * @return number of samples
+     */
+    public long numSamples() {
+        return n;
+    }
+
     @Override
     public String toString() {
         String str = "";
