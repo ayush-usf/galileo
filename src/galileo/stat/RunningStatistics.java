@@ -81,11 +81,20 @@ public class RunningStatistics {
     }
 
     /**
-     * Calculates the running population variance observed thus far.
+     * Calculates the running sample variance.
+     *
+     * @return sample variance
+     */
+    public double var() {
+        return var(1.0);
+    }
+
+    /**
+     * Calculates the population variance.
      *
      * @return population variance
      */
-    public double var() {
+    public double popVar() {
         return var(0.0);
     }
 
