@@ -56,73 +56,73 @@ public class WelfordBench {
     }
 
     private static void testUpdate(int values) {
-            /* Generate our incoming samples */
-            Random rand = new Random();
-            double[] samples = new double[values];
-            for (int j = 0; j < values; ++j) {
-                samples[j] = rand.nextDouble();
-            }
+        /* Generate our incoming samples */
+        Random rand = new Random();
+        double[] samples = new double[values];
+        for (int j = 0; j < values; ++j) {
+            samples[j] = rand.nextDouble();
+        }
 
-            RunningStatistics rs = new RunningStatistics();
-            PerformanceTimer pt = new PerformanceTimer("welford-update");
-            pt.start();
-            for (int j = 0; j < values; ++j) {
-                rs.put(samples[j]);
-            }
-            pt.stopAndPrint();
+        RunningStatistics rs = new RunningStatistics();
+        PerformanceTimer pt = new PerformanceTimer("welford-update");
+        pt.start();
+        for (int j = 0; j < values; ++j) {
+            rs.put(samples[j]);
+        }
+        pt.stopAndPrint();
     }
 
     private static void testMean(int values) {
-            /* Generate our incoming samples */
-            Random rand = new Random();
-            double[] samples = new double[values];
-            for (int j = 0; j < values; ++j) {
-                samples[j] = rand.nextDouble();
-            }
+        /* Generate our incoming samples */
+        Random rand = new Random();
+        double[] samples = new double[values];
+        for (int j = 0; j < values; ++j) {
+            samples[j] = rand.nextDouble();
+        }
 
-            double[] results = new double[values];
+        double[] results = new double[values];
 
-            RunningStatistics rs = new RunningStatistics();
-            PerformanceTimer meanpt = new PerformanceTimer("welford-mean");
-            meanpt.start();
-            for (int j = 0; j < values; ++j) {
-                rs.put(samples[j]);
-                results[j] = rs.mean();
-            }
-            meanpt.stopAndPrint();
+        RunningStatistics rs = new RunningStatistics();
+        PerformanceTimer meanpt = new PerformanceTimer("welford-mean");
+        meanpt.start();
+        for (int j = 0; j < values; ++j) {
+            rs.put(samples[j]);
+            results[j] = rs.mean();
+        }
+        meanpt.stopAndPrint();
 
-            /* Sanity check */
-            double tot = 0;
-            for (int j = 0; j < values; ++j) {
-                tot += results[j];
-            }
-            System.out.println("Mean total: " + tot);
+        /* Sanity check */
+        double tot = 0;
+        for (int j = 0; j < values; ++j) {
+            tot += results[j];
+        }
+        System.out.println("Mean total: " + tot);
     }
 
     private static void testSTD(int values) {
-            /* Generate our incoming samples */
-            Random rand = new Random();
-            double[] samples = new double[values];
-            for (int j = 0; j < values; ++j) {
-                samples[j] = rand.nextDouble();
-            }
+        /* Generate our incoming samples */
+        Random rand = new Random();
+        double[] samples = new double[values];
+        for (int j = 0; j < values; ++j) {
+            samples[j] = rand.nextDouble();
+        }
 
-            double[] results = new double[values];
+        double[] results = new double[values];
 
-            RunningStatistics rs = new RunningStatistics();
-            PerformanceTimer stdpt = new PerformanceTimer("welford-std");
-            stdpt.start();
-            for (int j = 0; j < values; ++j) {
-                rs.put(samples[j]);
-                results[j] = rs.std();
-            }
-            stdpt.stopAndPrint();
+        RunningStatistics rs = new RunningStatistics();
+        PerformanceTimer stdpt = new PerformanceTimer("welford-std");
+        stdpt.start();
+        for (int j = 0; j < values; ++j) {
+            rs.put(samples[j]);
+            results[j] = rs.std();
+        }
+        stdpt.stopAndPrint();
 
-            /* Sanity check */
-            double tot = 0;
-            for (int j = 0; j < values; ++j) {
-                tot += results[j];
-            }
-            System.out.println("STD total: " + tot);
+        /* Sanity check */
+        double tot = 0;
+        for (int j = 0; j < values; ++j) {
+            tot += results[j];
+        }
+        System.out.println("STD total: " + tot);
     }
 }
