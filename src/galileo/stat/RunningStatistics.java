@@ -43,6 +43,15 @@ public class RunningStatistics {
     public RunningStatistics() { }
 
     /**
+     * Creates a copy of a {@link RunningStatistics} instance.
+     */
+    public RunningStatistics(RunningStatistics other) {
+        this.n = other.n;
+        this.mean = other.mean;
+        this.M2 = other.M2;
+    }
+
+    /**
      * Creates a Welford running statistics instance based on a number of
      * samples.
      */
