@@ -63,7 +63,7 @@ public class RunningStatistics2D {
      * Adds a new sample to the 2D running statistics.
      */
     public void put(double x, double y) {
-        double n = (double) xs.numSamples();
+        double n = (double) numSamples();
 
         double dx = x - xs.mean();
         double dy = y - ys.mean();
@@ -84,14 +84,14 @@ public class RunningStatistics2D {
      * @return Sum of squared deviations from the mean of x
      */
     public double SSxx() {
-        return xs.var() * (xs.numSamples() - 1.0);
+        return xs.var() * (numSamples() - 1.0);
     }
 
     /**
      * @return Sum of squared deviations from the mean of y
      */
     public double SSyy() {
-        return ys.var() * (xs.numSamples() - 1.0);
+        return ys.var() * (numSamples() - 1.0);
     }
 
     /**
@@ -149,5 +149,15 @@ public class RunningStatistics2D {
      */
     public RunningStatistics yStatistics() {
         return new RunningStatistics(ys);
+    }
+
+    /**
+     * Retrieves the number of samples submitted to the RunningStatistics2D
+     * instance so far.
+     *
+     * @return number of samples
+     */
+    public long numSamples() {
+        return xs.numSamples();
     }
 }
