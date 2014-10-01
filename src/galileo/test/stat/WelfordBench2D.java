@@ -44,6 +44,7 @@ public class WelfordBench2D {
         testUpdate(iters);
         testR(iters);
         testR2(iters);
+        testMerge(iters);
     }
 
     private static void testUpdate(int iters) {
@@ -83,6 +84,21 @@ public class WelfordBench2D {
             pt.start();
             rs.R2();
             pt.stopAndPrint();
+        }
+    }
+
+    private static void testMerge(int iters) {
+        double[] xSamples = WelfordBench.generateSamples(iters);
+        double[] ySamples = WelfordBench.generateSamples(iters);
+
+        RunningStatistics2D rs1 = new RunningStatistics2D();
+        RunningStatistics2D rs2 = new RunningStatistics2D();
+        PerformanceTimer mergept = new PerformanceTimer("welford2d-merge");
+        for (int j = 0; j < iters; ++j) {
+            rs1.put(xSamples[j], ySamples[j]);
+            mergept.start();
+            rs2.merge(rs1);
+            mergept.stopAndPrint();
         }
     }
 }
