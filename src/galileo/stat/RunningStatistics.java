@@ -51,6 +51,14 @@ public class RunningStatistics {
         this.M2 = other.M2;
     }
 
+    public void combine(RunningStatistics other) {
+        long newN = n + other.n;
+        double delta = mean - other.mean;
+        mean = (n * mean + other.n * other.mean) / newN;
+        M2 = M2 + other.M2 + delta * delta * n * other.n / newN;
+        n = newN;
+    }
+
     /**
      * Creates a Welford running statistics instance based on a number of
      * samples.
