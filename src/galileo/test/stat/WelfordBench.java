@@ -46,6 +46,7 @@ public class WelfordBench {
         testUpdate(iters);
         testMean(iters);
         testSTD(iters);
+        testCombine(iters);
     }
 
     private static void testUpdate(int iters) {
@@ -83,6 +84,20 @@ public class WelfordBench {
             stdpt.start();
             rs.std();
             stdpt.stopAndPrint();
+        }
+    }
+
+    private static void testCombine(int iters) {
+        double[] samples = generateSamples(iters);
+
+        RunningStatistics rs1 = new RunningStatistics();
+        RunningStatistics rs2 = new RunningStatistics();
+        PerformanceTimer compt = new PerformanceTimer("welford-combine");
+        for (int j = 0; j < iters; ++j) {
+            rs1.put(samples[j]);
+            compt.start();
+            rs2.combine(rs1);
+            compt.stopAndPrint();
         }
     }
 
