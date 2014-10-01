@@ -153,6 +153,7 @@ public class RunningStatistics {
     @Override
     public String toString() {
         String str = "";
+        str += "Number of Samples: " + n + System.lineSeparator();
         str += "Mean: " + mean + System.lineSeparator();
         str += "Variance: " + var() + System.lineSeparator();
         str += "Std Dev: " + std();
