@@ -63,7 +63,7 @@ public class RunningStatistics {
 
         /* Calculate new n */
         for (RunningStatistics rs : others) {
-            combine(rs);
+            merge(rs);
         }
     }
 
@@ -76,7 +76,7 @@ public class RunningStatistics {
         this.M2 = other.M2;
     }
 
-    public void combine(RunningStatistics other) {
+    public void merge(RunningStatistics other) {
         long newN = n + other.n;
         double delta = mean - other.mean;
         mean = (n * mean + other.n * other.mean) / newN;
