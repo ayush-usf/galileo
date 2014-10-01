@@ -36,93 +36,62 @@ import galileo.util.PerformanceTimer;
 public class WelfordBench {
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Usage: WelfordBench iterations num_values");
+        if (args.length < 1) {
+            System.out.println("Usage: WelfordBench iterations");
             System.exit(1);
         }
 
         int iters = Integer.parseInt(args[0]);
-        int values = Integer.parseInt(args[1]);
 
-        for (int i = 0; i < iters; ++i) {
-            testUpdate(values);
-        }
-        for (int i = 0; i < iters; ++i) {
-            testMean(values);
-        }
-        for (int i = 0; i < iters; ++i) {
-            testSTD(values);
-        }
+        testUpdate(iters);
+        testMean(iters);
+        testSTD(iters);
     }
 
-    private static void testUpdate(int values) {
+    private static void testUpdate(int iters) {
         /* Generate our incoming samples */
-        Random rand = new Random();
-        double[] samples = new double[values];
-        for (int j = 0; j < values; ++j) {
-            samples[j] = rand.nextDouble();
-        }
+        double[] samples = generateSamples(iters);
 
         RunningStatistics rs = new RunningStatistics();
         PerformanceTimer pt = new PerformanceTimer("welford-update");
-        pt.start();
-        for (int j = 0; j < values; ++j) {
+        for (int j = 0; j < iters; ++j) {
+            pt.start();
             rs.put(samples[j]);
+            pt.stopAndPrint();
         }
-        pt.stopAndPrint();
     }
 
-    private static void testMean(int values) {
-        /* Generate our incoming samples */
-        Random rand = new Random();
-        double[] samples = new double[values];
-        for (int j = 0; j < values; ++j) {
-            samples[j] = rand.nextDouble();
-        }
-
-        double[] results = new double[values];
-
+    private static void testMean(int iters) {
+        double[] samples = generateSamples(iters);
         RunningStatistics rs = new RunningStatistics();
         PerformanceTimer meanpt = new PerformanceTimer("welford-mean");
-        meanpt.start();
-        for (int j = 0; j < values; ++j) {
+        for (int j = 0; j < iters; ++j) {
             rs.put(samples[j]);
-            results[j] = rs.mean();
+            meanpt.start();
+            rs.mean();
+            meanpt.stopAndPrint();
         }
-        meanpt.stopAndPrint();
-
-        /* Sanity check */
-        double tot = 0;
-        for (int j = 0; j < values; ++j) {
-            tot += results[j];
-        }
-        System.out.println("Mean total: " + tot);
     }
 
-    private static void testSTD(int values) {
-        /* Generate our incoming samples */
-        Random rand = new Random();
-        double[] samples = new double[values];
-        for (int j = 0; j < values; ++j) {
-            samples[j] = rand.nextDouble();
-        }
-
-        double[] results = new double[values];
+    private static void testSTD(int iters) {
+        double[] samples = generateSamples(iters);
 
         RunningStatistics rs = new RunningStatistics();
         PerformanceTimer stdpt = new PerformanceTimer("welford-std");
-        stdpt.start();
-        for (int j = 0; j < values; ++j) {
+        for (int j = 0; j < iters; ++j) {
             rs.put(samples[j]);
-            results[j] = rs.std();
+            stdpt.start();
+            rs.std();
+            stdpt.stopAndPrint();
         }
-        stdpt.stopAndPrint();
+    }
 
-        /* Sanity check */
-        double tot = 0;
-        for (int j = 0; j < values; ++j) {
-            tot += results[j];
+    protected static double[] generateSamples(int numSamples) {
+        Random rand = new Random();
+        double[] samples = new double[numSamples];
+        for (int j = 0; j < numSamples; ++j) {
+            samples[j] = rand.nextDouble();
         }
-        System.out.println("STD total: " + tot);
+        return samples;
     }
 }
