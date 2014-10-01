@@ -45,8 +45,8 @@ public class RunningStatistics {
     /**
      * Creates a copy of a {@link RunningStatistics} instance.
      */
-    public RunningStatistics(RunningStatistics other) {
-        copyFrom(other);
+    public RunningStatistics(RunningStatistics that) {
+        copyFrom(that);
     }
 
     /**
@@ -70,17 +70,17 @@ public class RunningStatistics {
     /**
      * Copies statistics from another RunningStatistics instance.
      */
-    private void copyFrom(RunningStatistics other) {
-        this.n = other.n;
-        this.mean = other.mean;
-        this.M2 = other.M2;
+    private void copyFrom(RunningStatistics that) {
+        this.n = that.n;
+        this.mean = that.mean;
+        this.M2 = that.M2;
     }
 
-    public void merge(RunningStatistics other) {
-        long newN = n + other.n;
-        double delta = this.mean - other.mean;
-        mean = (this.n * this.mean + other.n * other.mean) / newN;
-        M2 = M2 + other.M2 + delta * delta * this.n * other.n / newN;
+    public void merge(RunningStatistics that) {
+        long newN = n + that.n;
+        double delta = this.mean - that.mean;
+        mean = (this.n * this.mean + that.n * that.mean) / newN;
+        M2 = M2 + that.M2 + delta * delta * this.n * that.n / newN;
         n = newN;
     }
 
