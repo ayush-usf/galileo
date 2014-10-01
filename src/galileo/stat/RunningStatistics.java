@@ -46,6 +46,31 @@ public class RunningStatistics {
      * Creates a copy of a {@link RunningStatistics} instance.
      */
     public RunningStatistics(RunningStatistics other) {
+        copyFrom(other);
+    }
+
+    /**
+     * Create a new {@link RunningStatistics} instance by combining multiple
+     * existing instances.
+     */
+    public RunningStatistics(RunningStatistics... others) {
+        if (others.length == 0) {
+            return;
+        } else if (others.length == 1) {
+            copyFrom(others[0]);
+            return;
+        }
+
+        /* Calculate new n */
+        for (RunningStatistics rs : others) {
+            combine(rs);
+        }
+    }
+
+    /**
+     * Copies statistics from another RunningStatistics instance.
+     */
+    private void copyFrom(RunningStatistics other) {
         this.n = other.n;
         this.mean = other.mean;
         this.M2 = other.M2;
