@@ -25,8 +25,6 @@ software, even if advised of the possibility of such damage.
 
 package galileo.test.stat;
 
-import java.util.Random;
-
 import galileo.stat.RunningStatistics2D;
 import galileo.util.PerformanceTimer;
 
