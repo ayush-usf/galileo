@@ -44,6 +44,21 @@ public class RunningStatistics2D {
         ys = new RunningStatistics();
     }
 
+    public void merge(RunningStatistics2D that) {
+        long thisN = this.numSamples();
+        long thatN = that.numSamples();
+        RunningStatistics thatX = that.xStatistics();
+        RunningStatistics thatY = that.yStatistics();
+        double xDelta = thatX.mean() - this.xs.mean();
+        double yDelta = thatY.mean() - this.ys.mean();
+
+        this.SSxy = this.SSxy() + that.SSxy()
+            + thisN * thatN * xDelta * yDelta / (thisN + thatN);
+
+        this.xs.merge(thatX);
+        this.ys.merge(thatY);
+    }
+
     /**
      * Adds several new (x, y) sample pairs to the 2D running statistics.
      *
