@@ -78,9 +78,9 @@ public class RunningStatistics {
 
     public void merge(RunningStatistics other) {
         long newN = n + other.n;
-        double delta = mean - other.mean;
-        mean = (n * mean + other.n * other.mean) / newN;
-        M2 = M2 + other.M2 + delta * delta * n * other.n / newN;
+        double delta = this.mean - other.mean;
+        mean = (this.n * this.mean + other.n * other.mean) / newN;
+        M2 = M2 + other.M2 + delta * delta * this.n * other.n / newN;
         n = newN;
     }
 
