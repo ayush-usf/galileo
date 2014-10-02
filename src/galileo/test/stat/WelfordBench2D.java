@@ -44,6 +44,7 @@ public class WelfordBench2D {
         testUpdate(iters);
         testR(iters);
         testR2(iters);
+        testPredict(iters);
         testMerge(iters);
     }
 
@@ -86,6 +87,24 @@ public class WelfordBench2D {
             pt.stopAndPrint();
         }
     }
+
+    private static void testPredict(int iters) {
+        double[] xSamples = WelfordBench.generateSamples(iters);
+        double[] ySamples = WelfordBench.generateSamples(iters);
+        RunningStatistics2D rs = new RunningStatistics2D();
+        for (int i = 0; i < iters; ++i) {
+            rs.put(xSamples[i], ySamples[i]);
+        }
+
+        PerformanceTimer pt = new PerformanceTimer("welford2d-predict");
+        double[] inputs = WelfordBench.generateSamples(iters);
+        for (int i = 0; i < iters; ++i) {
+            pt.start();
+            rs.predict(inputs[i]);
+            pt.stopAndPrint();
+        }
+    }
+
 
     private static void testMerge(int iters) {
         double[] xSamples = WelfordBench.generateSamples(iters);
