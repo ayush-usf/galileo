@@ -149,6 +149,10 @@ public class RunningStatistics {
      * @return variance
      */
     public double var(double ddof) {
+        if (n == 0) {
+            return Double.NaN;
+        }
+
         return M2 / (n - ddof);
     }
 
