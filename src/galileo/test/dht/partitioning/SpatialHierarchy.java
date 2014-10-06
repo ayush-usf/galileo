@@ -102,17 +102,17 @@ public class SpatialHierarchy {
 
         fs.put(new Feature("temperature", 32.3));
         fs.put(new Feature("humidity", 33.3));
-        assertEquals("block3", "lattice-1:5555",
+        assertEquals("block3", "lattice-4:5555",
                 partitioner.locateData(meta).toString());
 
         fs.put(new Feature("wind_velocity", 55.2));
         fs.put(new Feature("featureificness", 100));
-        assertEquals("block4", "lattice-4:5555",
+        assertEquals("block4", "lattice-3:5555",
                 partitioner.locateData(meta).toString());
 
         sp = new SpatialProperties(29.55f, -111.19f);
         meta.setSpatialProperties(sp);
-        assertEquals("block5", "lattice-4:5555",
+        assertEquals("block5", "lattice-3:5555",
                 partitioner.locateData(meta).toString());
     }
 
