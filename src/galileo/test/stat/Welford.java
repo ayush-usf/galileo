@@ -44,7 +44,8 @@ public class Welford {
         assertEquals("no values, mean", 0.0, z1.mean(), EPSILON);
         assertEquals("no values, sample var", Double.NaN, z1.var(), EPSILON);
         assertEquals("no values, var", Double.NaN, z1.popVar(), EPSILON);
-        assertEquals("no values, std", Double.NaN, z1.std(), EPSILON);
+        assertEquals("no values, sample std", Double.NaN, z1.std(), EPSILON);
+        assertEquals("no values, std", Double.NaN, z1.popStd(), EPSILON);
 
         RunningStatistics z2 = new RunningStatistics(0.0);
         assertEquals("zero, mean", 0.0, z2.mean(), EPSILON);
@@ -99,6 +100,8 @@ public class Welford {
         RunningStatistics rs = new RunningStatistics(d);
         assertEquals("mean of vals: " + stringify(d),
                 3.5, rs.mean(), EPSILON);
+        assertEquals("sample var of vals: " + stringify(d),
+                3.5, rs.var(), EPSILON);
         assertEquals("var of vals: " + stringify(d),
                 2.9166666666666665, rs.popVar(), EPSILON);
         assertEquals("sample std of vals: " + stringify(d),
@@ -113,6 +116,8 @@ public class Welford {
         RunningStatistics rs = new RunningStatistics(d);
         assertEquals("mean of vals: " + stringify(d),
                 2.3333333333333333, rs.mean(), EPSILON);
+        assertEquals("sample var of vals: " + stringify(d),
+                2.3333333333333333, rs.var(), EPSILON);
         assertEquals("var of vals: " + stringify(d),
                 1.5555555555555555, rs.popVar(), EPSILON);
         assertEquals("sample std of vals: " + stringify(d),
