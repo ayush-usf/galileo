@@ -173,6 +173,12 @@ public class RunningStatistics {
         return Math.sqrt(var(ddof));
     }
 
+    public double prob(double sample) {
+        double norm = 1 / Math.sqrt(2 * Math.PI * this.var());
+        return norm * Math.exp((- Math.pow(sample - this.mean, 2))
+                / (2 * this.var()));
+    }
+
     /**
      * Retrieves the number of samples submitted to the RunningStatistics
      * instance so far.
