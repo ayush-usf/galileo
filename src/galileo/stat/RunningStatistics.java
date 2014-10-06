@@ -153,12 +153,22 @@ public class RunningStatistics {
     }
 
     /**
-     * Calculates the standard deviation of the samples observed thus far.
+     * Calculates the standard deviation of the data observed thus far.
      *
-     * @return population standard deviation
+     * @return sample standard deviation
      */
     public double std() {
         return Math.sqrt(var());
+    }
+
+    /**
+     * Calculates the sample standard deviation of the data observed thus
+     * far.
+     *
+     * @return population standard deviation
+     */
+    public double popStd() {
+        return Math.sqrt(popVar());
     }
 
     /**
