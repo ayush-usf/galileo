@@ -114,16 +114,20 @@ public class RunningStatistics2D {
      *
      * @return PPMCC (Pearson's r)
      */
-    public double R() {
-        return Math.sqrt(R2());
+    public double r() {
+        double r = Math.sqrt(r2());
+        if (r > 1.0) {
+            r = 1.0;
+        }
+        return r;
     }
 
     /**
-     * Calculate the coefficient of determination (R squared).
+     * Calculate the coefficient of determination (r squared).
      *
      * @return coefficient of determination
      */
-    public double R2() {
+    public double r2() {
         double SSE = (SSyy() - SSxy() * SSxy() / SSxx());
         return (SSyy() - SSE) / SSyy();
     }
