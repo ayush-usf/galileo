@@ -70,7 +70,7 @@ public class WelfordBench2D {
         for (int i = 0; i < iters; ++i) {
             rs.put(xSamples[i], ySamples[i]);
             pt.start();
-            rs.R();
+            rs.r();
             pt.stopAndPrint();
         }
     }
@@ -83,7 +83,7 @@ public class WelfordBench2D {
         for (int i = 0; i < iters; ++i) {
             rs.put(xSamples[i], ySamples[i]);
             pt.start();
-            rs.R2();
+            rs.r2();
             pt.stopAndPrint();
         }
     }
