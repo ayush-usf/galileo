@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.stat;
 
+import org.apache.commons.math3.distribution.TDistribution;
+
 /**
  * Provides an online method for computing mean, variance, and standard
  * deviation.  Based on "Note on a Method for Calculating Corrected Sums of
@@ -201,6 +203,43 @@ public class RunningStatistics {
      */
     public long n() {
         return n;
+    }
+
+    public static class WelchResult {
+        /** T-statistic */
+        public double t;
+
+        /** Two-tailed p-value */
+        public double p;
+
+        public WelchResult(double t, double p) {
+            this.t = t;
+            this.p = p;
+        }
+    }
+
+    public static WelchResult welchT(
+            RunningStatistics rs1, RunningStatistics rs2) {
+        double vn1 = rs1.var() / rs1.n();
+        double vn2 = rs2.var() / rs2.n();
+
+        /* Calculate t */
+        double xbs = rs1.mean() - rs2.mean();
+        double t = xbs / Math.sqrt(vn1 + vn2);
+
+        double vn12 = Math.pow(vn1, 2);
+        double vn22 = Math.pow(vn2, 2);
+
+        /* Calculate degrees of freedom */
+        double v = Math.pow(vn1 + vn2, 2)
+            / ((vn12 / (rs1.n() - 1)) + (vn22 / (rs2.n() - 1)));
+        if (v == Double.NaN) {
+            v = 1;
+        }
+
+        TDistribution tdist = new TDistribution(v);
+        double p = tdist.cumulativeProbability(t) * 2;
+        return new WelchResult(t, p);
     }
 
     @Override
