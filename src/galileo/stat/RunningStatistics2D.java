@@ -25,6 +25,8 @@ software, even if advised of the possibility of such damage.
 
 package galileo.stat;
 
+import org.apache.commons.math3.special.Beta;
+
 /**
  * Expanding on the {@link RunningStatistics} class, this class supports
  * two dimensions (x and y), along with some extra features (simple linear
@@ -118,6 +120,30 @@ public class RunningStatistics2D {
             r = 1.0;
         }
         return r;
+    }
+
+    public class PearsonResult {
+        /** Pearson's r-value */
+        double r;
+
+        /** p-value */
+        double p;
+
+        public PearsonResult(double r, double p) {
+            this.r = r;
+            this.p = p;
+        }
+    }
+
+    public PearsonResult rp() {
+        double r = r();
+        double p = 0.0;
+        if (Math.abs(r) != 1.0) {
+            double df = n() - 2;
+            double t2 = r * r * (df / ((1.0 - r) * (1.0 + r)));
+            p = Beta.regularizedBeta(df / (df + t2), 0.5 * df, 0.5);
+        }
+        return new PearsonResult(r, p);
     }
 
     /**
