@@ -199,7 +199,7 @@ public class RunningStatistics {
      *
      * @return number of samples
      */
-    public long numSamples() {
+    public long n() {
         return n;
     }
 
