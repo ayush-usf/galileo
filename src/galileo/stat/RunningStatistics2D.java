@@ -45,8 +45,8 @@ public class RunningStatistics2D {
     }
 
     public void merge(RunningStatistics2D that) {
-        long thisN = this.numSamples();
-        long thatN = that.numSamples();
+        long thisN = this.n();
+        long thatN = that.n();
         RunningStatistics thatX = that.xStatistics();
         RunningStatistics thatY = that.yStatistics();
         double xDelta = thatX.mean() - this.xs.mean();
@@ -78,11 +78,9 @@ public class RunningStatistics2D {
      * Adds a new sample to the 2D running statistics.
      */
     public void put(double x, double y) {
-        double n = (double) numSamples();
-
         double dx = x - xs.mean();
         double dy = y - ys.mean();
-        SSxy += dx * dy * n / (n + 1);
+        SSxy += dx * dy * n() / (n() + 1);
 
         xs.put(x);
         ys.put(y);
@@ -99,14 +97,14 @@ public class RunningStatistics2D {
      * @return Sum of squared deviations from the mean of x
      */
     public double SSxx() {
-        return xs.var() * (numSamples() - 1.0);
+        return xs.var() * (n() - 1.0);
     }
 
     /**
      * @return Sum of squared deviations from the mean of y
      */
     public double SSyy() {
-        return ys.var() * (numSamples() - 1.0);
+        return ys.var() * (n() - 1.0);
     }
 
     /**
@@ -176,7 +174,7 @@ public class RunningStatistics2D {
      *
      * @return number of samples
      */
-    public long numSamples() {
-        return xs.numSamples();
+    public long n() {
+        return xs.n();
     }
 }
