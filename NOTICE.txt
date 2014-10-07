@@ -2,7 +2,6 @@ The Galileo Project is licensed under the 2-clause BSD license:
 
     http://opensource.org/licenses/BSD-2-Clause
 
-
 This project includes additional software dependencies:
 ================================================================================
 Apache Commons Math
@@ -13,3 +12,5 @@ JavaEWAH
 Copyright 2009-2014 Lemire et al.
 License: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0.html)
 ================================================================================
+
+Text copies of the relevant license(s) are located in the /docs directory.
