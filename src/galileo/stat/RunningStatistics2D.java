@@ -47,6 +47,23 @@ public class RunningStatistics2D implements ByteSerializable {
 
     private double SSxy;
 
+    /**
+     * Encapsulates the results of a Pearson product-moment correlation
+     * coefficient calculation, including the two-tailed p-value.
+     */
+    public class PearsonResult {
+        /** Pearson's r-value */
+        double r;
+
+        /** p-value */
+        double p;
+
+        public PearsonResult(double r, double p) {
+            this.r = r;
+            this.p = p;
+        }
+    }
+
     public RunningStatistics2D() {
         xs = new RunningStatistics();
         ys = new RunningStatistics();
@@ -126,19 +143,6 @@ public class RunningStatistics2D implements ByteSerializable {
             r = 1.0;
         }
         return r;
-    }
-
-    public class PearsonResult {
-        /** Pearson's r-value */
-        double r;
-
-        /** p-value */
-        double p;
-
-        public PearsonResult(double r, double p) {
-            this.r = r;
-            this.p = p;
-        }
     }
 
     /**
