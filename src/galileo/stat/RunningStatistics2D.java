@@ -55,8 +55,8 @@ public class RunningStatistics2D implements ByteSerializable {
     public void merge(RunningStatistics2D that) {
         long thisN = this.n();
         long thatN = that.n();
-        RunningStatistics thatX = that.xStatistics();
-        RunningStatistics thatY = that.yStatistics();
+        RunningStatistics thatX = that.xStat();
+        RunningStatistics thatY = that.yStat();
         double xDelta = thatX.mean() - this.xs.mean();
         double yDelta = thatY.mean() - this.ys.mean();
 
@@ -189,14 +189,14 @@ public class RunningStatistics2D implements ByteSerializable {
     /**
      * @return a copy of the running statistics instance for x.
      */
-    public RunningStatistics xStatistics() {
+    public RunningStatistics xStat() {
         return new RunningStatistics(xs);
     }
 
     /**
      * @return a copy of the running statistics instance for y.
      */
-    public RunningStatistics yStatistics() {
+    public RunningStatistics yStat() {
         return new RunningStatistics(ys);
     }
 
