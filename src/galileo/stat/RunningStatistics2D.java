@@ -36,7 +36,7 @@ import org.apache.commons.math3.special.Beta;
 /**
  * Expanding on the {@link RunningStatistics} class, this class supports
  * two dimensions (x and y), along with some extra features (simple linear
- * regression and calculating correlation).
+ * regression, r^2, calculating correlation).
  *
  * @author malensek
  */
