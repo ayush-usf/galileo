@@ -36,4 +36,8 @@ public class FileSystemException extends Exception {
     public FileSystemException(String s) {
         super(s);
     }
+
+    public FileSystemException(String s, Throwable t) {
+        super(s, t);
+    }
 }
