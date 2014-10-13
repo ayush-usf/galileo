@@ -57,7 +57,6 @@ import galileo.net.ClientConnectionPool;
 import galileo.net.HostIdentifier;
 import galileo.net.PortTester;
 import galileo.net.ServerMessageRouter;
-import galileo.util.StatusLine;
 import galileo.util.Version;
 
 /**
