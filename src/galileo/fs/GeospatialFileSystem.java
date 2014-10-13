@@ -49,7 +49,6 @@ import galileo.query.Query;
 import galileo.serialization.SerializationException;
 import galileo.serialization.Serializer;
 import galileo.util.GeoHash;
-import galileo.util.StackTraceToString;
 
 /**
  * Implements a {@link FileSystem} for Geospatial data.  This file system
@@ -166,9 +165,7 @@ public class GeospatialFileSystem extends FileSystem {
             metadataGraph.addPath(path);
         } catch (Exception e) {
             throw new FileSystemException("Error storing block: "
-                    + e.getClass().getCanonicalName() + ":"
-                    + System.lineSeparator() +
-                    StackTraceToString.convert(e));
+                    + e.getClass().getCanonicalName(), e);
         }
 
         return blockPath;
@@ -230,9 +227,7 @@ public class GeospatialFileSystem extends FileSystem {
             metadataGraph.addPath(path);
         } catch (Exception e) {
             throw new FileSystemException("Error storing metadata: "
-                    + e.getClass().getCanonicalName() + ":"
-                    + System.lineSeparator() +
-                    StackTraceToString.convert(e));
+                    + e.getClass().getCanonicalName(), e);
         }
     }
 

@@ -35,7 +35,6 @@ import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 import galileo.util.Pair;
-import galileo.util.StackTraceToString;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -147,8 +146,7 @@ public class MetadataGraph implements ByteSerializable {
                 this.addPath(p);
             } catch (FeatureTypeMismatchException e) {
                 throw new SerializationException("Could not add deserialized "
-                        + "path to the MetadataGraph:" + System.lineSeparator()
-                        + StackTraceToString.convert(e));
+                        + "path to the MetadataGraph.", e);
             }
         }
     }
