@@ -25,6 +25,12 @@ software, even if advised of the possibility of such damage.
 
 package galileo.stat;
 
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
+import java.io.IOException;
+
 import org.apache.commons.math3.distribution.TDistribution;
 
 /**
@@ -34,7 +40,7 @@ import org.apache.commons.math3.distribution.TDistribution;
  *
  * @author malensek
  */
-public class RunningStatistics {
+public class RunningStatistics implements ByteSerializable {
     private long n;
     private double mean;
     private double M2;
@@ -250,5 +256,21 @@ public class RunningStatistics {
         str += "Variance: " + var() + System.lineSeparator();
         str += "Std Dev: " + std();
         return str;
+    }
+
+    @Deserialize
+    public RunningStatistics(SerializationInputStream in)
+    throws IOException {
+        n = in.readLong();
+        mean = in.readDouble();
+        M2 = in.readDouble();
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeLong(n);
+        out.writeDouble(mean);
+        out.writeDouble(M2);
     }
 }

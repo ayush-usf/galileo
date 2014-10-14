@@ -25,21 +25,44 @@ software, even if advised of the possibility of such damage.
 
 package galileo.stat;
 
+import java.io.IOException;
+
+import galileo.serialization.ByteSerializable;
+import galileo.serialization.SerializationInputStream;
+import galileo.serialization.SerializationOutputStream;
+
 import org.apache.commons.math3.special.Beta;
 
 /**
  * Expanding on the {@link RunningStatistics} class, this class supports
  * two dimensions (x and y), along with some extra features (simple linear
- * regression and calculating correlation).
+ * regression, r^2, calculating correlation).
  *
  * @author malensek
  */
-public class RunningStatistics2D {
+public class RunningStatistics2D implements ByteSerializable {
 
     private RunningStatistics xs;
     private RunningStatistics ys;
 
     private double SSxy;
+
+    /**
+     * Encapsulates the results of a Pearson product-moment correlation
+     * coefficient calculation, including the two-tailed p-value.
+     */
+    public class PearsonResult {
+        /** Pearson's r-value */
+        double r;
+
+        /** p-value */
+        double p;
+
+        public PearsonResult(double r, double p) {
+            this.r = r;
+            this.p = p;
+        }
+    }
 
     public RunningStatistics2D() {
         xs = new RunningStatistics();
@@ -49,8 +72,8 @@ public class RunningStatistics2D {
     public void merge(RunningStatistics2D that) {
         long thisN = this.n();
         long thatN = that.n();
-        RunningStatistics thatX = that.xStatistics();
-        RunningStatistics thatY = that.yStatistics();
+        RunningStatistics thatX = that.xStat();
+        RunningStatistics thatY = that.yStat();
         double xDelta = thatX.mean() - this.xs.mean();
         double yDelta = thatY.mean() - this.ys.mean();
 
@@ -122,19 +145,12 @@ public class RunningStatistics2D {
         return r;
     }
 
-    public class PearsonResult {
-        /** Pearson's r-value */
-        double r;
-
-        /** p-value */
-        double p;
-
-        public PearsonResult(double r, double p) {
-            this.r = r;
-            this.p = p;
-        }
-    }
-
+    /**
+     * Calculate the Pearson product-moment correlation coefficient, including
+     * the two-tailed p-value.
+     *
+     * @return PearsonResult containing the r-value and two-tailed p-value.
+     */
     public PearsonResult rp() {
         double r = r();
         double p = 0.0;
@@ -183,14 +199,14 @@ public class RunningStatistics2D {
     /**
      * @return a copy of the running statistics instance for x.
      */
-    public RunningStatistics xStatistics() {
+    public RunningStatistics xStat() {
         return new RunningStatistics(xs);
     }
 
     /**
      * @return a copy of the running statistics instance for y.
      */
-    public RunningStatistics yStatistics() {
+    public RunningStatistics yStat() {
         return new RunningStatistics(ys);
     }
 
@@ -202,5 +218,21 @@ public class RunningStatistics2D {
      */
     public long n() {
         return xs.n();
+    }
+
+    @Deserialize
+    public RunningStatistics2D(SerializationInputStream in)
+    throws IOException {
+        xs = new RunningStatistics(in);
+        ys = new RunningStatistics(in);
+        SSxy = in.readDouble();
+    }
+
+    @Override
+    public void serialize(SerializationOutputStream out)
+    throws IOException {
+        out.writeSerializable(xs);
+        out.writeSerializable(ys);
+        out.writeDouble(SSxy);
     }
 }
