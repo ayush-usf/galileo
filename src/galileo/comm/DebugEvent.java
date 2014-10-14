@@ -32,6 +32,11 @@ import galileo.serialization.SerializationException;
 import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 
+/**
+ * A generic event for debugging purposes.
+ *
+ * @author malensek
+ */
 public class DebugEvent implements Event {
 
     private byte[] payload;
