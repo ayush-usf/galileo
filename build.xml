@@ -99,6 +99,7 @@
             <test name="galileo.test.dataset.feature.TestSuite"/>
             <test name="galileo.test.dht.partitioning.TestSuite"/>
             <test name="galileo.test.graph.TestSuite"/>
+            <test name="galileo.test.stat.TestSuite"/>
         </junit>
     </target>
 
