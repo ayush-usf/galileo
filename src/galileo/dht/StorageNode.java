@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import galileo.comm.DebugEvent;
 import galileo.comm.GalileoEventMap;
 import galileo.comm.QueryEvent;
 import galileo.comm.QueryPreamble;
@@ -278,6 +279,16 @@ public class StorageNode {
             return;
         }
         //sendMessage(tracker.getSelectionKey(), message);
+    }
+
+    @EventHandler
+    public void handleDebugEvent(DebugEvent event, EventContext context) {
+        try {
+            Thread.sleep(1000);
+            context.sendReply(new DebugEvent(new byte[] { 0 }));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
