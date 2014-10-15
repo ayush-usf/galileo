@@ -47,6 +47,7 @@ public class WelfordBench {
         testMean(iters);
         testSTD(iters);
         testMerge(iters);
+        testT(iters);
     }
 
     private static void testUpdate(int iters) {
@@ -100,6 +101,24 @@ public class WelfordBench {
             mergept.stopAndPrint();
         }
     }
+
+    private static void testT(int iters) {
+        for (int i = 0; i < iters; ++i) {
+            double[] samples1 = generateSamples(100000);
+            double[] samples2 = generateSamples(100000);
+            RunningStatistics rs1 = new RunningStatistics();
+            RunningStatistics rs2 = new RunningStatistics();
+
+            PerformanceTimer pt = new PerformanceTimer("welford-T");
+            pt.start();
+
+            rs1.put(samples1);
+            rs2.put(samples2);
+            RunningStatistics.welchT(rs1, rs2);
+            pt.stopAndPrint();
+        }
+    }
+
 
     protected static double[] generateSamples(int numSamples) {
         Random rand = new Random();
