@@ -46,6 +46,9 @@ public class RunningStatistics implements ByteSerializable {
     private double mean;
     private double M2;
 
+    private double max;
+    private double min;
+
     public static class WelchResult {
         /** T-statistic */
         public double t;
@@ -96,6 +99,8 @@ public class RunningStatistics implements ByteSerializable {
         this.n = that.n;
         this.mean = that.mean;
         this.M2 = that.M2;
+        this.max = that.max;
+        this.min = that.min;
     }
 
     public void merge(RunningStatistics that) {
@@ -133,6 +138,9 @@ public class RunningStatistics implements ByteSerializable {
         double delta = sample - mean;
         mean = mean + delta / n;
         M2 = M2 + delta * (sample - mean);
+
+        max = FastMath.max(this.max, sample);
+        min = FastMath.min(this.min, sample);
     }
 
     /**
@@ -207,6 +215,22 @@ public class RunningStatistics implements ByteSerializable {
      */
     public double std(double ddof) {
         return FastMath.sqrt(var(ddof));
+    }
+
+    /**
+     * Retrieves the largest value seen thus far by this RunningStatistics
+     * instance.
+     */
+    public double max() {
+        return this.max;
+    }
+
+    /**
+     * Retrieves the smallest value seen thus far by this RunningStatistics
+     * instance.
+     */
+    public double min() {
+        return this.min;
     }
 
     public double prob(double sample) {
