@@ -112,8 +112,8 @@ public class RunningStatistics implements ByteSerializable {
     }
 
     /**
-     * Creates a Welford running statistics instance based on a number of
-     * samples.
+     * Creates a Welford running statistics instance with an array of samples.
+     * Samples are added to the statistics in order.
      */
     public RunningStatistics(double... samples ) {
         for (double sample : samples) {
@@ -122,7 +122,7 @@ public class RunningStatistics implements ByteSerializable {
     }
 
     /**
-     * Add a number of new samples to the running statistics.
+     * Add multiple new samples to the running statistics.
      */
     public void put(double... samples) {
         for (double sample : samples) {
