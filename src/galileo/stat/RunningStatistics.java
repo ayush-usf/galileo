@@ -46,6 +46,19 @@ public class RunningStatistics implements ByteSerializable {
     private double mean;
     private double M2;
 
+    public static class WelchResult {
+        /** T-statistic */
+        public double t;
+
+        /** Two-tailed p-value */
+        public double p;
+
+        public WelchResult(double t, double p) {
+            this.t = t;
+            this.p = p;
+        }
+    }
+
     /**
      * Creates a Welford running statistics instance without no observed values.
      */
@@ -210,19 +223,6 @@ public class RunningStatistics implements ByteSerializable {
      */
     public long n() {
         return n;
-    }
-
-    public static class WelchResult {
-        /** T-statistic */
-        public double t;
-
-        /** Two-tailed p-value */
-        public double p;
-
-        public WelchResult(double t, double p) {
-            this.t = t;
-            this.p = p;
-        }
     }
 
     public static WelchResult welchT(
