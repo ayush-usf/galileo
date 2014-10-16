@@ -32,6 +32,7 @@ import galileo.serialization.SerializationOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.math3.distribution.TDistribution;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Provides an online method for computing mean, variance, and standard
@@ -170,7 +171,7 @@ public class RunningStatistics implements ByteSerializable {
      * @return sample standard deviation
      */
     public double std() {
-        return Math.sqrt(var());
+        return FastMath.sqrt(var());
     }
 
     /**
@@ -180,7 +181,7 @@ public class RunningStatistics implements ByteSerializable {
      * @return population standard deviation
      */
     public double popStd() {
-        return Math.sqrt(popVar());
+        return FastMath.sqrt(popVar());
     }
 
     /**
@@ -192,12 +193,12 @@ public class RunningStatistics implements ByteSerializable {
      * @return standard deviation
      */
     public double std(double ddof) {
-        return Math.sqrt(var(ddof));
+        return FastMath.sqrt(var(ddof));
     }
 
     public double prob(double sample) {
-        double norm = 1 / Math.sqrt(2 * Math.PI * this.var());
-        return norm * Math.exp((- Math.pow(sample - this.mean, 2))
+        double norm = 1 / FastMath.sqrt(2 * FastMath.PI * this.var());
+        return norm * FastMath.exp((- FastMath.pow(sample - this.mean, 2))
                 / (2 * this.var()));
     }
 
@@ -231,13 +232,13 @@ public class RunningStatistics implements ByteSerializable {
 
         /* Calculate t */
         double xbs = rs1.mean() - rs2.mean();
-        double t = xbs / Math.sqrt(vn1 + vn2);
+        double t = xbs / FastMath.sqrt(vn1 + vn2);
 
-        double vn12 = Math.pow(vn1, 2);
-        double vn22 = Math.pow(vn2, 2);
+        double vn12 = FastMath.pow(vn1, 2);
+        double vn22 = FastMath.pow(vn2, 2);
 
         /* Calculate degrees of freedom */
-        double v = Math.pow(vn1 + vn2, 2)
+        double v = FastMath.pow(vn1 + vn2, 2)
             / ((vn12 / (rs1.n() - 1)) + (vn22 / (rs2.n() - 1)));
         if (v == Double.NaN) {
             v = 1;
