@@ -144,6 +144,26 @@ public class RunningStatistics implements ByteSerializable {
     }
 
     /**
+     * Removes a previously-added sample from the running statistics. WARNING:
+     * give careful consideration when using this method. If a value is removed
+     * that wasn't previously added, the statistics will be meaningless.
+     * Additionally, if you're keeping track of previous additions, then it
+     * might be worth evaluating whether a RunningStatistics instance is the
+     * right thing to be using at all. Caveat emptor, etc, etc.
+     */
+    public void remove(double sample) {
+        if (n <= 1) {
+            /* If we're removing the last sample, then just clear the stats. */
+            clear();
+            return;
+        }
+
+        double prevMean = (n * mean - sample) / (n - 1);
+        M2 = M2 - (sample - mean) * (sample - prevMean);
+        mean = prevMean;
+        n--;
+    }
+
     /**
      * Clears all values passed in, returning the RunningStatistics instance to
      * its original state.
