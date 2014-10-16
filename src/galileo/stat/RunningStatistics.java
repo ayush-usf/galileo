@@ -144,6 +144,15 @@ public class RunningStatistics implements ByteSerializable {
     }
 
     /**
+    /**
+     * Clears all values passed in, returning the RunningStatistics instance to
+     * its original state.
+     */
+    public void clear() {
+        n = 0;
+        mean = 0;
+        M2 = 0;
+    }
      * Calculates the current running mean for the values observed thus far.
      *
      * @return mean of all the samples observed thus far.
