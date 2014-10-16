@@ -173,6 +173,8 @@ public class RunningStatistics implements ByteSerializable {
         mean = 0;
         M2 = 0;
     }
+
+    /**
      * Calculates the current running mean for the values observed thus far.
      *
      * @return mean of all the samples observed thus far.
