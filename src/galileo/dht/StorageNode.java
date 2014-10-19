@@ -281,16 +281,6 @@ public class StorageNode {
         //sendMessage(tracker.getSelectionKey(), message);
     }
 
-    @EventHandler
-    public void handleDebugEvent(DebugEvent event, EventContext context) {
-        try {
-            Thread.sleep(1000);
-            context.sendReply(new DebugEvent(new byte[] { 0 }));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Handles cleaning up the system for a graceful shutdown.
      */
