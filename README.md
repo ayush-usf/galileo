@@ -1,3 +1,5 @@
+![Galileo](docs/galileo.svg)
+
 Galileo
 =======
 
