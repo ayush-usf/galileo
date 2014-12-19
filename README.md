@@ -1,6 +1,4 @@
-![Galileo](docs/galileo.svg)
-
-Galileo
+![Galileo](docs/galileo.png)
 =======
 
-Galileo is a high-throughput distributed file system for multidimensional data.  It is developed at the Colorado State University Computer Science Department.  For more information about the system and its development, please see http://galileo.cs.colostate.edu/
+This is Matthew Malensek's development branch of the Galileo framework (http://galileo.cs.colostate.edu/). Galileo is a high-throughput distributed file system for multidimensional data, developed at the Colorado State University Computer Science Department.
