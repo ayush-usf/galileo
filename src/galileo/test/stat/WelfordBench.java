@@ -44,6 +44,7 @@ public class WelfordBench {
         int iters = Integer.parseInt(args[0]);
 
         testUpdate(iters);
+        testRemove(iters);
         testMean(iters);
         testSTD(iters);
         testMerge(iters);
@@ -119,6 +120,19 @@ public class WelfordBench {
         }
     }
 
+    private static void testRemove(int iters) {
+        double[] samples = generateSamples(iters);
+        RunningStatistics rs = new RunningStatistics();
+        for (double sample : samples) {
+            rs.put(sample);
+        }
+        PerformanceTimer pt = new PerformanceTimer("welford-remove");
+        for (int j = 0; j < iters; ++j) {
+            pt.start();
+            rs.remove(samples[j]);
+            pt.stopAndPrint();
+        }
+    }
 
     protected static double[] generateSamples(int numSamples) {
         Random rand = new Random();
