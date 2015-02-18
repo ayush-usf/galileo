@@ -29,6 +29,12 @@ import galileo.dataset.Coordinates;
 
 import java.util.List;
 
+/**
+ * Encapsulates a GeoavailabilityGrid query: a list of a coordinates that form
+ * a polygon of interest that will be intersected with the grid points.
+ *
+ * @author malensek
+ */
 public class GeoavailabilityQuery {
 
     private List<Coordinates> polygon;

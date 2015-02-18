@@ -55,10 +55,7 @@ public class EventPublisher {
     }
 
     /**
-     * Publishes a {@link GalileoEvent} via the client's
-     * {@link ClientMessageRouter}.
-     *
-     * @return identification number of the event.
+     * Publishes an {@link Event} via the client's {@link ClientMessageRouter}.
      */
     public void publish(NetworkDestination destination, Event event)
     throws IOException {

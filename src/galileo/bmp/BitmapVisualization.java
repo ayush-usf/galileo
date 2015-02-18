@@ -43,6 +43,10 @@ public class BitmapVisualization {
 
     /**
      * Draws a {@link Bitmap} instance as a BufferedImage.
+     *
+     * @param bitmap The bitmap to draw.
+     * @param width Number of bits to draw before wrapping to the next line
+     * @param height Number of scanlines in the bitmap
      */
     public static BufferedImage drawBitmap(
             Bitmap bitmap, int width, int height) {
@@ -53,6 +57,11 @@ public class BitmapVisualization {
     /**
      * Draws a {@link Bitmap} instance as a BufferedImage with a particular
      * color used to indicate the areas of the bitmap set to 1.
+     *
+     * @param bitmap The bitmap to draw.
+     * @param width Number of bits to draw before wrapping to the next line
+     * @param height Number of scanlines in the bitmap
+     * @param color {@link java.awt.Color} to use for bits that are set to 1.
      */
     public static BufferedImage drawBitmap(
             Bitmap bitmap, int width, int height, Color color) {

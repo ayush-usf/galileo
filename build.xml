@@ -33,7 +33,6 @@
         <javac srcdir="${src}"
                 destdir="${build}"
                 classpathref="classpath"
-                debug="on"
                 includeantruntime="false">
 
             <compilerarg value="-Xlint"/>

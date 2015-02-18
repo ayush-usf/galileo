@@ -35,6 +35,12 @@ import galileo.dataset.Point;
 import galileo.dataset.SpatialRange;
 import galileo.util.GeoHash;
 
+/**
+ * Implements a bitmap-based spatial index that can be used to determine
+ * whether or not data is stored within specified spatial regions.
+ *
+ * @author malensek
+ */
 public class GeoavailabilityGrid {
 
     private static final Logger logger = Logger.getLogger("galileo");
@@ -277,59 +283,59 @@ public class GeoavailabilityGrid {
     }
 
     @Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((baseRange == null) ? 0 : baseRange.hashCode());
-		result = prime * result + ((bmp == null) ? 0 : bmp.hashCode());
-		result = prime * result + height;
-		result = prime * result + width;
-		result = prime * result + Float.floatToIntBits(xDegreesPerPixel);
-		result = prime * result + Float.floatToIntBits(yDegreesPerPixel);
-		return result;
-	}
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+            + ((baseRange == null) ? 0 : baseRange.hashCode());
+        result = prime * result + ((bmp == null) ? 0 : bmp.hashCode());
+        result = prime * result + height;
+        result = prime * result + width;
+        result = prime * result + Float.floatToIntBits(xDegreesPerPixel);
+        result = prime * result + Float.floatToIntBits(yDegreesPerPixel);
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		GeoavailabilityGrid other = (GeoavailabilityGrid) obj;
-		if (baseRange == null) {
-			if (other.baseRange != null) {
-				return false;
-			}
-		} else if (!baseRange.equals(other.baseRange)) {
-			return false;
-		}
-		if (bmp == null) {
-			if (other.bmp != null) {
-				return false;
-			}
-		} else if (!bmp.equals(other.bmp)) {
-			return false;
-		}
-		if (height != other.height) {
-			return false;
-		}
-		if (width != other.width) {
-			return false;
-		}
-		if (Float.floatToIntBits(xDegreesPerPixel) != Float
-				.floatToIntBits(other.xDegreesPerPixel)) {
-			return false;
-		}
-		if (Float.floatToIntBits(yDegreesPerPixel) != Float
-				.floatToIntBits(other.yDegreesPerPixel)) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        GeoavailabilityGrid other = (GeoavailabilityGrid) obj;
+        if (baseRange == null) {
+            if (other.baseRange != null) {
+                return false;
+            }
+        } else if (!baseRange.equals(other.baseRange)) {
+            return false;
+        }
+        if (bmp == null) {
+            if (other.bmp != null) {
+                return false;
+            }
+        } else if (!bmp.equals(other.bmp)) {
+            return false;
+        }
+        if (height != other.height) {
+            return false;
+        }
+        if (width != other.width) {
+            return false;
+        }
+        if (Float.floatToIntBits(xDegreesPerPixel) != Float
+                .floatToIntBits(other.xDegreesPerPixel)) {
+            return false;
+                }
+        if (Float.floatToIntBits(yDegreesPerPixel) != Float
+                .floatToIntBits(other.yDegreesPerPixel)) {
+            return false;
+                }
+        return true;
+    }
 }
