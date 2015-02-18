@@ -2,7 +2,7 @@
 
 <project name="galileo" basedir="." default="jar">
     <!-- Build properties -->
-    <property name="project.version" value="1.0"/>
+    <property name="project.version" value="1.1"/>
     <property name="project.url" value="http://galileo.cs.colostate.edu"/>
     <tstamp>
         <format property="build.date" pattern="MM-dd-yyyy"/>
