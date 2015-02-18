@@ -84,11 +84,16 @@
         <property name="doctitle"
                 value="${ant.project.name} ${project.version} Documentation"/>
 
-        <javadoc sourcepath="${src}"
-                destdir="${docs}"
+        <javadoc destdir="${docs}"
                 classpathref="classpath"
                 doctitle="${doctitle}"
-                windowtitle="${doctitle}"/>
+                windowtitle="${doctitle}">
+
+            <fileset dir="src" defaultexcludes="yes">
+                <exclude name="galileo/test/**"/>
+                <exclude name="galileo/samples/**"/>
+            </fileset>
+        </javadoc>
     </target>
 
     <target name="test" depends="testcompile,jar">
