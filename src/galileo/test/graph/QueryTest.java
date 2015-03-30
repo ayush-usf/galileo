@@ -56,7 +56,7 @@ public class QueryTest {
             }
         }
 
-        GeospatialFileSystem gfs = new GeospatialFileSystem("/tmp/galtest");
+        GeospatialFileSystem gfs = new GeospatialFileSystem("/var/tmp/galtest");
 
         /* Insert the blocks we've loaded, if any */
         if (blocks.size() > 0) {
