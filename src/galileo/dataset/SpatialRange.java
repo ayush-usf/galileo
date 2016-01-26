@@ -32,6 +32,9 @@ import galileo.serialization.SerializationInputStream;
 import galileo.serialization.SerializationOutputStream;
 import galileo.util.Pair;
 
+/**
+ * @author malensek
+ */
 public class SpatialRange implements ByteSerializable {
     private float upperLat;
     private float lowerLat;

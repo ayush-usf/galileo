@@ -36,6 +36,8 @@ import galileo.dataset.SpatialRange;
  * algorithm.
  *
  * See http://en.wikipedia.org/wiki/Geohash for implementation details.
+ *
+ * @author malensek
  */
 public class GeoHash {
 

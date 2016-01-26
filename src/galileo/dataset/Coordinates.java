@@ -33,6 +33,8 @@ import galileo.serialization.SerializationOutputStream;
 
 /**
  * Encapsulates a point in space with latitude, longitude coordinates.
+ *
+ * @author malensek
  */
 public class Coordinates implements ByteSerializable {
     private float lat;
