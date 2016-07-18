@@ -1,18 +1,19 @@
-# Eclipse files
-.project
-.classpath
-.build
+# Output binaries
+*.class
+/target
 
-# Local dev files
-classes
-depcache
-build.properties
+# IDE files
+/.project
+/.classpath
+/.settings
+/.build
 
 # javadoc-generated documentation
-docs/api
+/docs/api
 
 # Mac OS File Attributes
 .DS_Store
 
-# Binaries
-lib/galileo-[0-9].[0-9].jar
+# virtual machine crash logs
+hs_err_pid*
+
