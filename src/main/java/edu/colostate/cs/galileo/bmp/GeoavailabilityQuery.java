@@ -23,11 +23,11 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.bmp;
-
-import galileo.dataset.Coordinates;
+package edu.colostate.cs.galileo.bmp;
 
 import java.util.List;
+
+import edu.colostate.cs.galileo.dataset.Coordinates;
 
 /**
  * Encapsulates a GeoavailabilityGrid query: a list of a coordinates that form

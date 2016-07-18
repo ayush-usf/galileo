@@ -23,17 +23,16 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.bmp;
-
-import galileo.dataset.Coordinates;
-
-import galileo.dataset.Point;
-import galileo.dataset.SpatialRange;
+package edu.colostate.cs.galileo.bmp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.Point;
+import edu.colostate.cs.galileo.dataset.SpatialRange;
 
 /**
  * Similar to the GeoavailabilityGrid, the GeoavailabilityMap allows arbitrary

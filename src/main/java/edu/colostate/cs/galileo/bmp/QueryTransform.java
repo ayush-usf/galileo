@@ -23,11 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.bmp;
-
-import galileo.dataset.Coordinates;
-
-import galileo.dataset.Point;
+package edu.colostate.cs.galileo.bmp;
 
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -38,6 +34,9 @@ import java.awt.image.DataBufferByte;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.Point;
 
 /**
  * Provides functionality for transforming {@link GeoavailabilityQuery}

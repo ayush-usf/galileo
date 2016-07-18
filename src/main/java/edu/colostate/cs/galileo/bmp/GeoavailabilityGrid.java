@@ -23,17 +23,17 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.bmp;
+package edu.colostate.cs.galileo.bmp;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import galileo.dataset.Coordinates;
-import galileo.dataset.Point;
-import galileo.dataset.SpatialRange;
-import galileo.util.GeoHash;
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.Point;
+import edu.colostate.cs.galileo.dataset.SpatialRange;
+import edu.colostate.cs.galileo.util.GeoHash;
 
 /**
  * Implements a bitmap-based spatial index that can be used to determine
