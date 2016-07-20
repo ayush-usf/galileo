@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.net;
+package edu.colostate.cs.galileo.net;
 
 /**
  * Interface for classes that will listen for incoming {@link ElssaMessage}

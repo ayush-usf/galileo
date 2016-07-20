@@ -1,4 +1,4 @@
-package io.elssa.net;
+package edu.colostate.cs.galileo.net;
 
 public class ElssaMessage {
 
