@@ -23,11 +23,11 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.stat;
+package edu.colostate.cs.galileo.stat;
 
-import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 import java.io.IOException;
 
