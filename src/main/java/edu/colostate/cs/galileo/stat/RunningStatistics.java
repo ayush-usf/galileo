@@ -42,12 +42,14 @@ import org.apache.commons.math3.util.FastMath;
  * @author malensek
  */
 public class RunningStatistics implements ByteSerializable {
+
     private long n;
     private double mean;
     private double M2;
 
-    private double max;
-    private double min;
+    /* Initialize max/min to their respective opposite values: */
+    private double min = Double.MAX_VALUE;
+    private double max = Double.MIN_VALUE;
 
     public static class WelchResult {
         /** T-statistic */
@@ -63,9 +65,11 @@ public class RunningStatistics implements ByteSerializable {
     }
 
     /**
-     * Creates a Welford running statistics instance without no observed values.
+     * Creates an empty running statistics instance.
      */
-    public RunningStatistics() { }
+    public RunningStatistics() {
+
+    }
 
     /**
      * Creates a copy of a {@link RunningStatistics} instance.
@@ -99,20 +103,28 @@ public class RunningStatistics implements ByteSerializable {
         this.n = that.n;
         this.mean = that.mean;
         this.M2 = that.M2;
-        this.max = that.max;
         this.min = that.min;
+        this.max = that.max;
     }
 
+    /**
+     * Merges statistics from another {@link RunningStatistics} instance with
+     * this instance.
+     *
+     * @param that The {@link RunningStatistics} instance to merge data from.
+     */
     public void merge(RunningStatistics that) {
         long newN = n + that.n;
         double delta = this.mean - that.mean;
         mean = (this.n * this.mean + that.n * that.mean) / newN;
         M2 = M2 + that.M2 + delta * delta * this.n * that.n / newN;
         n = newN;
+        this.min = FastMath.min(this.min, that.min);
+        this.max = FastMath.max(this.max, that.max);
     }
 
     /**
-     * Creates a Welford running statistics instance with an array of samples.
+     * Creates a running statistics instance with an array of samples.
      * Samples are added to the statistics in order.
      */
     public RunningStatistics(double... samples ) {
@@ -139,8 +151,8 @@ public class RunningStatistics implements ByteSerializable {
         mean = mean + delta / n;
         M2 = M2 + delta * (sample - mean);
 
-        max = FastMath.max(this.max, sample);
         min = FastMath.min(this.min, sample);
+        max = FastMath.max(this.max, sample);
     }
 
     /**
@@ -172,6 +184,8 @@ public class RunningStatistics implements ByteSerializable {
         n = 0;
         mean = 0;
         M2 = 0;
+        min = Double.MAX_VALUE;
+        max = Double.MIN_VALUE;
     }
 
     /**
@@ -310,16 +324,20 @@ public class RunningStatistics implements ByteSerializable {
         str += "Number of Samples: " + n + System.lineSeparator();
         str += "Mean: " + mean + System.lineSeparator();
         str += "Variance: " + var() + System.lineSeparator();
-        str += "Std Dev: " + std();
+        str += "Std Dev: " + std() + System.lineSeparator();
+        str += "Min: " + min + System.lineSeparator();
+        str += "Max: " + max;
         return str;
     }
 
     @Deserialize
     public RunningStatistics(SerializationInputStream in)
     throws IOException {
-        n = in.readLong();
-        mean = in.readDouble();
-        M2 = in.readDouble();
+        this.n = in.readLong();
+        this.mean = in.readDouble();
+        this.M2 = in.readDouble();
+        this.min = in.readDouble();
+        this.max = in.readDouble();
     }
 
     @Override
@@ -328,5 +346,7 @@ public class RunningStatistics implements ByteSerializable {
         out.writeLong(n);
         out.writeDouble(mean);
         out.writeDouble(M2);
+        out.writeDouble(min);
+        out.writeDouble(max);
     }
 }
