@@ -27,5 +27,4 @@ software, even if advised of the possibility of such damage.
  * Provides implementations of methods used for autonomous functionality or
  * reporting statistics to clients.
  */
-
-package galileo.stat;
+package edu.colostate.cs.galileo.stat;
