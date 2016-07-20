@@ -33,7 +33,7 @@ public class MessageDecoder extends ReplayingDecoder<DecoderState> {
             byte[] payload = new byte[frame.readableBytes()];
             frame.readBytes(payload);
             MessageContext context = new MessageContext(ctx);
-            ElssaMessage msg = new ElssaMessage(payload, context);
+            GalileoMessage msg = new GalileoMessage(payload, context);
             out.add(msg);
             break;
 

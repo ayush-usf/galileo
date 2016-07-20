@@ -1,28 +1,28 @@
 package edu.colostate.cs.galileo.net;
 
-public class ElssaMessage {
+public class GalileoMessage {
 
     private byte[] payload;
     private MessageContext context;
 
     /**
-     * Constructs an ElssaMessage from an array of bytes.
+     * Constructs an GalileoMessage from an array of bytes.
      *
      * @param payload message payload in the form of a byte array.
      */
-    public ElssaMessage(byte[] payload) {
+    public GalileoMessage(byte[] payload) {
         this.payload = payload;
     }
 
-    public ElssaMessage(byte[] payload, MessageContext context) {
+    public GalileoMessage(byte[] payload, MessageContext context) {
         this(payload);
         this.context = context;
     }
 
     /**
-     * Retrieves the payload for this ElssaMessage.
+     * Retrieves the payload for this GalileoMessage.
      *
-     * @return the ElssaMessage payload
+     * @return the GalileoMessage payload
      */
     public byte[] payload() {
         return payload;

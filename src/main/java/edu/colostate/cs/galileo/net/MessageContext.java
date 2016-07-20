@@ -29,7 +29,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 /**
  * Contains connection-specific information about the source of a
- * {@link ElssaMessage}.
+ * {@link GalileoMessage}.
  *
  * @author malensek
  */
@@ -61,7 +61,7 @@ public class MessageContext {
      * Sends a message back to the originator of the message this context
      * belongs to.
      */
-    public void sendMessage(ElssaMessage message) {
+    public void sendMessage(GalileoMessage message) {
         channelCtx.channel().writeAndFlush(message);
     }
 }

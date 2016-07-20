@@ -6,11 +6,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 @ChannelHandler.Sharable
-public class MessageEncoder extends MessageToByteEncoder<ElssaMessage> {
+public class MessageEncoder extends MessageToByteEncoder<GalileoMessage> {
 
     @Override
     protected void encode(
-            ChannelHandlerContext ctx, ElssaMessage msg, ByteBuf out) {
+            ChannelHandlerContext ctx, GalileoMessage msg, ByteBuf out) {
         byte[] payload = msg.payload();
         out.writeInt(payload.length);
         out.writeBytes(payload);

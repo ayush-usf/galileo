@@ -1,4 +1,4 @@
-package io.elssa.net;
+package edu.colostate.cs.galileo.net;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;

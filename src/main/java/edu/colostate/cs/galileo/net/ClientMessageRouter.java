@@ -43,7 +43,7 @@ public class ClientMessageRouter extends MessageRouterBase {
      * Sends a message to multiple network destinations.
      */
     public List<Transmission> broadcastMessage(
-            Iterable<NetworkEndpoint> endpoints, ElssaMessage message) {
+            Iterable<NetworkEndpoint> endpoints, GalileoMessage message) {
         List<Transmission> transmissions = new ArrayList<>();
         for (NetworkEndpoint endpoint : endpoints) {
             Transmission trans = sendMessage(endpoint, message);
@@ -61,7 +61,7 @@ public class ClientMessageRouter extends MessageRouterBase {
     }
 
     public Transmission sendMessage(
-            NetworkEndpoint endpoint, ElssaMessage msg) {
+            NetworkEndpoint endpoint, GalileoMessage msg) {
         Channel chan = ensureConnected(endpoint);
         ChannelFuture cf = chan.writeAndFlush(msg);
 

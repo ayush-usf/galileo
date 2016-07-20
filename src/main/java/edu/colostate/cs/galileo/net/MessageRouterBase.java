@@ -42,7 +42,7 @@ public abstract class MessageRouterBase {
         }
     }
 
-    protected void onMessage(ElssaMessage msg) {
+    protected void onMessage(GalileoMessage msg) {
         for (MessageListener listener : listeners) {
             listener.onMessage(msg);
         }

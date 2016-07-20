@@ -43,8 +43,8 @@ public class InboundHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (msg instanceof ElssaMessage) {
-            router.onMessage((ElssaMessage) msg);
+        if (msg instanceof GalileoMessage) {
+            router.onMessage((GalileoMessage) msg);
         }
     }
 

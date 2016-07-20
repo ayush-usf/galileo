@@ -23,14 +23,14 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.net;
+package edu.colostate.cs.galileo.net;
 
 import io.netty.channel.ChannelFuture;
 
 /**
- * Represents the transmission of one unit of data ({@link ElssaMessage}). This
- * class acts as an encapsulation buffer between the netty ChannelFuture and
- * users of our networking package by only allowing sync operations.
+ * Represents the transmission of one unit of data ({@link GalileoMessage}).
+ * This class acts as an encapsulation buffer between the netty ChannelFuture
+ * and users of our networking package by only allowing sync operations.
  *
  * @author malensek
  */
