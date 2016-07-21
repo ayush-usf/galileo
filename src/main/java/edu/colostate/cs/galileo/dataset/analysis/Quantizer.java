@@ -23,14 +23,14 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.dataset.analysis;
+package edu.colostate.cs.galileo.dataset.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
-import io.sigpipe.sing.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
 
 /**
  * Handles quantization of {@link Feature} values. In other words, a Quantizer

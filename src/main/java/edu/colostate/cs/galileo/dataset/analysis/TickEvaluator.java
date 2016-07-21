@@ -1,4 +1,4 @@
-package io.sigpipe.sing.dataset.analysis;
+package edu.colostate.cs.galileo.dataset.analysis;
 
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.sigpipe.sing.dataset.analysis.Quantizer.QuantizerBuilder;
-import io.sigpipe.sing.dataset.feature.Feature;
-import io.sigpipe.sing.stat.RunningStatistics;
-import io.sigpipe.sing.stat.SquaredError;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.stat.RunningStatistics;
+import edu.colostate.cs.galileo.stat.SquaredError;
 
 public class TickEvaluator {
 
