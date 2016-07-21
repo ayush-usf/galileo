@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

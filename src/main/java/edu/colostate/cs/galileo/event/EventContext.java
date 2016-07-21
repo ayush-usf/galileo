@@ -23,12 +23,12 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
 import java.io.IOException;
 
-import io.elssa.net.ElssaMessage;
-import io.elssa.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
 
 /**
  * Tracks the context of an event and allows retrieving event metadata.  Allows
@@ -38,10 +38,10 @@ import io.elssa.net.NetworkEndpoint;
  */
 public class EventContext {
 
-    private ElssaMessage message;
+    private GalileoMessage message;
     private EventWrapper wrapper;
 
-    public EventContext(ElssaMessage message, EventWrapper wrapper) {
+    public EventContext(GalileoMessage message, EventWrapper wrapper) {
         this.message = message;
         this.wrapper = wrapper;
     }
@@ -51,7 +51,7 @@ public class EventContext {
      */
     public void sendReply(Event e)
     throws IOException {
-        ElssaMessage m = wrapper.wrap(e);
+        GalileoMessage m = wrapper.wrap(e);
         this.message.context().sendMessage(m);
     }
 

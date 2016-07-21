@@ -23,13 +23,13 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
 import java.io.IOException;
 
-import io.elssa.net.ClientMessageRouter;
-import io.elssa.net.ElssaMessage;
-import io.elssa.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.net.ClientMessageRouter;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
 
 /**
  * This class makes it easy to publish events from a client to a server by
@@ -55,7 +55,7 @@ public class EventProducer {
      */
     public void publishEvent(NetworkEndpoint endpoint, Event e)
     throws IOException {
-        ElssaMessage m = reactor.wrapEvent(e);
+        GalileoMessage m = reactor.wrapEvent(e);
         router.sendMessage(endpoint, m);
     }
 }

@@ -23,13 +23,13 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
-import io.elssa.net.ElssaMessage;
-import io.elssa.serialization.SerializationException;
-import io.elssa.serialization.SerializationInputStream;
-import io.elssa.serialization.SerializationOutputStream;
-import io.elssa.serialization.Serializer;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.serialization.Serializer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -52,7 +52,7 @@ public class BasicEventWrapper implements EventWrapper {
     }
 
     @Override
-    public ElssaMessage wrap(Event e)
+    public GalileoMessage wrap(Event e)
     throws IOException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         SerializationOutputStream sOut = new SerializationOutputStream(
@@ -64,12 +64,12 @@ public class BasicEventWrapper implements EventWrapper {
         sOut.close();
 
         byte[] payload = bOut.toByteArray();
-        ElssaMessage msg = new ElssaMessage(payload);
+        GalileoMessage msg = new GalileoMessage(payload);
         return msg;
     }
 
     @Override
-    public Event unwrap(ElssaMessage msg)
+    public Event unwrap(GalileoMessage msg)
     throws IOException, SerializationException {
         ByteArrayInputStream byteIn
             = new ByteArrayInputStream(msg.payload());

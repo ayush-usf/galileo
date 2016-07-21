@@ -23,10 +23,10 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
-import io.elssa.net.ElssaMessage;
-import io.elssa.serialization.SerializationException;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.serialization.SerializationException;
 
 import java.io.IOException;
 
@@ -39,17 +39,17 @@ import java.io.IOException;
 public interface EventWrapper {
 
     /**
-     * Wraps an {@link Event} up in a {@link ElssaMessage}, ready to be
+     * Wraps an {@link Event} up in a {@link GalileoMessage}, ready to be
      * transmitted across the network.
      */
-    public ElssaMessage wrap(Event e)
+    public GalileoMessage wrap(Event e)
         throws IOException;
 
     /**
-     * Unwraps a {@link ElssaMessage} to extract the {@link Event} it
+     * Unwraps a {@link GalileoMessage} to extract the {@link Event} it
      * contains.
      */
-    public Event unwrap(ElssaMessage msg)
+    public Event unwrap(GalileoMessage msg)
         throws IOException, SerializationException;
 
 }

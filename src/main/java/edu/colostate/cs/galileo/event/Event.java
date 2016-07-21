@@ -23,12 +23,12 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
-import io.elssa.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
 
 /**
- * Defines an interface for events in the elssa network.
+ * Defines an interface for events in the Galileo network.
  *
  * @author malensek
  */

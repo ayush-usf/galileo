@@ -23,11 +23,11 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
-import io.elssa.net.ElssaMessage;
-import io.elssa.serialization.SerializationException;
-import io.elssa.serialization.Serializer;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.Serializer;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ import java.io.IOException;
 public class SynopsisWrapper implements EventWrapper {
 
     @Override
-    public ElssaMessage wrap(Event e)
+    public GalileoMessage wrap(Event e)
     throws IOException {
         if (e instanceof EventWithSynopsis == false) {
             throw new IOException("This wrapper can only handle "
@@ -48,11 +48,11 @@ public class SynopsisWrapper implements EventWrapper {
         }
 
         byte[] rawMessage = Serializer.serialize(e);
-        return new ElssaMessage(rawMessage);
+        return new GalileoMessage(rawMessage);
     }
 
     @Override
-    public Event unwrap(ElssaMessage msg)
+    public Event unwrap(GalileoMessage msg)
     throws IOException, SerializationException {
         EventWithSynopsis event = Serializer.deserialize(
                 EventWithSynopsis.class, msg.payload());

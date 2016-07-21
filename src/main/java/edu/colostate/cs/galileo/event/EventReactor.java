@@ -23,12 +23,12 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.elssa.event;
+package edu.colostate.cs.galileo.event;
 
-import io.elssa.net.ElssaMessage;
-import io.elssa.net.MessageListener;
-import io.elssa.net.NetworkEndpoint;
-import io.elssa.serialization.SerializationException;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.MessageListener;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.serialization.SerializationException;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -43,7 +43,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Implements the reactor pattern for processing incoming events
- * ({@link ElssaMessage} instances).
+ * ({@link GalileoMessage} instances).
  *
  * @author malensek
  */
@@ -58,7 +58,7 @@ public class EventReactor implements MessageListener {
 
     private Map<Class<?>, Method> classToMethod = new HashMap<>();
 
-    private BlockingQueue<ElssaMessage> messageQueue
+    private BlockingQueue<GalileoMessage> messageQueue
         = new LinkedBlockingQueue<>();
 
     /**
@@ -176,7 +176,7 @@ public class EventReactor implements MessageListener {
     public void processNextEvent() throws EventException, IOException,
             InterruptedException, SerializationException {
 
-        ElssaMessage message = messageQueue.take();
+        GalileoMessage message = messageQueue.take();
 
         try {
             Event event = eventWrapper.unwrap(message);
@@ -208,7 +208,7 @@ public class EventReactor implements MessageListener {
     }
 
     @Override
-    public void onMessage(ElssaMessage message) {
+    public void onMessage(GalileoMessage message) {
         try {
             messageQueue.put(message);
         } catch (InterruptedException e) {
@@ -220,7 +220,7 @@ public class EventReactor implements MessageListener {
      * Convenience function for wrapping an outgoing event with this
      * EventReactor's {@link EventWrapper} implementation.
      */
-    public ElssaMessage wrapEvent(Event e)
+    public GalileoMessage wrapEvent(Event e)
     throws IOException {
         return eventWrapper.wrap(e);
     }
