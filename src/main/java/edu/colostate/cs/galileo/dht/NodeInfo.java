@@ -23,21 +23,21 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package edu.colostate.cs.galileo.dht;
 
 import java.io.IOException;
 
-import galileo.net.NetworkDestination;
-import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * Records network 'node' informaton: hostname/port pairs.
  *
  * @author malensek
  */
-public class NodeInfo extends NetworkDestination implements ByteSerializable {
+public class NodeInfo extends NetworkEndpoint implements ByteSerializable {
 
     public NodeInfo(String hostname, int port) {
         super(hostname, port);

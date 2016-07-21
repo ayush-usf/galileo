@@ -23,17 +23,18 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.comm;
+package edu.colostate.cs.galileo.comm;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import galileo.dht.NodeInfo;
-import galileo.event.Event;
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.dht.NodeInfo;
+import edu.colostate.cs.galileo.event.Event;
+import edu.colostate.cs.galileo.serialization.ByteSerializable.Deserialize;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * Represents a "Query Preamble" -- a set of information sent back to a client
