@@ -23,7 +23,6 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.fs;
 package edu.colostate.cs.galileo.fs;
 
 import java.io.File;
@@ -36,11 +35,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import galileo.dataset.Block;
-import galileo.dataset.Metadata;
-import galileo.serialization.SerializationException;
-import galileo.serialization.Serializer;
-import galileo.util.PerformanceTimer;
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.serialization.Serializer;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public abstract class FileSystem implements PhysicalGraph {
 

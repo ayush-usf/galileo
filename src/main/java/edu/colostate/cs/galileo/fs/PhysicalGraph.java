@@ -23,14 +23,13 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.fs;
 package edu.colostate.cs.galileo.fs;
 
 import java.io.IOException;
 
-import galileo.dataset.Block;
-import galileo.dataset.Metadata;
-import galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.serialization.SerializationException;
 
 /**
  * Defines the interface for "physical graphs" --- on-disk storage hierarchies.

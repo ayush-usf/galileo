@@ -23,7 +23,6 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.fs;
 package edu.colostate.cs.galileo.fs;
 
 import java.io.BufferedInputStream;
@@ -49,15 +48,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
-import galileo.dataset.feature.Feature;
-import galileo.dataset.feature.FeatureType;
-import galileo.graph.FeaturePath;
-import galileo.graph.Vertex;
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
-import galileo.util.Pair;
-import galileo.util.PerformanceTimer;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.graph.FeaturePath;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.util.Pair;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class PathJournal {
 

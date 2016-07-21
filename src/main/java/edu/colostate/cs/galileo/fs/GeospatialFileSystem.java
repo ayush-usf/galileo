@@ -23,7 +23,6 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.fs;
 package edu.colostate.cs.galileo.fs;
 
 import java.io.File;
@@ -38,18 +37,14 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import galileo.dataset.Block;
-import galileo.dataset.Coordinates;
-import galileo.dataset.Metadata;
-import galileo.dataset.SpatialProperties;
-import galileo.dataset.feature.Feature;
-import galileo.graph.FeaturePath;
-import galileo.graph.MetadataGraph;
-import galileo.graph.Path;
-import galileo.query.Query;
-import galileo.serialization.SerializationException;
-import galileo.serialization.Serializer;
-import galileo.util.GeoHash;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.graph.FeaturePath;
+import edu.colostate.cs.galileo.graph.MetadataGraph;
+import edu.colostate.cs.galileo.graph.Path;
+import edu.colostate.cs.galileo.query.Query;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.Serializer;
 
 /**
  * Implements a {@link FileSystem} for Geospatial data.  This file system
