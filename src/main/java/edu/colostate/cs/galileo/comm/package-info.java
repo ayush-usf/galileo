@@ -28,4 +28,4 @@ software, even if advised of the possibility of such damage.
  * represents a higher level of abstraction than the galileo.net package.  It
  * provides event implementations and other communication structures.
  */
-package galileo.comm;
+package edu.colostate.cs.galileo.comm;

@@ -23,9 +23,9 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.comm;
+package edu.colostate.cs.galileo.comm;
 
-import galileo.event.EventMap;
+import edu.colostate.cs.galileo.event.EventMap;
 
 public class GalileoEventMap extends EventMap {
     public GalileoEventMap() {
