@@ -27,4 +27,4 @@ software, even if advised of the possibility of such damage.
  * Deals with dataset analysis: automatic configuration of data structures based
  * on distributions and evaluation of error levels.
  */
-package io.sigpipe.sing.dataset.analysis;
+package edu.colostate.cs.galileo.dataset.analysis;
