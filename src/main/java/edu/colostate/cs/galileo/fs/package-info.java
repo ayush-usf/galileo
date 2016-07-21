@@ -26,5 +26,4 @@ software, even if advised of the possibility of such damage.
 /**
  * File system implementation.
  */
-
-package galileo.fs;
+package edu.colostate.cs.galileo.fs;

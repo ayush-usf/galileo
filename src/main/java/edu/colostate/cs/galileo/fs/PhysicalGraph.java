@@ -24,6 +24,7 @@ software, even if advised of the possibility of such damage.
 */
 
 package galileo.fs;
+package edu.colostate.cs.galileo.fs;
 
 import java.io.IOException;
 
