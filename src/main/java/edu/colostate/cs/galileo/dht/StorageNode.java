@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package edu.colostate.cs.galileo.dht;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,32 +33,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import galileo.comm.DebugEvent;
-import galileo.comm.GalileoEventMap;
-import galileo.comm.QueryEvent;
-import galileo.comm.QueryPreamble;
-import galileo.comm.QueryRequest;
-import galileo.comm.QueryResponse;
-import galileo.comm.StorageEvent;
-import galileo.comm.StorageRequest;
-import galileo.config.SystemConfig;
-import galileo.dataset.Block;
-import galileo.dataset.Metadata;
-import galileo.dataset.feature.Feature;
-import galileo.dht.hash.HashException;
-import galileo.dht.hash.HashTopologyException;
-import galileo.event.Event;
-import galileo.event.EventContext;
-import galileo.event.EventHandler;
-import galileo.event.EventReactor;
-import galileo.fs.FileSystemException;
-import galileo.fs.GeospatialFileSystem;
-import galileo.graph.Path;
-import galileo.net.ClientConnectionPool;
-import galileo.net.HostIdentifier;
-import galileo.net.PortTester;
-import galileo.net.ServerMessageRouter;
-import galileo.util.Version;
+import edu.colostate.cs.galileo.comm.GalileoEventMap;
+import edu.colostate.cs.galileo.event.EventReactor;
+import edu.colostate.cs.galileo.fs.GeospatialFileSystem;
+import edu.colostate.cs.galileo.net.ServerMessageRouter;
+import edu.colostate.cs.galileo.util.Version;
 
 /**
  * Primary communication component in the Galileo DHT.  StorageNodes service
