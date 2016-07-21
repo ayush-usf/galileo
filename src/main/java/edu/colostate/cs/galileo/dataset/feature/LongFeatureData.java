@@ -23,13 +23,13 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.dataset.feature;
+package edu.colostate.cs.galileo.dataset.feature;
 
 import java.io.IOException;
 
-import io.sigpipe.sing.serialization.ByteSerializable;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * Encapsulates feature values that are represented by long integers.

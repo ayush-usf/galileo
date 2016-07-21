@@ -23,12 +23,12 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.dataset.feature;
+package edu.colostate.cs.galileo.dataset.feature;
 
-import io.sigpipe.sing.serialization.ByteSerializable;
-import io.sigpipe.sing.serialization.SerializationException;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  */
 public class FeatureSet implements ByteSerializable, Iterable<Feature> {
 
-    private static final Logger logger = Logger.getLogger("io.sigpipe.sing");
+    private static final Logger logger = Logger.getLogger("edu.colostate.cs.galileo");
 
     private Map<String, Feature> features = new HashMap<String, Feature>();
 
