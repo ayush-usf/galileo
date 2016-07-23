@@ -48,6 +48,7 @@ import edu.colostate.cs.galileo.event.EventHandler;
 import edu.colostate.cs.galileo.event.EventReactor;
 import edu.colostate.cs.galileo.fs.FileSystemException;
 import edu.colostate.cs.galileo.fs.GeospatialFileSystem;
+import edu.colostate.cs.galileo.net.ClientConnectionPool;
 import edu.colostate.cs.galileo.net.ServerMessageRouter;
 import edu.colostate.cs.galileo.util.Version;
 
