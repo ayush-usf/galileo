@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package edu.colostate.cs.galileo.dht;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -31,14 +31,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import galileo.dataset.Metadata;
-import galileo.dataset.feature.Feature;
-import galileo.dht.hash.BalancedHashRing;
-import galileo.dht.hash.ConstrainedGeohash;
-import galileo.dht.hash.HashException;
-import galileo.dht.hash.HashRing;
-import galileo.dht.hash.HashTopologyException;
-import galileo.dht.hash.SHA1;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dht.hash.BalancedHashRing;
+import edu.colostate.cs.galileo.dht.hash.ConstrainedGeohash;
+import edu.colostate.cs.galileo.dht.hash.HashException;
+import edu.colostate.cs.galileo.dht.hash.HashRing;
+import edu.colostate.cs.galileo.dht.hash.HashTopologyException;
+import edu.colostate.cs.galileo.dht.hash.SHA1;
 
 /**
  * Implements a spatial partitioner that creates a two-tiered hierarchical DHT.

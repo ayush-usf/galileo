@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht;
+package edu.colostate.cs.galileo.dht;
 
 /**
  * Represents a single unit of processing at a Galileo StorageNode.  Client

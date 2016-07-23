@@ -26,5 +26,4 @@ software, even if advised of the possibility of such damage.
 /**
  * Functionality for the Galileo Distributed Hash Table (DHT).
  */
-
-package galileo.dht;
+package edu.colostate.cs.galileo.dht;
