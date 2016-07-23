@@ -23,11 +23,12 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.util;
+package edu.colostate.cs.galileo.util;
 
 public class Version {
 
-    private final static Version version = new galileo.util.Version();
+    private final static Version version
+        = new edu.colostate.cs.galileo.util.Version();
     private final static Package pkg = version.getClass().getPackage();
 
     public static final String PRODUCT_NAME = "Galileo";
