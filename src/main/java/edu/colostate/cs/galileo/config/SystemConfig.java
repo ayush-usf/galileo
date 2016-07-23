@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.config;
+package edu.colostate.cs.galileo.config;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

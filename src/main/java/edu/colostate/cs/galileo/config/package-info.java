@@ -26,5 +26,4 @@ software, even if advised of the possibility of such damage.
 /**
  * System configuration and preferences.
  */
-
-package galileo.config;
+package edu.colostate.cs.galileo.config;
