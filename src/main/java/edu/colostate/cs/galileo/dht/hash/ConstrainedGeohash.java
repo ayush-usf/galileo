@@ -23,16 +23,16 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht.hash;
-
-import galileo.dataset.Metadata;
-import galileo.dataset.SpatialProperties;
-import galileo.util.GeoHash;
+package edu.colostate.cs.galileo.dht.hash;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
+import edu.colostate.cs.galileo.util.Geohash;
 
 /**
  * Provides a Geohash-based hash function that acts on a predefined constrained
@@ -74,9 +74,9 @@ public class ConstrainedGeohash implements HashFunction<Metadata> {
         SpatialProperties spatialProps = data.getSpatialProperties();
 
         if (spatialProps.hasRange()) {
-            hash = GeoHash.encode(spatialProps.getSpatialRange(), precision);
+            hash = Geohash.encode(spatialProps.getSpatialRange(), precision);
         } else {
-            hash = GeoHash.encode(spatialProps.getCoordinates(), precision);
+            hash = Geohash.encode(spatialProps.getCoordinates(), precision);
         }
 
         BigInteger position = hashMappings.get(hash);

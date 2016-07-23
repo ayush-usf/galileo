@@ -23,12 +23,12 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht.hash;
-
-import galileo.util.Checksum;
+package edu.colostate.cs.galileo.dht.hash;
 
 import java.math.BigInteger;
 import java.util.Random;
+
+import edu.colostate.cs.galileo.util.Checksum;
 
 /**
  * Provides a very small (configurable) hash space for testing purposes.

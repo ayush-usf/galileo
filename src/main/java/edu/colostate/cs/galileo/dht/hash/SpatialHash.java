@@ -23,13 +23,13 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.dht.hash;
-
-import galileo.dataset.SpatialProperties;
-import galileo.util.GeoHash;
+package edu.colostate.cs.galileo.dht.hash;
 
 import java.math.BigInteger;
 import java.util.Random;
+
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
+import edu.colostate.cs.galileo.util.Geohash;
 
 /**
  * Provides a Geohash-based hash function for spatial data.
@@ -49,29 +49,29 @@ public class SpatialHash implements HashFunction<SpatialProperties> {
         String hash = "";
 
         if (spatialProps.hasRange()) {
-            hash = GeoHash.encode(spatialProps.getSpatialRange(), PRECISION);
+            hash = Geohash.encode(spatialProps.getSpatialRange(), PRECISION);
         } else {
-            hash = GeoHash.encode(spatialProps.getCoordinates(), PRECISION);
+            hash = Geohash.encode(spatialProps.getCoordinates(), PRECISION);
         }
 
-        return BigInteger.valueOf(GeoHash.hashToLong(hash));
+        return BigInteger.valueOf(Geohash.hashToLong(hash));
     }
 
     @Override
     public BigInteger maxValue() {
         /* 12 chars * 5 bits/char = 60 bits for a 12-char hash. */
-        return BigInteger.valueOf(2).pow(PRECISION * GeoHash.BITS_PER_CHAR);
+        return BigInteger.valueOf(2).pow(PRECISION * Geohash.BITS_PER_CHAR);
     }
 
     @Override
     public BigInteger randomHash() {
-        float lat = random.nextFloat() * GeoHash.LATITUDE_RANGE
+        float lat = random.nextFloat() * Geohash.LATITUDE_RANGE
             * (random.nextBoolean() ? 1 : -1 ); // randomly negate
 
-        float lon = random.nextFloat() * GeoHash.LONGITUDE_RANGE
+        float lon = random.nextFloat() * Geohash.LONGITUDE_RANGE
             * (random.nextBoolean() ? 1 : -1 );
 
-        String hash = GeoHash.encode(lat, lon, PRECISION);
-        return BigInteger.valueOf(GeoHash.hashToLong(hash));
+        String hash = Geohash.encode(lat, lon, PRECISION);
+        return BigInteger.valueOf(Geohash.hashToLong(hash));
     }
 }
