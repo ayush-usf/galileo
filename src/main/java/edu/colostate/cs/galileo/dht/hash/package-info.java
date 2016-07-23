@@ -27,4 +27,4 @@ software, even if advised of the possibility of such damage.
  * Provides functionality for dealing with hash spaces and logical network
  * topologies.
  */
-package galileo.dht.hash;
+package edu.colostate.cs.galileo.dht.hash;
