@@ -26,5 +26,4 @@ software, even if advised of the possibility of such damage.
 /**
  * Provides an implementation-neutral model of the queries Galileo supports.
  */
-
-package galileo.query;
+package edu.colostate.cs.galileo.query;
