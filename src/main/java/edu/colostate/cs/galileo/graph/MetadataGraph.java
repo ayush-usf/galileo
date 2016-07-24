@@ -23,22 +23,17 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.graph;
-
-import galileo.dataset.feature.Feature;
-import galileo.dataset.feature.FeatureType;
-
-import galileo.query.PayloadFilter;
-import galileo.query.Query;
-import galileo.serialization.ByteSerializable;
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
-import galileo.util.Pair;
+package edu.colostate.cs.galileo.graph;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import edu.colostate.cs.galileo.dataset.Pair;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class MetadataGraph implements ByteSerializable {
 

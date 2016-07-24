@@ -23,15 +23,15 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.graph;
-
-import galileo.dataset.feature.Feature;
-import galileo.dataset.feature.FeatureType;
-import galileo.util.Pair;
+package edu.colostate.cs.galileo.graph;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import edu.colostate.cs.galileo.dataset.Pair;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
 
 /**
  * Describes how a graph hierarchy is ordered; includes the name and type of

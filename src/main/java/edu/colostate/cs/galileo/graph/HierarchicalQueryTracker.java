@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.graph;
+package edu.colostate.cs.galileo.graph;
 
 import java.util.ArrayList;
 
@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
 
 /**
  * Tracks a {@link galileo.query.Query} as it traverses through a graph

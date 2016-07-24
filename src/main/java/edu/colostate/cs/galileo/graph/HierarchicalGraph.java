@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.graph;
+package edu.colostate.cs.galileo.graph;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -35,17 +35,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.logging.Logger;
+
+import edu.colostate.cs.galileo.dataset.Pair;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.query.Operation;
+import edu.colostate.cs.galileo.query.Query;
+
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
-import galileo.dataset.feature.Feature;
-import galileo.dataset.feature.FeatureType;
-import galileo.query.Expression;
-import galileo.query.Operation;
-import galileo.query.PayloadFilter;
-import galileo.query.Query;
-import galileo.util.Pair;
 
 /**
  * A type-aware hierarchical graph implementation with each type occupying a
