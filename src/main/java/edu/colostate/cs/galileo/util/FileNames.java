@@ -27,6 +27,8 @@ package edu.colostate.cs.galileo.util;
 
 import java.io.File;
 
+import edu.colostate.cs.galileo.dataset.Pair;
+
 /**
  * Utility class for working with file names.
  *
