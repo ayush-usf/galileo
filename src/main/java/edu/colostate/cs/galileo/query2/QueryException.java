@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.query;
+package edu.colostate.cs.galileo.query2;
 
 public class QueryException extends Exception {
 

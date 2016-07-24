@@ -1,13 +1,13 @@
-package io.sigpipe.sing.query;
+package edu.colostate.cs.galileo.query2;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.graph.Vertex;
-import io.sigpipe.sing.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class RelationalQuery extends Query {
 

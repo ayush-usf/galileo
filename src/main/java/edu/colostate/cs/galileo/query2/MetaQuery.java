@@ -23,14 +23,14 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.query;
+package edu.colostate.cs.galileo.query2;
 
 import java.util.List;
 import java.util.Set;
 
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.graph.DataContainer;
-import io.sigpipe.sing.graph.Vertex;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.graph.DataContainer;
+import edu.colostate.cs.galileo.graph.Vertex;
 
 /**
  * Retrieves metadata records stored in {@link DataContainer} instances and

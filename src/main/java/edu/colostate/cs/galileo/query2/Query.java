@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.query;
+package edu.colostate.cs.galileo.query2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.sigpipe.sing.dataset.feature.Feature;
-import io.sigpipe.sing.graph.GraphMetrics;
-import io.sigpipe.sing.graph.Vertex;
-import io.sigpipe.sing.serialization.ByteSerializable;
-import io.sigpipe.sing.serialization.SerializationException;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.graph.GraphMetrics;
+import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * General query interface. In SING, queries are executed against a graph
