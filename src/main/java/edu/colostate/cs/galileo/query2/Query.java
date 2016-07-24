@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.colostate.cs.galileo.dataset.feature.Feature;
-import edu.colostate.cs.galileo.graph.GraphMetrics;
-import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.graph2.GraphMetrics;
+import edu.colostate.cs.galileo.graph2.Vertex;
 import edu.colostate.cs.galileo.serialization.ByteSerializable;
 import edu.colostate.cs.galileo.serialization.SerializationException;
 import edu.colostate.cs.galileo.serialization.SerializationInputStream;
