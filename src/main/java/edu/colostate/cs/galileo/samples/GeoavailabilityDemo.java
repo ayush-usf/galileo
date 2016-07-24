@@ -23,24 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
-
-import galileo.bmp.Bitmap;
-
-import galileo.bmp.BitmapVisualization;
-import galileo.bmp.GeoavailabilityGrid;
-import galileo.bmp.GeoavailabilityMap;
-import galileo.bmp.GeoavailabilityQuery;
-import galileo.bmp.QueryTransform;
-import galileo.dataset.Coordinates;
-import galileo.dataset.Metadata;
-import galileo.dataset.feature.Feature;
-import galileo.fs.GeospatialFileSystem;
-import galileo.graph.Path;
-import galileo.query.Expression;
-import galileo.query.Operation;
-import galileo.query.PayloadFilter;
-import galileo.query.Query;
+package edu.colostate.cs.galileo.samples;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -49,6 +32,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import edu.colostate.cs.galileo.bmp.Bitmap;
+import edu.colostate.cs.galileo.bmp.BitmapVisualization;
+import edu.colostate.cs.galileo.bmp.GeoavailabilityGrid;
+import edu.colostate.cs.galileo.bmp.GeoavailabilityMap;
+import edu.colostate.cs.galileo.bmp.GeoavailabilityQuery;
+import edu.colostate.cs.galileo.bmp.QueryTransform;
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.fs.GeospatialFileSystem;
+import edu.colostate.cs.galileo.graph.Path;
+import edu.colostate.cs.galileo.query.Expression;
+import edu.colostate.cs.galileo.query.Operation;
+import edu.colostate.cs.galileo.query.PayloadFilter;
+import edu.colostate.cs.galileo.query.Query;
 
 /**
  * Demonstrates the use of a {@link GeoavailabilityGrid} in determining whether
