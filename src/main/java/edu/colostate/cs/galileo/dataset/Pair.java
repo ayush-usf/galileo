@@ -23,7 +23,7 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.dataset;
+package edu.colostate.cs.galileo.dataset;
 
 /**
  * Simple tuple class for holding arbitrary value pairs.
