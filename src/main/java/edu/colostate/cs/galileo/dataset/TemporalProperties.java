@@ -23,17 +23,16 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.dataset;
+package edu.colostate.cs.galileo.dataset;
 
 import java.util.Date;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 
-import io.sigpipe.sing.serialization.ByteSerializable;
-import io.sigpipe.sing.serialization.ByteSerializable.Deserialize;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class TemporalProperties implements ByteSerializable {
 

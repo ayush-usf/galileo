@@ -28,6 +28,7 @@ package edu.colostate.cs.galileo.dataset;
 import java.io.IOException;
 
 import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureArray;
 import edu.colostate.cs.galileo.dataset.feature.FeatureArraySet;
 import edu.colostate.cs.galileo.dataset.feature.FeatureSet;
 import edu.colostate.cs.galileo.serialization.ByteSerializable;
