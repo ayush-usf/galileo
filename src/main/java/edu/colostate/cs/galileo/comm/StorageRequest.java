@@ -27,11 +27,11 @@ package edu.colostate.cs.galileo.comm;
 
 import java.io.IOException;
 
-import galileo.dataset.Block;
-import galileo.event.Event;
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.event.Event;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * Represents a client request for storage at a DHT

@@ -27,11 +27,11 @@ package edu.colostate.cs.galileo.comm;
 
 import java.io.IOException;
 
-import galileo.event.Event;
-import galileo.query.Query;
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.event.Event;
+import edu.colostate.cs.galileo.query.Query;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * Contains an internal query between StorageNodes.

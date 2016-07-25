@@ -30,15 +30,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import galileo.dataset.feature.Feature;
-import galileo.event.Event;
-import galileo.graph.FeaturePath;
-import galileo.graph.GraphException;
-import galileo.graph.Path;
-import galileo.graph.Vertex;
-import galileo.serialization.SerializationException;
-import galileo.serialization.SerializationInputStream;
-import galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.event.Event;
+import edu.colostate.cs.galileo.graph.FeaturePath;
+import edu.colostate.cs.galileo.graph.GraphException;
+import edu.colostate.cs.galileo.graph.Path;
+import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class QueryResponse implements Event {
 
