@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
-import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.graph2.Vertex;
 import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class RelationalQuery extends Query {

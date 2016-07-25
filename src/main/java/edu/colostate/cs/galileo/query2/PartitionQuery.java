@@ -28,7 +28,7 @@ package edu.colostate.cs.galileo.query2;
 import java.io.IOException;
 import java.util.Iterator;
 
-import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.graph2.Vertex;
 import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
