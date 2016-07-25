@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import edu.colostate.cs.galileo.dataset.Coordinates;
 import edu.colostate.cs.galileo.dataset.Point;
 import edu.colostate.cs.galileo.dataset.SpatialRange;
-import edu.colostate.cs.galileo.util.GeoHash;
+import edu.colostate.cs.galileo.util.Geohash;
 
 /**
  * Implements a bitmap-based spatial index that can be used to determine
@@ -55,7 +55,7 @@ public class GeoavailabilityGrid {
     private float yDegreesPerPixel;
 
     public GeoavailabilityGrid(String baseGeohash, int precision) {
-        this.baseRange = GeoHash.decodeHash(baseGeohash);
+        this.baseRange = Geohash.decodeHash(baseGeohash);
 
         /*
          * height, width calculated like so:
