@@ -29,4 +29,4 @@ software, even if advised of the possibility of such damage.
  * various hierarchical graph implementations, and form the basis of our
  * multidimensional storage format.
  */
-package io.sigpipe.sing.dataset.feature;
+package edu.colostate.cs.galileo.dataset.feature;
