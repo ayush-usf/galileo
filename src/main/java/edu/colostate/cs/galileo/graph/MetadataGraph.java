@@ -32,7 +32,11 @@ import java.util.List;
 import edu.colostate.cs.galileo.dataset.Pair;
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.query.PayloadFilter;
+import edu.colostate.cs.galileo.query.Query;
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
 import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
 import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class MetadataGraph implements ByteSerializable {

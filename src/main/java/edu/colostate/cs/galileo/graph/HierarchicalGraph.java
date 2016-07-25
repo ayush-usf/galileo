@@ -39,7 +39,9 @@ import java.util.logging.Logger;
 import edu.colostate.cs.galileo.dataset.Pair;
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.query.Expression;
 import edu.colostate.cs.galileo.query.Operation;
+import edu.colostate.cs.galileo.query.PayloadFilter;
 import edu.colostate.cs.galileo.query.Query;
 
 import java.util.Map;
