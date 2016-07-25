@@ -270,6 +270,7 @@ public class ConvertNetCDF {
                 convert3DVariable(g, calendar.getTime(), metaMap);
             }
         }
+        gridData.close();
 
         return metaMap;
 
