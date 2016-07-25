@@ -23,18 +23,18 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;
 
-import galileo.dataset.Block;
-import galileo.dataset.Coordinates;
-import galileo.dataset.Metadata;
-import galileo.dataset.SpatialProperties;
-import galileo.dataset.TemporalProperties;
-import galileo.dataset.feature.Feature;
-import galileo.serialization.Serializer;
-import galileo.util.FileNames;
-import galileo.util.GeoHash;
-import galileo.util.Pair;
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.Pair;
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
+import edu.colostate.cs.galileo.dataset.TemporalProperties;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.serialization.Serializer;
+import edu.colostate.cs.galileo.util.FileNames;
+import edu.colostate.cs.galileo.util.Geohash;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -170,7 +170,7 @@ public class ConvertNetCDF {
     private static String getStorageDir(String outputDir, Metadata meta) {
         Coordinates coords
             = meta.getSpatialProperties().getCoordinates();
-        String location = GeoHash.encode(
+        String location = Geohash.encode(
                 coords.getLatitude(), coords.getLongitude(), 10);
 
         String subDir = location.substring(0, 2) + "/"
@@ -194,7 +194,7 @@ public class ConvertNetCDF {
         for (int i = 0; i < h; ++i) {
             for (int j = 0; j < w; ++j) {
                 LatLonPoint pt = g.getCoordinateSystem().getLatLon(j, i);
-                String hash = GeoHash.encode(
+                String hash = Geohash.encode(
                         (float) pt.getLatitude(),
                         (float) pt.getLongitude(), 10).toLowerCase();
 

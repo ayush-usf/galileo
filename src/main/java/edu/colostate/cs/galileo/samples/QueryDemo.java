@@ -23,25 +23,25 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;
 
 import java.util.List;
 
-import galileo.client.EventPublisher;
-import galileo.comm.GalileoEventMap;
-import galileo.comm.QueryEvent;
-import galileo.comm.QueryResponse;
-import galileo.dataset.feature.Feature;
-import galileo.event.BasicEventWrapper;
-import galileo.event.EventWrapper;
-import galileo.graph.Path;
-import galileo.net.ClientMessageRouter;
-import galileo.net.GalileoMessage;
-import galileo.net.MessageListener;
-import galileo.net.NetworkDestination;
-import galileo.query.Expression;
-import galileo.query.Operation;
-import galileo.query.Query;
+import edu.colostate.cs.galileo.client.EventPublisher;
+import edu.colostate.cs.galileo.comm.GalileoEventMap;
+import edu.colostate.cs.galileo.comm.QueryEvent;
+import edu.colostate.cs.galileo.comm.QueryResponse;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.event.BasicEventWrapper;
+import edu.colostate.cs.galileo.event.EventWrapper;
+import edu.colostate.cs.galileo.graph.Path;
+import edu.colostate.cs.galileo.net.ClientMessageRouter;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.MessageListener;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.query.Expression;
+import edu.colostate.cs.galileo.query.Operation;
+import edu.colostate.cs.galileo.query.Query;
 
 public class QueryDemo implements MessageListener {
 
@@ -49,10 +49,10 @@ public class QueryDemo implements MessageListener {
     private static EventWrapper wrapper = new BasicEventWrapper(eventMap);
 
     @Override
-    public void onConnect(NetworkDestination endpoint) { }
+    public void onConnect(NetworkEndpoint endpoint) { }
 
     @Override
-    public void onDisconnect(NetworkDestination endpoint) { }
+    public void onDisconnect(NetworkEndpoint endpoint) { }
 
     @Override
     public void onMessage(GalileoMessage message) {
@@ -90,8 +90,8 @@ public class QueryDemo implements MessageListener {
         }
         String serverHostName = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        NetworkDestination server
-            = new NetworkDestination(serverHostName, serverPort);
+        NetworkEndpoint server
+            = new NetworkEndpoint(serverHostName, serverPort);
 
         QueryDemo qd = new QueryDemo();
 

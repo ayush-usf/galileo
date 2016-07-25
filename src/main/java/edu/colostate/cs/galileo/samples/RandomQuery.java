@@ -23,26 +23,26 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import galileo.client.EventPublisher;
-import galileo.comm.QueryEvent;
-import galileo.comm.StorageRequest;
-import galileo.dataset.feature.Feature;
-import galileo.net.ClientMessageRouter;
-import galileo.net.GalileoMessage;
-import galileo.net.MessageListener;
-import galileo.net.NetworkDestination;
-import galileo.query.Expression;
-import galileo.query.Operation;
-import galileo.query.Operator;
-import galileo.query.Query;
-import galileo.util.PerformanceTimer;
+import edu.colostate.cs.galileo.client.EventPublisher;
+import edu.colostate.cs.galileo.comm.QueryEvent;
+import edu.colostate.cs.galileo.comm.StorageRequest;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.net.ClientMessageRouter;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.MessageListener;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.query.Expression;
+import edu.colostate.cs.galileo.query.Operation;
+import edu.colostate.cs.galileo.query.Operator;
+import edu.colostate.cs.galileo.query.Query;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class RandomQuery implements MessageListener, Runnable {
 
@@ -104,7 +104,7 @@ public class RandomQuery implements MessageListener, Runnable {
     /*--------------------------------------------------------------------*/
 
     private ClientMessageRouter messageRouter;
-    private NetworkDestination server;
+    private NetworkEndpoint server;
     private PerformanceTimer resp = new PerformanceTimer("ResponseTime");
     private boolean responded;
 
@@ -114,7 +114,7 @@ public class RandomQuery implements MessageListener, Runnable {
 
         messageRouter = new ClientMessageRouter();
         messageRouter.addListener(this);
-        server = new NetworkDestination(serverHostName, serverPort);
+        server = new NetworkEndpoint(serverHostName, serverPort);
 
         /* Sleep for a random amount of time */
         Thread.sleep(random.nextInt(3000));
@@ -156,10 +156,10 @@ public class RandomQuery implements MessageListener, Runnable {
     }
 
     @Override
-    public void onConnect(NetworkDestination endpoint) { }
+    public void onConnect(NetworkEndpoint endpoint) { }
 
     @Override
-    public void onDisconnect(NetworkDestination endpoint) {
+    public void onDisconnect(NetworkEndpoint endpoint) {
         System.out.println("Disconnected from the server.  Goodbye!");
         System.exit(0);
     }

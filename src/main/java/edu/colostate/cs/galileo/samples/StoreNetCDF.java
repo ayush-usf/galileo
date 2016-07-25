@@ -23,20 +23,20 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;
 
 import java.io.IOException;
 
 import java.util.Map;
 
-import galileo.client.EventPublisher;
-import galileo.comm.StorageRequest;
-import galileo.dataset.Block;
-import galileo.dataset.Metadata;
-import galileo.net.ClientMessageRouter;
-import galileo.net.GalileoMessage;
-import galileo.net.MessageListener;
-import galileo.net.NetworkDestination;
+import edu.colostate.cs.galileo.client.EventPublisher;
+import edu.colostate.cs.galileo.comm.StorageRequest;
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.net.ClientMessageRouter;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.MessageListener;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
 
 public class StoreNetCDF implements MessageListener {
 
@@ -55,12 +55,12 @@ public class StoreNetCDF implements MessageListener {
     }
 
     @Override
-    public void onConnect(NetworkDestination endpoint) {
+    public void onConnect(NetworkEndpoint endpoint) {
         System.out.println("Connected to " + endpoint);
     }
 
     @Override
-    public void onDisconnect(NetworkDestination endpoint) {
+    public void onDisconnect(NetworkEndpoint endpoint) {
         System.out.println("Disconnected from " + endpoint);
     }
 
@@ -79,8 +79,8 @@ public class StoreNetCDF implements MessageListener {
         String fileName = args[2];
 
         StoreNetCDF client = new StoreNetCDF();
-        NetworkDestination server
-            = new NetworkDestination(serverHostName, serverPort);
+        NetworkEndpoint server
+            = new NetworkEndpoint(serverHostName, serverPort);
 
         Map<String, Metadata> metas = ConvertNetCDF.readFile(fileName);
         for (Map.Entry<String, Metadata> entry : metas.entrySet()) {

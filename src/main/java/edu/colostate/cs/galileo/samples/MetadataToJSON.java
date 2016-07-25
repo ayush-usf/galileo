@@ -23,14 +23,14 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;
 
 import java.util.Map;
 
-import galileo.dataset.Coordinates;
-import galileo.dataset.Metadata;
-import galileo.dataset.SpatialProperties;
-import galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
 
 /**
  * A simple demo showing the conversion of a Metadata instance to a custom

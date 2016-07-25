@@ -26,5 +26,4 @@ software, even if advised of the possibility of such damage.
 /**
  * Contains various sample code for demonstration purposes.
  */
-
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;

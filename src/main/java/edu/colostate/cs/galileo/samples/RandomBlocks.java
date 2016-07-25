@@ -23,25 +23,25 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.samples;
+package edu.colostate.cs.galileo.samples;
 
 import java.io.IOException;
 
 import java.util.Calendar;
 import java.util.Random;
 
-import galileo.client.EventPublisher;
-import galileo.comm.StorageRequest;
-import galileo.dataset.Block;
-import galileo.dataset.Metadata;
-import galileo.dataset.SpatialProperties;
-import galileo.dataset.TemporalProperties;
-import galileo.dataset.feature.Feature;
-import galileo.dataset.feature.FeatureSet;
-import galileo.net.ClientMessageRouter;
-import galileo.net.NetworkDestination;
-import galileo.util.GeoHash;
-import galileo.util.PerformanceTimer;
+import edu.colostate.cs.galileo.client.EventPublisher;
+import edu.colostate.cs.galileo.comm.StorageRequest;
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
+import edu.colostate.cs.galileo.dataset.TemporalProperties;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureSet;
+import edu.colostate.cs.galileo.net.ClientMessageRouter;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
+import edu.colostate.cs.galileo.util.Geohash;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 /**
  * Sample class that generates {@link Block} instances using random data and
@@ -65,7 +65,7 @@ public class RandomBlocks {
         messageRouter.shutdown();
     }
 
-    public void store(NetworkDestination destination, Block fb)
+    public void store(NetworkEndpoint destination, Block fb)
     throws Exception {
         StorageRequest store = new StorageRequest(fb);
         publisher.publish(destination, store);
@@ -109,12 +109,12 @@ public class RandomBlocks {
         String hash = geoPre;
 
         for (int i = 0; i < 10; ++i) {
-            int random = randomInt(0, GeoHash.charMap.length - 1);
-            hash += GeoHash.charMap[random];
+            int random = randomInt(0, Geohash.charMap.length - 1);
+            hash += Geohash.charMap[random];
         }
 
         SpatialProperties spatialProperties
-            = new SpatialProperties(GeoHash.decodeHash(hash));
+            = new SpatialProperties(Geohash.decodeHash(hash));
 
         String[] featSet = { "wind_speed", "wind_direction", "condensation",
                              "temperature", "humidity" };
@@ -153,8 +153,8 @@ public class RandomBlocks {
         int num = Integer.parseInt(args[2]);
 
         RandomBlocks client = new RandomBlocks();
-        NetworkDestination server
-            = new NetworkDestination(serverHostName, serverPort);
+        NetworkEndpoint server
+            = new NetworkEndpoint(serverHostName, serverPort);
 
         System.out.println("Sending " + num + " blocks...");
         PerformanceTimer pt = new PerformanceTimer("Send operation time");
