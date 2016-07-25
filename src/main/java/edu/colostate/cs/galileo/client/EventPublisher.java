@@ -23,17 +23,17 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package galileo.client;
+package edu.colostate.cs.galileo.client;
 
 import java.io.IOException;
 
-import galileo.comm.GalileoEventMap;
-import galileo.event.BasicEventWrapper;
-import galileo.event.Event;
-import galileo.event.EventWrapper;
-import galileo.net.ClientMessageRouter;
-import galileo.net.GalileoMessage;
-import galileo.net.NetworkDestination;
+import edu.colostate.cs.galileo.comm.GalileoEventMap;
+import edu.colostate.cs.galileo.event.BasicEventWrapper;
+import edu.colostate.cs.galileo.event.Event;
+import edu.colostate.cs.galileo.event.EventWrapper;
+import edu.colostate.cs.galileo.net.ClientMessageRouter;
+import edu.colostate.cs.galileo.net.GalileoMessage;
+import edu.colostate.cs.galileo.net.NetworkEndpoint;
 
 /**
  * Handles publishing events from a client to a server.
@@ -57,7 +57,7 @@ public class EventPublisher {
     /**
      * Publishes an {@link Event} via the client's {@link ClientMessageRouter}.
      */
-    public void publish(NetworkDestination destination, Event event)
+    public void publish(NetworkEndpoint destination, Event event)
     throws IOException {
         GalileoMessage message = wrapper.wrap(event);
         router.sendMessage(destination, message);

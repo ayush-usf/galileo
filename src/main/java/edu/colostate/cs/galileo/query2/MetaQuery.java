@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
-import edu.colostate.cs.galileo.graph.DataContainer;
-import edu.colostate.cs.galileo.graph.Vertex;
+import edu.colostate.cs.galileo.graph2.DataContainer;
+import edu.colostate.cs.galileo.graph2.Vertex;
 
 /**
  * Retrieves metadata records stored in {@link DataContainer} instances and
