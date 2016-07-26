@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import edu.colostate.cs.galileo.dataset.analysis.Quantizer.QuantizerBuilder;
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.stat.RunningStatistics;
 import edu.colostate.cs.galileo.stat.SquaredError;

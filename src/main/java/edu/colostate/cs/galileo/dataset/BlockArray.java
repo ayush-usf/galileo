@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import edu.colostate.cs.galileo.serialization.ByteSerializable;
 import edu.colostate.cs.galileo.serialization.SerializationInputStream;
 import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 

@@ -27,7 +27,10 @@ package edu.colostate.cs.galileo.dataset;
 
 import java.io.IOException;
 
+import edu.colostate.cs.galileo.dataset.feature.FeatureSet;
 import edu.colostate.cs.galileo.serialization.ByteSerializable;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 /**
  * Represents FileBlock metadata.

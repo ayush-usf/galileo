@@ -23,9 +23,9 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package io.sigpipe.sing.dataset;
+package edu.colostate.cs.galileo.dataset;
 
-import io.sigpipe.sing.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
 
 public class Temperature extends Feature {
 
