@@ -34,8 +34,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import galileo.util.FileNames;
-import galileo.util.Pair;
+import edu.colostate.cs.galileo.dataset.Pair;
+import edu.colostate.cs.galileo.util.FileNames;
 
 /**
  * Reads Galileo DHT information from disk.  The on-disk format for a network

@@ -25,7 +25,7 @@ software, even if advised of the possibility of such damage.
 
 package edu.colostate.cs.galileo.dht;
 
-import galileo.dht.hash.HashException;
+import edu.colostate.cs.galileo.dht.hash.HashException;
 
 /**
  * This provides an abstract implementation of a Galileo Partitioner, which

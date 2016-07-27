@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import galileo.dht.hash.BalancedHashRing;
-import galileo.dht.hash.HashException;
-import galileo.dht.hash.HashTopologyException;
-import galileo.dht.hash.SHA1;
+import edu.colostate.cs.galileo.dht.hash.BalancedHashRing;
+import edu.colostate.cs.galileo.dht.hash.HashException;
+import edu.colostate.cs.galileo.dht.hash.HashTopologyException;
+import edu.colostate.cs.galileo.dht.hash.SHA1;
 
 /**
  * Example Partitioner that creates a classic, balanced DHT based on file names.

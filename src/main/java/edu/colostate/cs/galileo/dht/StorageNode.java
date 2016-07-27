@@ -34,21 +34,28 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.colostate.cs.galileo.comm.GalileoEventMap;
+import edu.colostate.cs.galileo.comm.QueryEvent;
 import edu.colostate.cs.galileo.comm.QueryRequest;
+import edu.colostate.cs.galileo.comm.QueryResponse;
 import edu.colostate.cs.galileo.comm.StorageEvent;
 import edu.colostate.cs.galileo.comm.StorageRequest;
 import edu.colostate.cs.galileo.config.SystemConfig;
 import edu.colostate.cs.galileo.dataset.Block;
 import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.dht.hash.HashException;
 import edu.colostate.cs.galileo.dht.hash.HashTopologyException;
 import edu.colostate.cs.galileo.event.Event;
 import edu.colostate.cs.galileo.event.EventContext;
 import edu.colostate.cs.galileo.event.EventHandler;
+import edu.colostate.cs.galileo.event.EventLinkException;
 import edu.colostate.cs.galileo.event.EventReactor;
 import edu.colostate.cs.galileo.fs.FileSystemException;
 import edu.colostate.cs.galileo.fs.GeospatialFileSystem;
+import edu.colostate.cs.galileo.graph.Path;
 import edu.colostate.cs.galileo.net.ClientConnectionPool;
+import edu.colostate.cs.galileo.net.HostIdentifier;
+import edu.colostate.cs.galileo.net.PortTester;
 import edu.colostate.cs.galileo.net.ServerMessageRouter;
 import edu.colostate.cs.galileo.util.Version;
 
@@ -76,7 +83,7 @@ public class StorageNode {
     private GeospatialFileSystem fs;
 
     private GalileoEventMap eventMap = new GalileoEventMap();
-    private EventReactor eventReactor = new EventReactor(this, eventMap);
+    private EventReactor eventReactor;
 
     private Partitioner<Metadata> partitioner;
 
@@ -85,9 +92,11 @@ public class StorageNode {
 
     private String sessionId;
 
-    public StorageNode() {
+    public StorageNode() throws EventLinkException {
         this.port = NetworkConfig.DEFAULT_PORT;
         this.rootDir = SystemConfig.getRootDir();
+
+        this.eventReactor = new EventReactor(this, eventMap);
 
         this.sessionId = HostIdentifier.getSessionId(port);
         nodeStatus = new StatusLine(SystemConfig.getRootDir() + "/status.txt");
@@ -306,8 +315,8 @@ public class StorageNode {
      * Executable entrypoint for a Galileo DHT Storage Node
      */
     public static void main(String[] args) {
-        StorageNode node = new StorageNode();
         try {
+            StorageNode node = new StorageNode();
             node.start();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Could not start StorageNode.", e);
