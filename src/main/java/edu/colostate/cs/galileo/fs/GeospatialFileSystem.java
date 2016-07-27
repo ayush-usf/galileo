@@ -37,7 +37,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.colostate.cs.galileo.dataset.Block;
+import edu.colostate.cs.galileo.dataset.Coordinates;
 import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.graph.FeaturePath;
 import edu.colostate.cs.galileo.graph.MetadataGraph;
@@ -45,6 +48,7 @@ import edu.colostate.cs.galileo.graph.Path;
 import edu.colostate.cs.galileo.query.Query;
 import edu.colostate.cs.galileo.serialization.SerializationException;
 import edu.colostate.cs.galileo.serialization.Serializer;
+import edu.colostate.cs.galileo.util.Geohash;
 
 /**
  * Implements a {@link FileSystem} for Geospatial data.  This file system
@@ -190,7 +194,7 @@ public class GeospatialFileSystem extends FileSystem {
         } else {
             coords = spatialProps.getCoordinates();
         }
-        directory += GeoHash.encode(coords, geohashPrecision);
+        directory += Geohash.encode(coords, geohashPrecision);
 
         return directory;
     }

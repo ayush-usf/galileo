@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import edu.colostate.cs.galileo.dataset.Block;
 import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.serialization.SerializationException;
 import edu.colostate.cs.galileo.serialization.Serializer;
 import edu.colostate.cs.galileo.util.PerformanceTimer;
 

@@ -48,12 +48,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
+import edu.colostate.cs.galileo.dataset.Pair;
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
 import edu.colostate.cs.galileo.graph.FeaturePath;
+import edu.colostate.cs.galileo.graph.Vertex;
 import edu.colostate.cs.galileo.serialization.SerializationException;
 import edu.colostate.cs.galileo.serialization.SerializationInputStream;
-import edu.colostate.cs.galileo.util.Pair;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class PathJournal {
