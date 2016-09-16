@@ -1,7 +1,7 @@
 package edu.colostate.cs.galileo.adapters;
 
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
-import edu.colostate.cs.galileo.graph2.FeatureHierarchy;
+import edu.colostate.cs.galileo.graph.FeatureHierarchy;
 import edu.colostate.cs.galileo.graph2.Sketch;
 
 public class BigSketch {

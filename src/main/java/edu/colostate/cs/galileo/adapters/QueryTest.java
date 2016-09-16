@@ -2,7 +2,7 @@ package edu.colostate.cs.galileo.adapters;
 
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
-import edu.colostate.cs.galileo.graph2.FeatureHierarchy;
+import edu.colostate.cs.galileo.graph.FeatureHierarchy;
 import edu.colostate.cs.galileo.graph2.Sketch;
 import edu.colostate.cs.galileo.query2.Expression;
 import edu.colostate.cs.galileo.query2.Operator;
