@@ -16,6 +16,8 @@ import java.util.Set;
 import edu.colostate.cs.galileo.dataset.Pair;
 import edu.colostate.cs.galileo.dataset.feature.Feature;
 import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.graph.FeatureHierarchy;
+import edu.colostate.cs.galileo.graph.GraphException;
 import edu.colostate.cs.galileo.query2.Query;
 import edu.colostate.cs.galileo.query2.QueryException;
 import edu.colostate.cs.galileo.serialization.SerializationException;
