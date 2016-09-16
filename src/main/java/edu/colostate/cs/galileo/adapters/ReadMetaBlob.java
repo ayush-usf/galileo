@@ -1,23 +1,20 @@
-
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.sigpipe.sing.dataset.Metadata;
-import io.sigpipe.sing.dataset.analysis.Quantizer;
-import io.sigpipe.sing.dataset.feature.Feature;
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.graph.FeatureHierarchy;
-import io.sigpipe.sing.graph.Path;
-import io.sigpipe.sing.graph.Sketch;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.serialization.Serializer;
-import io.sigpipe.sing.util.Geohash;
-import io.sigpipe.sing.util.PerformanceTimer;
-import io.sigpipe.sing.util.TestConfiguration;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.analysis.Quantizer;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.graph2.FeatureHierarchy;
+import edu.colostate.cs.galileo.graph2.Path;
+import edu.colostate.cs.galileo.graph2.Sketch;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.Serializer;
+import edu.colostate.cs.galileo.util.Geohash;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class ReadMetaBlob {
 

@@ -1,4 +1,4 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -6,13 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.graph.FeatureHierarchy;
-import io.sigpipe.sing.graph.Sketch;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.util.Geohash;
-import io.sigpipe.sing.util.PerformanceTimer;
-import io.sigpipe.sing.util.TestConfiguration;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.util.Geohash;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class MergeSketch {
 

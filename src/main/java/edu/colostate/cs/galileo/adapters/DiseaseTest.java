@@ -1,4 +1,4 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.sigpipe.sing.dataset.analysis.AutoQuantizer;
-import io.sigpipe.sing.dataset.analysis.Quantizer;
-import io.sigpipe.sing.dataset.feature.Feature;
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.stat.SquaredError;
+import edu.colostate.cs.galileo.dataset.analysis.AutoQuantizer;
+import edu.colostate.cs.galileo.dataset.analysis.Quantizer;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.stat.SquaredError;
 
 public class DiseaseTest {
 

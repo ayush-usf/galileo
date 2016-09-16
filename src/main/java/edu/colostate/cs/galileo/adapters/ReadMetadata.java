@@ -1,4 +1,4 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.sigpipe.sing.dataset.Metadata;
-import io.sigpipe.sing.dataset.SpatialProperties;
-import io.sigpipe.sing.serialization.SerializationException;
-import io.sigpipe.sing.serialization.SerializationInputStream;
-import io.sigpipe.sing.serialization.Serializer;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.SpatialProperties;
+import edu.colostate.cs.galileo.serialization.SerializationException;
+import edu.colostate.cs.galileo.serialization.SerializationInputStream;
+import edu.colostate.cs.galileo.serialization.Serializer;
 
 public class ReadMetadata {
 
@@ -36,6 +36,7 @@ public class ReadMetadata {
         }
 
         in.close();
+        bIn.close();
 
         return metadataList;
     }

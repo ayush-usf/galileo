@@ -1,14 +1,13 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
-import io.sigpipe.sing.dataset.feature.Feature;
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.graph.FeatureHierarchy;
-import io.sigpipe.sing.graph.Sketch;
-import io.sigpipe.sing.query.Expression;
-import io.sigpipe.sing.query.Operator;
-import io.sigpipe.sing.query.RelationalQuery;
-import io.sigpipe.sing.util.PerformanceTimer;
-import io.sigpipe.sing.util.TestConfiguration;
+import edu.colostate.cs.galileo.dataset.feature.Feature;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.graph2.FeatureHierarchy;
+import edu.colostate.cs.galileo.graph2.Sketch;
+import edu.colostate.cs.galileo.query2.Expression;
+import edu.colostate.cs.galileo.query2.Operator;
+import edu.colostate.cs.galileo.query2.RelationalQuery;
+import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class QueryTest {
 
@@ -33,7 +32,8 @@ public class QueryTest {
         }
 
         RelationalQuery mq = new RelationalQuery();
-        mq.addExpression(new Expression(Operator.STR_PREFIX, new Feature("location", "9xqj")));
+        mq.addExpression(new Expression(
+                    Operator.STR_PREFIX, new Feature("location", "9xqj")));
         mq.addExpression(
                 new Expression(
                     Operator.RANGE_INC,

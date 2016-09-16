@@ -1,4 +1,4 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
 public class GeoHashIndexedRecord {
 

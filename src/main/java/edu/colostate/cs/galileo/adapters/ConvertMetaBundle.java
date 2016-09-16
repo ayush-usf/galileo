@@ -1,16 +1,16 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import io.sigpipe.sing.dataset.Coordinates;
-import io.sigpipe.sing.dataset.MetaArray;
-import io.sigpipe.sing.dataset.Metadata;
-import io.sigpipe.sing.dataset.Pair;
-import io.sigpipe.sing.serialization.SerializationOutputStream;
-import io.sigpipe.sing.serialization.Serializer;
-import io.sigpipe.sing.util.FileNames;
+import edu.colostate.cs.galileo.dataset.Coordinates;
+import edu.colostate.cs.galileo.dataset.MetaArray;
+import edu.colostate.cs.galileo.dataset.Metadata;
+import edu.colostate.cs.galileo.dataset.Pair;
+import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
+import edu.colostate.cs.galileo.serialization.Serializer;
+import edu.colostate.cs.galileo.util.FileNames;
 
 public class ConvertMetaBundle {
 
@@ -38,5 +38,6 @@ public class ConvertMetaBundle {
             out.writeField(metaBytes);
         }
         out.close();
+        buffOut.close();
     }
 }

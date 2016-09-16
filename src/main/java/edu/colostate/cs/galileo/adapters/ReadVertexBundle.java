@@ -1,7 +1,7 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
-import io.sigpipe.sing.graph.Vertex;
-import io.sigpipe.sing.serialization.Serializer;
+import edu.colostate.cs.galileo.graph2.Vertex;
+import edu.colostate.cs.galileo.serialization.Serializer;
 
 public class ReadVertexBundle {
 

@@ -1,9 +1,8 @@
-package io.sigpipe.sing.adapters;
+package edu.colostate.cs.galileo.adapters;
 
-import io.sigpipe.sing.dataset.feature.FeatureType;
-import io.sigpipe.sing.graph.FeatureHierarchy;
-import io.sigpipe.sing.graph.Sketch;
-import io.sigpipe.sing.util.TestConfiguration;
+import edu.colostate.cs.galileo.dataset.feature.FeatureType;
+import edu.colostate.cs.galileo.graph2.FeatureHierarchy;
+import edu.colostate.cs.galileo.graph2.Sketch;
 
 public class BigSketch {
 
