@@ -208,6 +208,10 @@ public class RunningStatisticsND implements ByteSerializable {
         return this.mean[dimension];
     }
 
+    public double std(int dimension) {
+        return FastMath.sqrt(var(dimension));
+    }
+
     public double var(int dimension) {
         return var(dimension, 1.0);
     }
