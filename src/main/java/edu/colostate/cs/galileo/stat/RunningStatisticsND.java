@@ -245,6 +245,15 @@ public class RunningStatisticsND implements ByteSerializable {
         return stds;
     }
 
+    public double[] vars() {
+        double[] vars = new double[this.dimensions()];
+        for (int i = 0; i < this.dimensions(); ++i) {
+            vars[i] = this.var(i);
+        }
+
+        return vars;
+    }
+
     public double[] mins() {
         return this.min;
     }
