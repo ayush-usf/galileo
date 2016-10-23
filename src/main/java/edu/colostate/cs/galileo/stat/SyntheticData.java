@@ -1,5 +1,8 @@
 package edu.colostate.cs.galileo.stat;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 public class SyntheticData {
@@ -32,16 +35,13 @@ public class SyntheticData {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         RunningStatisticsND rnd = new RunningStatisticsND(1);
-        rnd.put(3.0);
-        rnd.put(10.0);
-        rnd.put(1.0);
-        rnd.put(-5.0);
-        rnd.put(16.25);
+        Files.lines(Paths.get(args[0]))
+            .map(Double::parseDouble)
+            .forEach(item -> rnd.put(item));
         SyntheticData sd = new SyntheticData(rnd);
         System.out.println(rnd.mean(0));
-        System.out.println(rnd.var(0));
         System.out.println(rnd.std(0));
     }
 }
