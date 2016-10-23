@@ -208,6 +208,10 @@ public class RunningStatisticsND implements ByteSerializable {
         return this.mean[dimension];
     }
 
+    public double var(int dimension) {
+        return var(dimension, 1.0);
+    }
+
     public double var(int dimension, double ddof) {
         if (n == 0) {
             return Double.NaN;
