@@ -9,14 +9,24 @@ public class SyntheticData {
     public SyntheticData(RunningStatisticsND stats) {
         double[] means = stats.means();
         double[] stds = stats.stds();
+        double[] mins = stats.mins();
+        double[] maxes = stats.maxes();
+
         this.distributions = new NormalDistribution[stats.dimensions()];
         for (int i = 0; i < stats.dimensions(); ++i) {
             NormalDistribution nd = new NormalDistribution(means[i], stds[i]);
             distributions[i] = nd;
 
             RunningStatistics rs = new RunningStatistics();
-            for (int j = 0; j < 1000; ++j) {
-                rs.put(nd.sample());
+            for (int j = 0; j < 10000; ++j) {
+                double sample;
+                while (true) {
+                    sample = nd.sample();
+                    if (sample <= maxes[i] && sample >= mins[i]) {
+                        rs.put(sample);
+                        break;
+                    }
+                }
             }
             System.out.println(rs);
         }
