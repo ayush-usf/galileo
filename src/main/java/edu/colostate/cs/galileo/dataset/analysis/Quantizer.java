@@ -185,6 +185,20 @@ public class Quantizer {
         return ticks.lower(feature);
     }
 
+    /**
+     * Retrieves the first (smallest) tick mark.
+     */
+    public Feature first() {
+        return ticks.first();
+    }
+
+    /**
+     * Retrieves the last (largest) tick mark.
+     */
+    public Feature last() {
+        return ticks.last();
+    }
+
     @Override
     public String toString() {
         String output = "";
