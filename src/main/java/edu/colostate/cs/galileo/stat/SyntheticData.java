@@ -22,12 +22,16 @@ public class SyntheticData {
         for (int i = 0; i < stats.dimensions(); ++i) {
             NormalDistribution nd = new NormalDistribution(means[i], stds[i]);
             distributions[i] = nd;
+        }
+    }
 
+    public void test() {
+        for (int i = 0; i < distributions.length; ++i) {
             RunningStatistics rs = new RunningStatistics();
             for (int j = 0; j < 10000; ++j) {
                 double sample;
                 while (true) {
-                    sample = nd.sample();
+                    sample = distributions[i].sample();
                     if (sample <= maxes[i] && sample >= mins[i]) {
                         rs.put(sample);
                         break;
