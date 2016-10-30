@@ -4,10 +4,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
 
 public class SyntheticData {
 
-    private NormalDistribution[] distributions;
+    private RealDistribution[] distributions;
 
     public SyntheticData(RunningStatisticsND stats) {
         double[] means = stats.means();
