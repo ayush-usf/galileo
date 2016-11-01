@@ -25,17 +25,26 @@ public class SyntheticData {
         }
     }
 
+    public double nextSample(int dimension) {
+        while (true) {
+            double sample = distributions[dimension].sample();
+            if (sample <= maxes[dimension] && sample >= mins[dimension]) {
+                return sample;
+            }
+        }
+    }
+
     public void test() {
         for (int i = 0; i < distributions.length; ++i) {
             RunningStatistics rs = new RunningStatistics();
             for (int j = 0; j < 10000; ++j) {
-                double sample;
-                while (true) {
-                    sample = distributions[i].sample();
-                    if (sample <= maxes[i] && sample >= mins[i]) {
-                        rs.put(sample);
-                        break;
-                    }
+                double sample = nextSample(i);
+                rs.put(sample);
+            }
+            System.out.println(rs);
+        }
+    }
+
                 }
             }
             System.out.println(rs);
