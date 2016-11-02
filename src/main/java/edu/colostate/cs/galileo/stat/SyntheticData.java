@@ -29,8 +29,7 @@ public class SyntheticData {
     public double nextSample(int dimension) {
         while (true) {
             double sample = distributions[dimension].sample();
-            if (sample <= this.stats.maxes()[dimension]
-                    && sample >= this.stats.mins()[dimension]) {
+            if (sample <= maxes[dimension] && sample >= mins[dimension]) {
                 return sample;
             }
         }
