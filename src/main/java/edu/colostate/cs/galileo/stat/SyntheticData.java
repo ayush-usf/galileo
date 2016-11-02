@@ -46,6 +46,15 @@ public class SyntheticData {
         }
     }
 
+    public void testBoolean() {
+        for (int i = 0; i < distributions.length; ++i) {
+            RunningStatistics rs = new RunningStatistics();
+            for (int j = 0; j < 100000000; ++j) {
+                double sample = distributions[i].sample();
+                if (sample <= 0.5) {
+                    rs.put(0.0);
+                } else if (sample > 0.5) {
+                    rs.put(1.0);
                 }
             }
             System.out.println(rs);
