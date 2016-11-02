@@ -9,15 +9,17 @@ import org.apache.commons.math3.distribution.RealDistribution;
 public class SyntheticData {
 
     private RealDistribution[] distributions;
-    private RunningStatisticsND stats;
+    private double[] mins;
+    private double[] maxes;
+    private double[] means;
 
     public SyntheticData(RunningStatisticsND stats) {
-        double[] means = stats.means();
+        this.mins = stats.mins();
+        this.maxes = stats.maxes();
+        this.means = stats.means();
         double[] stds = stats.stds();
 
         this.distributions = new NormalDistribution[stats.dimensions()];
-        this.stats = stats;
-
         for (int i = 0; i < stats.dimensions(); ++i) {
             NormalDistribution nd = new NormalDistribution(means[i], stds[i]);
             distributions[i] = nd;
