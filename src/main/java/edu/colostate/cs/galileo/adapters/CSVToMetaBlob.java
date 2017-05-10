@@ -3,6 +3,7 @@ package edu.colostate.cs.galileo.adapters;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,8 +41,11 @@ public class CSVToMetaBlob {
         SerializationOutputStream out =
             new SerializationOutputStream(buffOut);
 
+        /* Write a placeholder for the blob length */
+        out.writeInt(0);
+
         System.out.print("Generating metadata...");
-        long counter = 0;
+        int counter = 0;
         for (CSVRecord record : records) {
             Metadata meta = new Metadata();
             float lat = 0.0f;
@@ -114,6 +118,11 @@ public class CSVToMetaBlob {
         System.out.println();
         out.close();
         buffOut.close();
+
+        RandomAccessFile raf = new RandomAccessFile(fileName + ".mblob", "rw");
+        raf.writeInt(counter);
+        raf.close();
+
         System.out.println("Complete!");
     }
 }
