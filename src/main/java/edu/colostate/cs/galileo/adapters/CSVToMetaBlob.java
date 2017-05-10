@@ -119,6 +119,7 @@ public class CSVToMetaBlob {
         out.close();
         buffOut.close();
 
+        System.out.println("Writing blob size: " + counter);
         RandomAccessFile raf = new RandomAccessFile(fileName + ".mblob", "rw");
         raf.writeInt(counter);
         raf.close();
