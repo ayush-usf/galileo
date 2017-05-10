@@ -54,7 +54,7 @@ public class CSVToMetaBlob {
                 String value = recordMap.get(key);
 
                 if (key.equals(NAME_ID)) {
-                    meta.setName(value);
+                    meta.putAttribute(new Feature(key, value));
                     continue;
                 }
 
