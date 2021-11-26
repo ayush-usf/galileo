@@ -41,90 +41,90 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class Expression implements ByteSerializable {
 
-    private Operator operator;
-    private Feature operand1;
-    private Feature operand2;
+  private Operator operator;
+  private Feature operand1;
+  private Feature operand2;
 
-    public Expression(Operator operator, Feature operand) {
-        this.operator = operator;
-        this.operand1 = operand;
+  public Expression(Operator operator, Feature operand) {
+    this.operator = operator;
+    this.operand1 = operand;
+  }
+
+  public Expression(String operator, Feature operand) {
+    this(Operator.fromString(operator), operand);
+  }
+
+  public Expression(Operator operator, Feature start, Feature end) {
+    if (operator != Operator.RANGE_EXC
+        && operator != Operator.RANGE_INC
+        && operator != Operator.RANGE_EXC_INC
+        && operator != Operator.RANGE_INC_EXC) {
+
+      throw new IllegalArgumentException(
+          "Range-based expression requires a range operator");
     }
 
-    public Expression(String operator, Feature operand) {
-        this(Operator.fromString(operator), operand);
+    this.operator = operator;
+    this.operand1 = start;
+    this.operand2 = end;
+  }
+
+  public Expression(String operator, Feature start, Feature end) {
+    this(Operator.fromString(operator), start, end);
+  }
+
+  @Deserialize
+  public Expression(SerializationInputStream in)
+      throws IOException, SerializationException {
+    operator = Operator.fromInt(in.readInt());
+    boolean hasRange = (in.readInt() == 2);
+    this.operand1 = new Feature(in);
+    if (hasRange) {
+      this.operand2 = new Feature(in);
     }
+  }
 
-    public Expression(Operator operator, Feature start, Feature end) {
-        if (operator != Operator.RANGE_EXC
-                && operator != Operator.RANGE_INC
-                && operator != Operator.RANGE_EXC_INC
-                && operator != Operator.RANGE_INC_EXC) {
+  public Operator getOperator() {
+    return operator;
+  }
 
-            throw new IllegalArgumentException(
-                    "Range-based expression requires a range operator");
-        }
+  public Feature getOperand() {
+    return this.operand1;
+  }
 
-        this.operator = operator;
-        this.operand1 = start;
-        this.operand2 = end;
+  public Feature getSecondOperand() {
+    return this.operand2;
+  }
+
+  @Override
+  public String toString() {
+    switch (operator) {
+      case RANGE_INC:
+      case RANGE_EXC:
+      case RANGE_INC_EXC:
+      case RANGE_EXC_INC:
+        return operand1.getName() + " in "
+            + operator.toString().charAt(0)
+            + operand1.getString()
+            + ", "
+            + operand2.getString()
+            + operator.toString().charAt(1);
+
+      default:
+        return operand1.getName() + " " + operator + " "
+            + operand1.getString();
     }
+  }
 
-    public Expression(String operator, Feature start, Feature end) {
-        this(Operator.fromString(operator), start, end);
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(operator.toInt());
+    int numOperands = (operand2 != null) ? 2 : 1;
+    out.writeInt(numOperands);
+    operand1.serialize(out);
+    if (operand2 != null) {
+      operand2.serialize(out);
     }
-
-    public Operator getOperator() {
-        return operator;
-    }
-
-    public Feature getOperand() {
-        return this.operand1;
-    }
-
-    public Feature getSecondOperand() {
-        return this.operand2;
-    }
-
-    @Override
-    public String toString() {
-        switch (operator) {
-            case RANGE_INC:
-            case RANGE_EXC:
-            case RANGE_INC_EXC:
-            case RANGE_EXC_INC:
-                return operand1.getName() + " in "
-                    + operator.toString().charAt(0)
-                    + operand1.getString()
-                    + ", "
-                    + operand2.getString()
-                    + operator.toString().charAt(1);
-
-            default:
-                return operand1.getName() + " " + operator + " "
-                    + operand1.getString();
-        }
-    }
-
-    @Deserialize
-    public Expression(SerializationInputStream in)
-    throws IOException, SerializationException {
-        operator = Operator.fromInt(in.readInt());
-        boolean hasRange = (in.readInt() == 2);
-        this.operand1 = new Feature(in);
-        if (hasRange) {
-            this.operand2 = new Feature(in);
-        }
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(operator.toInt());
-        int numOperands = (operand2 != null) ? 2 : 1;
-        out.writeInt(numOperands);
-        operand1.serialize(out);
-        if (operand2 != null) {
-            operand2.serialize(out);
-        }
-    }
+  }
 }

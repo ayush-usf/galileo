@@ -43,47 +43,48 @@ import java.util.Map;
  * @author malensek
  */
 public class FeatureArraySet
-implements ByteSerializable, Iterable<FeatureArray>,
-        SimpleMap<String, FeatureArray> {
+    implements ByteSerializable, Iterable<FeatureArray>,
+    SimpleMap<String, FeatureArray> {
 
-    private Map<String, FeatureArray> arrays = new HashMap<>();
+  private Map<String, FeatureArray> arrays = new HashMap<>();
 
-    public FeatureArraySet() { }
+  public FeatureArraySet() {
+  }
 
-    @Override
-    public void put(FeatureArray array) {
-        arrays.put(array.getName(), array);
-    }
+  @Deserialize
+  public FeatureArraySet(SerializationInputStream in)
+      throws IOException, SerializationException {
+    in.readSimpleMap(FeatureArray.class, this);
+  }
 
-    @Override
-    public FeatureArray get(String name) {
-        return arrays.get(name);
-    }
+  @Override
+  public void put(FeatureArray array) {
+    arrays.put(array.getName(), array);
+  }
 
-    @Override
-    public Iterator<FeatureArray> iterator() {
-        return arrays.values().iterator();
-    }
+  @Override
+  public FeatureArray get(String name) {
+    return arrays.get(name);
+  }
 
-    @Override
-    public Collection<FeatureArray> values() {
-        return arrays.values();
-    }
+  @Override
+  public Iterator<FeatureArray> iterator() {
+    return arrays.values().iterator();
+  }
 
-    @Override
-    public int size() {
-        return arrays.size();
-    }
+  @Override
+  public Collection<FeatureArray> values() {
+    return arrays.values();
+  }
 
-    @Deserialize
-    public FeatureArraySet(SerializationInputStream in)
-    throws IOException, SerializationException {
-        in.readSimpleMap(FeatureArray.class, this);
-    }
+  @Override
+  public int size() {
+    return arrays.size();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeSimpleMap(this);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeSimpleMap(this);
+  }
 }

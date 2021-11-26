@@ -37,41 +37,41 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class IntegerFeatureData
-extends NumericFeatureData<Integer> implements ByteSerializable {
+    extends NumericFeatureData<Integer> implements ByteSerializable {
 
-    public IntegerFeatureData(int data) {
-        super(data);
-    }
+  public IntegerFeatureData(int data) {
+    super(data);
+  }
 
-    @Override
-    public Feature add(Feature f) {
-        return new Feature(this.data + f.getInt());
-    }
+  @Deserialize
+  public IntegerFeatureData(SerializationInputStream in)
+      throws IOException {
+    super(in.readInt());
+  }
 
-    @Override
-    public Feature subtract(Feature f) {
-        return new Feature(this.data - f.getInt());
-    }
+  @Override
+  public Feature add(Feature f) {
+    return new Feature(this.data + f.getInt());
+  }
 
-    @Override
-    public Feature divide(Feature f) {
-        return new Feature(this.data / f.getInt());
-    }
+  @Override
+  public Feature subtract(Feature f) {
+    return new Feature(this.data - f.getInt());
+  }
 
-    @Override
-    public Feature multiply(Feature f) {
-        return new Feature(this.data * f.getInt());
-    }
+  @Override
+  public Feature divide(Feature f) {
+    return new Feature(this.data / f.getInt());
+  }
 
-    @Deserialize
-    public IntegerFeatureData(SerializationInputStream in)
-    throws IOException {
-        super(in.readInt());
-    }
+  @Override
+  public Feature multiply(Feature f) {
+    return new Feature(this.data * f.getInt());
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(this.data);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(this.data);
+  }
 }

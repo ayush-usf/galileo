@@ -33,52 +33,53 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class RuntimeMetadata implements ByteSerializable {
 
-    private String storageNodeIdentifier = "";
-    private String physicalGraphPath = "";
+  private String storageNodeIdentifier = "";
+  private String physicalGraphPath = "";
 
-    public RuntimeMetadata() { }
+  public RuntimeMetadata() {
+  }
 
-    public RuntimeMetadata(String storageNodeIdentifier,
-            String physicalGraphPath) {
+  public RuntimeMetadata(String storageNodeIdentifier,
+                         String physicalGraphPath) {
 
-        this.storageNodeIdentifier = storageNodeIdentifier;
-        this.physicalGraphPath = physicalGraphPath;
-    }
+    this.storageNodeIdentifier = storageNodeIdentifier;
+    this.physicalGraphPath = physicalGraphPath;
+  }
 
-    public String getStorageNodeIdentifier() {
-        return storageNodeIdentifier;
-    }
+  @Deserialize
+  public RuntimeMetadata(SerializationInputStream in)
+      throws IOException {
+    storageNodeIdentifier = new String(in.readField());
+    physicalGraphPath = new String(in.readField());
+  }
 
-    public void setStorageNodeIdentifier(String identifier) {
-        storageNodeIdentifier = identifier;
-    }
+  public String getStorageNodeIdentifier() {
+    return storageNodeIdentifier;
+  }
 
-    public String getPhysicalGraphPath() {
-        return physicalGraphPath;
-    }
+  public void setStorageNodeIdentifier(String identifier) {
+    storageNodeIdentifier = identifier;
+  }
 
-    public void setPhysicalGraphPath(String path) {
-        physicalGraphPath = path;
-    }
+  public String getPhysicalGraphPath() {
+    return physicalGraphPath;
+  }
 
-    @Override
-    public String toString() {
-        return "StorageNode Identifier: " + storageNodeIdentifier
-            + System.lineSeparator()
-            + "Physical Graph Location: " + physicalGraphPath;
-    }
+  public void setPhysicalGraphPath(String path) {
+    physicalGraphPath = path;
+  }
 
-    @Deserialize
-    public RuntimeMetadata(SerializationInputStream in)
-    throws IOException {
-        storageNodeIdentifier = new String(in.readField());
-        physicalGraphPath = new String(in.readField());
-    }
+  @Override
+  public String toString() {
+    return "StorageNode Identifier: " + storageNodeIdentifier
+        + System.lineSeparator()
+        + "Physical Graph Location: " + physicalGraphPath;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeField(storageNodeIdentifier.getBytes());
-        out.writeField(physicalGraphPath.getBytes());
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeField(storageNodeIdentifier.getBytes());
+    out.writeField(physicalGraphPath.getBytes());
+  }
 }

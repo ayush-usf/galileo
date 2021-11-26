@@ -36,53 +36,52 @@ import java.util.List;
  */
 public class GroupInfo {
 
-    private String name;
+  List<NodeInfo> nodes = new ArrayList<>();
+  List<GroupInfo> groups = new ArrayList<>();
+  private String name;
 
-    List<NodeInfo> nodes = new ArrayList<>();
-    List<GroupInfo> groups = new ArrayList<>();
+  public GroupInfo(String name) {
+    this.name = name;
+  }
 
-    public GroupInfo(String name) {
-        this.name = name;
+  public void addNode(NodeInfo node) {
+    nodes.add(node);
+  }
+
+  public List<NodeInfo> getNodes() {
+    return nodes;
+  }
+
+  public void addGroup(GroupInfo group) {
+    groups.add(group);
+  }
+
+  public List<GroupInfo> getGroups() {
+    return groups;
+  }
+
+  public List<NodeInfo> getAllNodes() {
+    List<NodeInfo> nodeList = new ArrayList<>();
+    for (GroupInfo group : groups) {
+      nodeList.addAll(group.getAllNodes());
     }
+    nodeList.addAll(nodes);
+    return nodeList;
+  }
 
-    public void addNode(NodeInfo node) {
-        nodes.add(node);
-    }
+  public String getName() {
+    return name;
+  }
 
-    public List<NodeInfo> getNodes() {
-        return nodes;
+  @Override
+  public String toString() {
+    String str = "Group: " + name + System.lineSeparator();
+    for (GroupInfo group : groups) {
+      str += "    " + group + System.lineSeparator();
     }
-
-    public void addGroup(GroupInfo group) {
-        groups.add(group);
+    for (NodeInfo node : nodes) {
+      str += "    " + node + System.lineSeparator();
     }
-
-    public List<GroupInfo> getGroups() {
-        return groups;
-    }
-
-    public List<NodeInfo> getAllNodes() {
-        List<NodeInfo> nodeList = new ArrayList<>();
-        for (GroupInfo group : groups) {
-            nodeList.addAll(group.getAllNodes());
-        }
-        nodeList.addAll(nodes);
-        return nodeList;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        String str = "Group: " + name + System.lineSeparator();
-        for (GroupInfo group : groups) {
-            str += "    " + group + System.lineSeparator();
-        }
-        for (NodeInfo node : nodes) {
-            str += "    " + node + System.lineSeparator();
-        }
-        return str;
-    }
+    return str;
+  }
 }

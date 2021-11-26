@@ -37,41 +37,41 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class LongFeatureData
-extends NumericFeatureData<Long> implements ByteSerializable {
+    extends NumericFeatureData<Long> implements ByteSerializable {
 
-    public LongFeatureData(long data) {
-        super(data);
-    }
+  public LongFeatureData(long data) {
+    super(data);
+  }
 
-    @Override
-    public Feature add(Feature f) {
-        return new Feature(this.data + f.getLong());
-    }
+  @Deserialize
+  public LongFeatureData(SerializationInputStream in)
+      throws IOException {
+    super(in.readLong());
+  }
 
-    @Override
-    public Feature subtract(Feature f) {
-        return new Feature(this.data - f.getLong());
-    }
+  @Override
+  public Feature add(Feature f) {
+    return new Feature(this.data + f.getLong());
+  }
 
-    @Override
-    public Feature divide(Feature f) {
-        return new Feature(this.data / f.getLong());
-    }
+  @Override
+  public Feature subtract(Feature f) {
+    return new Feature(this.data - f.getLong());
+  }
 
-    @Override
-    public Feature multiply(Feature f) {
-        return new Feature(this.data * f.getLong());
-    }
+  @Override
+  public Feature divide(Feature f) {
+    return new Feature(this.data / f.getLong());
+  }
 
-    @Deserialize
-    public LongFeatureData(SerializationInputStream in)
-    throws IOException {
-        super(in.readLong());
-    }
+  @Override
+  public Feature multiply(Feature f) {
+    return new Feature(this.data * f.getLong());
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeLong(this.data);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeLong(this.data);
+  }
 }

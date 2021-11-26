@@ -39,59 +39,59 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class BinaryFeatureData
-extends FeatureData<ByteArray> implements ByteSerializable {
+    extends FeatureData<ByteArray> implements ByteSerializable {
 
-    public BinaryFeatureData(ByteArray data) {
-        super(data);
-    }
+  public BinaryFeatureData(ByteArray data) {
+    super(data);
+  }
 
-    public BinaryFeatureData(byte[] data) {
-        super(new ByteArray(data));
-    }
+  public BinaryFeatureData(byte[] data) {
+    super(new ByteArray(data));
+  }
 
-    @Override
-    public int toInt() {
-        ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
-        return buffer.getInt();
-    }
+  @Deserialize
+  public BinaryFeatureData(SerializationInputStream in)
+      throws IOException {
+    super(new ByteArray(in.readField()));
+  }
 
-    @Override
-    public long toLong() {
-        ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
-        return buffer.getLong();
-    }
+  @Override
+  public int toInt() {
+    ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
+    return buffer.getInt();
+  }
 
-    @Override
-    public float toFloat() {
-        ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
-        return buffer.getFloat();
-    }
+  @Override
+  public long toLong() {
+    ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
+    return buffer.getLong();
+  }
 
-    @Override
-    public double toDouble() {
-        ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
-        return buffer.getDouble();
-    }
+  @Override
+  public float toFloat() {
+    ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
+    return buffer.getFloat();
+  }
 
-    @Override
-    public String toString() {
-        return new String(this.data.getBytes());
-    }
+  @Override
+  public double toDouble() {
+    ByteBuffer buffer = ByteBuffer.wrap(this.data.getBytes());
+    return buffer.getDouble();
+  }
 
-    @Override
-    public byte[] toBytes() {
-        return this.data.getBytes();
-    }
+  @Override
+  public String toString() {
+    return new String(this.data.getBytes());
+  }
 
-    @Deserialize
-    public BinaryFeatureData(SerializationInputStream in)
-    throws IOException {
-        super(new ByteArray(in.readField()));
-    }
+  @Override
+  public byte[] toBytes() {
+    return this.data.getBytes();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeField(data.getBytes());
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeField(data.getBytes());
+  }
 }

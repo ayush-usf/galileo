@@ -41,47 +41,47 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class Expression implements ByteSerializable {
 
-    private Operator operator;
-    private Feature value;
+  private Operator operator;
+  private Feature value;
 
-    public Expression(Operator operator, Feature value) {
-        this.operator = operator;
-        this.value = value;
-    }
+  public Expression(Operator operator, Feature value) {
+    this.operator = operator;
+    this.value = value;
+  }
 
-    public Expression(String operator, Feature value) {
-        this.operator = Operator.fromString(operator);
-        this.value = value;
-    }
+  public Expression(String operator, Feature value) {
+    this.operator = Operator.fromString(operator);
+    this.value = value;
+  }
 
-    public Feature getValue() {
-        return value;
-    }
+  @Deserialize
+  public Expression(SerializationInputStream in)
+      throws IOException, SerializationException {
+    operator = Operator.fromInt(in.readInt());
+    value = new Feature(in);
+  }
 
-    public Operator getOperator() {
-        return operator;
-    }
+  public Feature getValue() {
+    return value;
+  }
 
-    public String getOperand() {
-        return value.getName();
-    }
+  public Operator getOperator() {
+    return operator;
+  }
 
-    @Override
-    public String toString() {
-        return value.getName() + " " + operator + " " + value.getString();
-    }
+  public String getOperand() {
+    return value.getName();
+  }
 
-    @Deserialize
-    public Expression(SerializationInputStream in)
-    throws IOException, SerializationException {
-        operator = Operator.fromInt(in.readInt());
-        value = new Feature(in);
-    }
+  @Override
+  public String toString() {
+    return value.getName() + " " + operator + " " + value.getString();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(operator.toInt());
-        out.writeSerializable(value);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(operator.toInt());
+    out.writeSerializable(value);
+  }
 }

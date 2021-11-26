@@ -49,181 +49,181 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public abstract class Query implements ByteSerializable {
 
-    protected Map<String, List<Expression>> expressions = new HashMap<>();
-    protected GraphMetrics metrics;
+  protected Map<String, List<Expression>> expressions = new HashMap<>();
+  protected GraphMetrics metrics;
 
-    public Query() {
+  public Query() {
 
+  }
+
+  @Deserialize
+  public Query(SerializationInputStream in)
+      throws IOException, SerializationException {
+    int size = in.readInt();
+    this.expressions = new HashMap<>(size);
+    for (int i = 0; i < size; ++i) {
+      int listSize = in.readInt();
+      List<Expression> expList = new ArrayList<>(listSize);
+      for (int j = 0; j < listSize; ++j) {
+        Expression exp = new Expression(in);
+        expList.add(exp);
+      }
+      String featureName = expList.get(0).getOperand().getName();
+      this.expressions.put(featureName, expList);
     }
+  }
 
-    public abstract void execute(Vertex root)
-    throws QueryException;
+  public abstract void execute(Vertex root)
+      throws QueryException;
 
-    public void addExpression(Expression e) {
-        String name = e.getOperand().getName();
-        List<Expression> expList = expressions.get(name);
-        if (expList == null) {
-            expList = new ArrayList<>();
-            expressions.put(name, expList);
-        }
-        expList.add(e);
+  public void addExpression(Expression e) {
+    String name = e.getOperand().getName();
+    List<Expression> expList = expressions.get(name);
+    if (expList == null) {
+      expList = new ArrayList<>();
+      expressions.put(name, expList);
     }
+    expList.add(e);
+  }
 
-    protected Set<Vertex> evaluate(Vertex vertex, List<Expression> expressions)
-    throws QueryException {
-        Set<Vertex> matches = new HashSet<>(vertex.numNeighbors(), 1.0f);
+  protected Set<Vertex> evaluate(Vertex vertex, List<Expression> expressions)
+      throws QueryException {
+    Set<Vertex> matches = new HashSet<>(vertex.numNeighbors(), 1.0f);
 
-        for (Expression expression : expressions) {
+    for (Expression expression : expressions) {
 
-            Operator operator = expression.getOperator();
-            Feature operand = expression.getOperand();
+      Operator operator = expression.getOperator();
+      Feature operand = expression.getOperand();
 
-            switch (operator) {
-                case EQUAL: {
-                    matches.add(vertex.getNeighbor(operand));
-                    break;
-                }
-
-                case NOTEQUAL: {
-                    boolean exists = matches.contains(operand);
-                    matches.addAll(vertex.getAllNeighbors());
-                    if (exists == false) {
-                        /* If the operand (not equal value) wasn't already added
-                         * by another expression, we can safely remove it now.
-                         * In other words, if another expression includes the
-                         * value excluded by this expression, the user has
-                         * effectively requested the entire neighbor set. */
-                        matches.remove(operand);
-                    }
-                    break;
-                }
-
-                case LESS: {
-                    matches.addAll(
-                            vertex.getNeighborsLessThan(operand, false)
-                            .values());
-                    break;
-                }
-
-                case LESSEQUAL: {
-                    matches.addAll(
-                            vertex.getNeighborsLessThan(operand, true)
-                            .values());
-                    break;
-                }
-
-                case GREATER: {
-                    matches.addAll(
-                            vertex.getNeighborsGreaterThan(operand, false)
-                            .values());
-                    break;
-                }
-
-                case GREATEREQUAL: {
-                    matches.addAll(
-                            vertex.getNeighborsGreaterThan(operand, true)
-                            .values());
-                    break;
-                }
-
-                case RANGE_INC: {
-                    Feature secondOperand = expression.getSecondOperand();
-                    matches.addAll(vertex.getNeighborsInRange(
-                                operand, true,
-                                secondOperand, true)
-                            .values());
-                    break;
-                }
-
-                case RANGE_EXC: {
-                    Feature secondOperand = expression.getSecondOperand();
-                    matches.addAll(vertex.getNeighborsInRange(
-                                operand, false,
-                                secondOperand, false)
-                            .values());
-                    break;
-                }
-
-                case RANGE_INC_EXC: {
-                    Feature secondOperand = expression.getSecondOperand();
-                    matches.addAll(vertex.getNeighborsInRange(
-                                operand, true,
-                                secondOperand, false)
-                            .values());
-                    break;
-                }
-
-                case RANGE_EXC_INC: {
-                    Feature secondOperand = expression.getSecondOperand();
-                    matches.addAll(vertex.getNeighborsInRange(
-                                operand, false,
-                                secondOperand, true)
-                            .values());
-                    break;
-                }
-
-                case STR_PREFIX: {
-                    vertex
-                        .getAllNeighbors()
-                        .stream()
-                        .filter(v -> v
-                                .getLabel()
-                                .getString()
-                                .startsWith(operand.getString()))
-                        .forEach(matches::add);
-                    break;
-                }
-
-                case STR_SUFFIX: {
-                    vertex
-                        .getAllNeighbors()
-                        .stream()
-                        .filter(v -> v
-                                .getLabel()
-                                .getString()
-                                .endsWith(operand.getString()))
-                        .forEach(matches::add);
-                    break;
-                }
-
-                default:
-                    throw new QueryException("Unknown operator: " + operator);
-            }
+      switch (operator) {
+        case EQUAL: {
+          matches.add(vertex.getNeighbor(operand));
+          break;
         }
 
-        return matches;
-    }
-
-    public void setGraphMetrics(GraphMetrics metrics) {
-        this.metrics = metrics;
-    }
-
-    @Deserialize
-    public Query(SerializationInputStream in)
-    throws IOException, SerializationException {
-        int size = in.readInt();
-        this.expressions = new HashMap<>(size);
-        for (int i = 0; i < size; ++i) {
-            int listSize = in.readInt();
-            List<Expression> expList = new ArrayList<>(listSize);
-            for (int j = 0; j < listSize; ++j) {
-                Expression exp = new Expression(in);
-                expList.add(exp);
-            }
-            String featureName = expList.get(0).getOperand().getName();
-            this.expressions.put(featureName, expList);
+        case NOTEQUAL: {
+          boolean exists = matches.contains(operand);
+          matches.addAll(vertex.getAllNeighbors());
+          if (exists == false) {
+            /* If the operand (not equal value) wasn't already added
+             * by another expression, we can safely remove it now.
+             * In other words, if another expression includes the
+             * value excluded by this expression, the user has
+             * effectively requested the entire neighbor set. */
+            matches.remove(operand);
+          }
+          break;
         }
+
+        case LESS: {
+          matches.addAll(
+              vertex.getNeighborsLessThan(operand, false)
+                  .values());
+          break;
+        }
+
+        case LESSEQUAL: {
+          matches.addAll(
+              vertex.getNeighborsLessThan(operand, true)
+                  .values());
+          break;
+        }
+
+        case GREATER: {
+          matches.addAll(
+              vertex.getNeighborsGreaterThan(operand, false)
+                  .values());
+          break;
+        }
+
+        case GREATEREQUAL: {
+          matches.addAll(
+              vertex.getNeighborsGreaterThan(operand, true)
+                  .values());
+          break;
+        }
+
+        case RANGE_INC: {
+          Feature secondOperand = expression.getSecondOperand();
+          matches.addAll(vertex.getNeighborsInRange(
+              operand, true,
+              secondOperand, true)
+              .values());
+          break;
+        }
+
+        case RANGE_EXC: {
+          Feature secondOperand = expression.getSecondOperand();
+          matches.addAll(vertex.getNeighborsInRange(
+              operand, false,
+              secondOperand, false)
+              .values());
+          break;
+        }
+
+        case RANGE_INC_EXC: {
+          Feature secondOperand = expression.getSecondOperand();
+          matches.addAll(vertex.getNeighborsInRange(
+              operand, true,
+              secondOperand, false)
+              .values());
+          break;
+        }
+
+        case RANGE_EXC_INC: {
+          Feature secondOperand = expression.getSecondOperand();
+          matches.addAll(vertex.getNeighborsInRange(
+              operand, false,
+              secondOperand, true)
+              .values());
+          break;
+        }
+
+        case STR_PREFIX: {
+          vertex
+              .getAllNeighbors()
+              .stream()
+              .filter(v -> v
+                  .getLabel()
+                  .getString()
+                  .startsWith(operand.getString()))
+              .forEach(matches::add);
+          break;
+        }
+
+        case STR_SUFFIX: {
+          vertex
+              .getAllNeighbors()
+              .stream()
+              .filter(v -> v
+                  .getLabel()
+                  .getString()
+                  .endsWith(operand.getString()))
+              .forEach(matches::add);
+          break;
+        }
+
+        default:
+          throw new QueryException("Unknown operator: " + operator);
+      }
     }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(this.expressions.size());
-        for (List<Expression> expList : this.expressions.values()) {
-            out.writeInt(expList.size());
-            for (Expression expression : expList) {
-                expression.serialize(out);
-            }
-        }
+    return matches;
+  }
+
+  public void setGraphMetrics(GraphMetrics metrics) {
+    this.metrics = metrics;
+  }
+
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(this.expressions.size());
+    for (List<Expression> expList : this.expressions.values()) {
+      out.writeInt(expList.size());
+      for (Expression expression : expList) {
+        expression.serialize(out);
+      }
     }
+  }
 }

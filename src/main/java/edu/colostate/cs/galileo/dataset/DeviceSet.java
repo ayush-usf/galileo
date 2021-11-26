@@ -41,50 +41,51 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class DeviceSet implements ByteSerializable, Iterable<Device> {
 
-    private Map<String, Device> devices = new HashMap<String, Device>();
+  private Map<String, Device> devices = new HashMap<String, Device>();
 
-    public DeviceSet() { }
+  public DeviceSet() {
+  }
 
-    public void put(Device device) {
-        devices.put(device.getName(), device);
+  @Deserialize
+  public DeviceSet(SerializationInputStream in)
+      throws IOException {
+    int numDevices = in.readInt();
+    for (int i = 0; i < numDevices; ++i) {
+      Device device = new Device(in);
+      put(device);
     }
+  }
 
-    public Device get(String name) {
-        return devices.get(name);
-    }
+  public void put(Device device) {
+    devices.put(device.getName(), device);
+  }
 
-    @Override
-    public Iterator<Device> iterator() {
-        return devices.values().iterator();
-    }
+  public Device get(String name) {
+    return devices.get(name);
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(devices.values().size() + " features in DeviceSet:");
-        for (Device device : devices.values()) {
-            sb.append(System.lineSeparator());
-            sb.append(device.toString());
-        }
-        return sb.toString();
-    }
+  @Override
+  public Iterator<Device> iterator() {
+    return devices.values().iterator();
+  }
 
-    @Deserialize
-    public DeviceSet(SerializationInputStream in)
-    throws IOException {
-        int numDevices = in.readInt();
-        for (int i = 0; i < numDevices; ++i) {
-            Device device = new Device(in);
-            put(device);
-        }
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(devices.values().size() + " features in DeviceSet:");
+    for (Device device : devices.values()) {
+      sb.append(System.lineSeparator());
+      sb.append(device.toString());
     }
+    return sb.toString();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(devices.size());
-        for (Device device : devices.values()) {
-            out.writeSerializable(device);
-        }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(devices.size());
+    for (Device device : devices.values()) {
+      out.writeSerializable(device);
     }
+  }
 }

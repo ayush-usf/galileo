@@ -39,33 +39,33 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class QueryEvent implements Event {
-    private String id;
-    private Query query;
+  private String id;
+  private Query query;
 
-    public QueryEvent(String id, Query query) {
-        this.id = id;
-        this.query = query;
-    }
+  public QueryEvent(String id, Query query) {
+    this.id = id;
+    this.query = query;
+  }
 
-    public Query getQuery() {
-        return query;
-    }
+  @Deserialize
+  public QueryEvent(SerializationInputStream in)
+      throws IOException, SerializationException {
+    id = in.readString();
+    query = new Query(in);
+  }
 
-    public String getQueryId() {
-        return id;
-    }
+  public Query getQuery() {
+    return query;
+  }
 
-    @Deserialize
-    public QueryEvent(SerializationInputStream in)
-    throws IOException, SerializationException {
-        id = in.readString();
-        query = new Query(in);
-    }
+  public String getQueryId() {
+    return id;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(id);
-        out.writeSerializable(query);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeString(id);
+    out.writeSerializable(query);
+  }
 }

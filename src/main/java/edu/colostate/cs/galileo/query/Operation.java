@@ -45,67 +45,67 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class Operation implements ByteSerializable {
 
-    private Map<String, List<Expression>> expressionMap
-        = new HashMap<>();
+  private Map<String, List<Expression>> expressionMap
+      = new HashMap<>();
 
-    private List<Expression> expressions = new ArrayList<>();
+  private List<Expression> expressions = new ArrayList<>();
 
-    public Operation(Expression... expressions) {
-        addExpressions(expressions);
+  public Operation(Expression... expressions) {
+    addExpressions(expressions);
+  }
+
+  @Deserialize
+  public Operation(SerializationInputStream in)
+      throws IOException, SerializationException {
+    int numExpressions = in.readInt();
+    for (int i = 0; i < numExpressions; ++i) {
+      Expression exp = new Expression(in);
+      addExpressions(exp);
+    }
+  }
+
+  public void addExpressions(Expression... expressions) {
+    for (Expression expression : expressions) {
+      this.expressions.add(expression);
+
+      String operand = expression.getOperand();
+
+      List<Expression> list = expressionMap.get(operand);
+      if (list == null) {
+        List<Expression> newList = new ArrayList<>();
+        expressionMap.put(operand, newList);
+        list = newList;
+      }
+
+      list.add(expression);
+    }
+  }
+
+  public List<Expression> getOperand(String operand) {
+    return expressionMap.get(operand);
+  }
+
+  public List<Expression> getExpressions() {
+    return expressions;
+  }
+
+  @Override
+  public String toString() {
+    String str = "";
+    for (int i = 0; i < expressions.size(); ++i) {
+      str += expressions.get(i);
+
+      if (i < expressions.size() - 1) {
+        str += " && ";
+      }
     }
 
-    public void addExpressions(Expression... expressions) {
-        for (Expression expression : expressions) {
-            this.expressions.add(expression);
+    return "(" + str + ")";
+  }
 
-            String operand = expression.getOperand();
-
-            List<Expression> list = expressionMap.get(operand);
-            if (list == null) {
-                List<Expression> newList = new ArrayList<>();
-                expressionMap.put(operand, newList);
-                list = newList;
-            }
-
-            list.add(expression);
-        }
-    }
-
-    public List<Expression> getOperand(String operand) {
-        return expressionMap.get(operand);
-    }
-
-    public List<Expression> getExpressions() {
-        return expressions;
-    }
-
-    @Override
-    public String toString() {
-        String str = "";
-        for (int i = 0; i < expressions.size(); ++i) {
-            str += expressions.get(i);
-
-            if (i < expressions.size() - 1) {
-                str += " && ";
-            }
-        }
-
-        return "(" + str + ")";
-    }
-
-    @Deserialize
-    public Operation(SerializationInputStream in)
-    throws IOException, SerializationException {
-        int numExpressions = in.readInt();
-        for (int i = 0; i < numExpressions; ++i) {
-            Expression exp = new Expression(in);
-            addExpressions(exp);
-        }
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeSerializableCollection(expressions);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeSerializableCollection(expressions);
+  }
 }

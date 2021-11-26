@@ -37,51 +37,51 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class StringFeatureData
-extends FeatureData<String> implements ByteSerializable {
+    extends FeatureData<String> implements ByteSerializable {
 
-    public StringFeatureData(String data) {
-        super(data);
-    }
+  public StringFeatureData(String data) {
+    super(data);
+  }
 
-    @Override
-    public int toInt() {
-        return Integer.parseInt(this.data);
-    }
+  @Deserialize
+  public StringFeatureData(SerializationInputStream in)
+      throws IOException {
+    super(in.readString());
+  }
 
-    @Override
-    public long toLong() {
-        return Long.parseLong(this.data);
-    }
+  @Override
+  public int toInt() {
+    return Integer.parseInt(this.data);
+  }
 
-    @Override
-    public float toFloat() {
-        return Float.parseFloat(this.data);
-    }
+  @Override
+  public long toLong() {
+    return Long.parseLong(this.data);
+  }
 
-    @Override
-    public double toDouble() {
-        return Double.parseDouble(this.data);
-    }
+  @Override
+  public float toFloat() {
+    return Float.parseFloat(this.data);
+  }
 
-    @Override
-    public String toString() {
-        return this.data;
-    }
+  @Override
+  public double toDouble() {
+    return Double.parseDouble(this.data);
+  }
 
-    @Override
-    public byte[] toBytes() {
-        return this.data.getBytes();
-    }
+  @Override
+  public String toString() {
+    return this.data;
+  }
 
-    @Deserialize
-    public StringFeatureData(SerializationInputStream in)
-    throws IOException {
-        super(in.readString());
-    }
+  @Override
+  public byte[] toBytes() {
+    return this.data.getBytes();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(data);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeString(data);
+  }
 }

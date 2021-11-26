@@ -39,25 +39,25 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class StorageRequest implements Event {
 
-    private Block block;
+  private Block block;
 
-    public StorageRequest(Block block) {
-        this.block = block;
-    }
+  public StorageRequest(Block block) {
+    this.block = block;
+  }
 
-    public Block getBlock() {
-        return block;
-    }
+  @Deserialize
+  public StorageRequest(SerializationInputStream in)
+      throws IOException, SerializationException {
+    block = new Block(in);
+  }
 
-    @Deserialize
-    public StorageRequest(SerializationInputStream in)
-    throws IOException, SerializationException {
-        block = new Block(in);
-    }
+  public Block getBlock() {
+    return block;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        block.serialize(out);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    block.serialize(out);
+  }
 }

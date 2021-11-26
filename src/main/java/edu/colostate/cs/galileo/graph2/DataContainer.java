@@ -9,33 +9,33 @@ import edu.colostate.cs.galileo.stat.RunningStatisticsND;
 
 public class DataContainer implements ByteSerializable {
 
-    public RunningStatisticsND statistics;
+  public RunningStatisticsND statistics;
 
-    public DataContainer() {
-        this.statistics = new RunningStatisticsND();
-    }
+  public DataContainer() {
+    this.statistics = new RunningStatisticsND();
+  }
 
-    public DataContainer(RunningStatisticsND statistics) {
-        this.statistics = statistics;
-    }
+  public DataContainer(RunningStatisticsND statistics) {
+    this.statistics = statistics;
+  }
 
-    public void merge(DataContainer container) {
-        statistics.merge(container.statistics);
-    }
+  @Deserialize
+  public DataContainer(SerializationInputStream in)
+      throws IOException {
+    statistics = new RunningStatisticsND(in);
+  }
 
-    public void clear() {
-        statistics.clear();
-    }
+  public void merge(DataContainer container) {
+    statistics.merge(container.statistics);
+  }
 
-    @Deserialize
-    public DataContainer(SerializationInputStream in)
-    throws IOException {
-        statistics = new RunningStatisticsND(in);
-    }
+  public void clear() {
+    statistics.clear();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        statistics.serialize(out);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    statistics.serialize(out);
+  }
 }

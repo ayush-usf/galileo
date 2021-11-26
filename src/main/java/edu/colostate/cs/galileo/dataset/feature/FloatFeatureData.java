@@ -37,41 +37,41 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class FloatFeatureData
-extends NumericFeatureData<Float> implements ByteSerializable {
+    extends NumericFeatureData<Float> implements ByteSerializable {
 
-    public FloatFeatureData(float data) {
-        super(data);
-    }
+  public FloatFeatureData(float data) {
+    super(data);
+  }
 
-    @Override
-    public Feature add(Feature f) {
-        return new Feature(this.data + f.getFloat());
-    }
+  @Deserialize
+  public FloatFeatureData(SerializationInputStream in)
+      throws IOException {
+    super(in.readFloat());
+  }
 
-    @Override
-    public Feature subtract(Feature f) {
-        return new Feature(this.data - f.getFloat());
-    }
+  @Override
+  public Feature add(Feature f) {
+    return new Feature(this.data + f.getFloat());
+  }
 
-    @Override
-    public Feature divide(Feature f) {
-        return new Feature(this.data / f.getFloat());
-    }
+  @Override
+  public Feature subtract(Feature f) {
+    return new Feature(this.data - f.getFloat());
+  }
 
-    @Override
-    public Feature multiply(Feature f) {
-        return new Feature(this.data * f.getFloat());
-    }
+  @Override
+  public Feature divide(Feature f) {
+    return new Feature(this.data / f.getFloat());
+  }
 
-    @Deserialize
-    public FloatFeatureData(SerializationInputStream in)
-    throws IOException {
-        super(in.readFloat());
-    }
+  @Override
+  public Feature multiply(Feature f) {
+    return new Feature(this.data * f.getFloat());
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeFloat(this.data);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeFloat(this.data);
+  }
 }

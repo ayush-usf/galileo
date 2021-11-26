@@ -43,46 +43,46 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class QueryPreamble implements Event {
-    private String id;
-    private String query;
-    private List<NodeInfo> nodesInvolved = new ArrayList<>();
+  private String id;
+  private String query;
+  private List<NodeInfo> nodesInvolved = new ArrayList<>();
 
-    public QueryPreamble(String id, String query,
-            List<NodeInfo> nodesInvolved) {
-        this.id = id;
-        this.query = query;
-        this.nodesInvolved = nodesInvolved;
-    }
+  public QueryPreamble(String id, String query,
+                       List<NodeInfo> nodesInvolved) {
+    this.id = id;
+    this.query = query;
+    this.nodesInvolved = nodesInvolved;
+  }
 
-    public String getQueryString() {
-        return query;
-    }
+  @Deserialize
+  public QueryPreamble(SerializationInputStream in)
+      throws IOException, SerializationException {
+    id = in.readString();
+    query = in.readString();
+    in.readSerializableCollection(NodeInfo.class, nodesInvolved);
+  }
 
-    public String getQueryId() {
-        return id;
-    }
+  public String getQueryString() {
+    return query;
+  }
 
-    /**
-     * Retrieves the list of StorageNodes involved in servicing a QueryRequest.
-     * Each node in the list should reply with resulting metadata.
-     */
-    public List<NodeInfo> getNodesInvolved() {
-        return nodesInvolved;
-    }
+  public String getQueryId() {
+    return id;
+  }
 
-    @Deserialize
-    public QueryPreamble(SerializationInputStream in)
-    throws IOException, SerializationException {
-        id = in.readString();
-        query = in.readString();
-        in.readSerializableCollection(NodeInfo.class, nodesInvolved);
-    }
+  /**
+   * Retrieves the list of StorageNodes involved in servicing a QueryRequest.
+   * Each node in the list should reply with resulting metadata.
+   */
+  public List<NodeInfo> getNodesInvolved() {
+    return nodesInvolved;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(id);
-        out.writeString(query);
-        out.writeSerializableCollection(nodesInvolved);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeString(id);
+    out.writeString(query);
+    out.writeSerializableCollection(nodesInvolved);
+  }
 }

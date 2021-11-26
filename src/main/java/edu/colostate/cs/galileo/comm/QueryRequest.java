@@ -41,27 +41,29 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class QueryRequest implements Event {
 
-    private Query query;
+  private Query query;
 
-    public QueryRequest(Query query) {
-        this.query = query;
-    }
+  public QueryRequest(Query query) {
+    this.query = query;
+  }
 
-    public Query getQuery() {
-        return query;
-    }
+  @Deserialize
+  public QueryRequest(SerializationInputStream in)
+      throws IOException, SerializationException {
+    query = new Query(in);
+  }
 
-    public String getQueryString() { return ""; }
+  public Query getQuery() {
+    return query;
+  }
 
-    @Deserialize
-    public QueryRequest(SerializationInputStream in)
-    throws IOException, SerializationException {
-        query = new Query(in);
-    }
+  public String getQueryString() {
+    return "";
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeSerializable(query);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeSerializable(query);
+  }
 }

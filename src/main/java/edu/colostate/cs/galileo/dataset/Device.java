@@ -32,17 +32,17 @@ import edu.colostate.cs.galileo.serialization.SerializationInputStream;
 
 public class Device extends StringFeatureData {
 
-    public Device(String name) {
-        super(name);
-    }
+  public Device(String name) {
+    super(name);
+  }
 
-    public String getName() {
-        return data;
-    }
+  @Deserialize
+  public Device(SerializationInputStream in)
+      throws IOException {
+    super(in);
+  }
 
-    @Deserialize
-    public Device(SerializationInputStream in)
-    throws IOException {
-        super(in);
-    }
+  public String getName() {
+    return data;
+  }
 }

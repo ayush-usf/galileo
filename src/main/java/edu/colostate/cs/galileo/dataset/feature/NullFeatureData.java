@@ -37,60 +37,60 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class NullFeatureData
-extends FeatureData<Integer> implements ByteSerializable {
+    extends FeatureData<Integer> implements ByteSerializable {
 
-    public NullFeatureData() {
-        this.type = FeatureType.NULL;
-    }
+  public NullFeatureData() {
+    this.type = FeatureType.NULL;
+  }
 
-    @Override
-    public int toInt() {
-        return 0;
-    }
+  @Deserialize
+  public NullFeatureData(SerializationInputStream in)
+      throws IOException {
+    this.type = FeatureType.NULL;
+  }
 
-    @Override
-    public long toLong() {
-        return 0l;
-    }
+  @Override
+  public int toInt() {
+    return 0;
+  }
 
-    @Override
-    public float toFloat() {
-        return 0f;
-    }
+  @Override
+  public long toLong() {
+    return 0l;
+  }
 
-    @Override
-    public double toDouble() {
-        return 0d;
-    }
+  @Override
+  public float toFloat() {
+    return 0f;
+  }
 
-    @Override
-    public String toString() {
-        return null;
-    }
+  @Override
+  public double toDouble() {
+    return 0d;
+  }
 
-    @Override
-    public byte[] toBytes() {
-        return null;
-    }
+  @Override
+  public String toString() {
+    return null;
+  }
 
-    @Override
-    public int compareTo(FeatureData<?> featureData) {
-        if (featureData.getType() == FeatureType.NULL) {
-            return 0;
-        } else {
-            return Integer.MIN_VALUE;
-        }
-    }
+  @Override
+  public byte[] toBytes() {
+    return null;
+  }
 
-    @Deserialize
-    public NullFeatureData(SerializationInputStream in)
-    throws IOException {
-        this.type = FeatureType.NULL;
+  @Override
+  public int compareTo(FeatureData<?> featureData) {
+    if (featureData.getType() == FeatureType.NULL) {
+      return 0;
+    } else {
+      return Integer.MIN_VALUE;
     }
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        /* Do nothing */
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    /* Do nothing */
+  }
 }

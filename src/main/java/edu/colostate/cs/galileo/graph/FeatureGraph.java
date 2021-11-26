@@ -39,39 +39,39 @@ import edu.colostate.cs.galileo.serialization.SerializationInputStream;
  */
 public class FeatureGraph extends MetadataGraph {
 
-    public FeatureGraph() {
-        super();
-    }
+  public FeatureGraph() {
+    super();
+  }
 
-    public FeatureGraph(FeatureHierarchy hierarchy) {
-        super(hierarchy);
-    }
+  public FeatureGraph(FeatureHierarchy hierarchy) {
+    super(hierarchy);
+  }
 
-    @Override
-    public void addPath(Path<Feature, String> path)
-    throws FeatureTypeMismatchException, GraphException {
-        Path<Feature, String> qPath = quantizePath(path);
-        graph.addPath(qPath);
-    }
+  @Deserialize
+  public FeatureGraph(SerializationInputStream in)
+      throws GraphException, IOException, SerializationException {
+    super(in);
+  }
 
-    private Path<Feature, String> quantizePath(Path<Feature, String> path) {
-        Path<Feature, String> newPath = new Path<Feature, String>();
-        for (Vertex<Feature, String> v : path.getVertices()) {
-            Feature oldFeature = v.getLabel();
-//            Feature newFeature = new Feature(oldFeature.getName(),
-//                    Math.round(oldFeature.getFloat()));
-            Feature newFeature = new Feature(oldFeature.getName(),
-                    oldFeature.getInt());
-            Vertex<Feature, String> newVertex = new Vertex<>(newFeature);
-            newPath.add(newVertex);
-        }
-        newPath.setPayload(path.getPayload());
-        return newPath;
-    }
+  @Override
+  public void addPath(Path<Feature, String> path)
+      throws FeatureTypeMismatchException, GraphException {
+    Path<Feature, String> qPath = quantizePath(path);
+    graph.addPath(qPath);
+  }
 
-    @Deserialize
-    public FeatureGraph(SerializationInputStream in)
-    throws GraphException, IOException, SerializationException {
-        super(in);
+  private Path<Feature, String> quantizePath(Path<Feature, String> path) {
+    Path<Feature, String> newPath = new Path<Feature, String>();
+    for (Vertex<Feature, String> v : path.getVertices()) {
+      Feature oldFeature = v.getLabel();
+      //            Feature newFeature = new Feature(oldFeature.getName(),
+      //                    Math.round(oldFeature.getFloat()));
+      Feature newFeature = new Feature(oldFeature.getName(),
+          oldFeature.getInt());
+      Vertex<Feature, String> newVertex = new Vertex<>(newFeature);
+      newPath.add(newVertex);
     }
+    newPath.setPayload(path.getPayload());
+    return newPath;
+  }
 }

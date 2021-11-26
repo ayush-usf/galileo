@@ -39,50 +39,50 @@ import java.io.IOException;
  */
 public class EventWithSynopsis implements Event {
 
-    private String synopsis;
-    private byte[] data;
-    private boolean compress = false;
+  private String synopsis;
+  private byte[] data;
+  private boolean compress = false;
 
-    public EventWithSynopsis(String synopsis, byte[] data) {
-        this.synopsis = synopsis;
-        this.data = data;
-    }
+  public EventWithSynopsis(String synopsis, byte[] data) {
+    this.synopsis = synopsis;
+    this.data = data;
+  }
 
-    public String getSynopsis() {
-        return this.synopsis;
-    }
+  @Deserialize
+  public EventWithSynopsis(SerializationInputStream in)
+      throws IOException {
+    this.synopsis = in.readString();
+    this.data = in.readCompressableField();
+  }
 
-    public byte[] getPayload() {
-        return this.data;
-    }
+  public String getSynopsis() {
+    return this.synopsis;
+  }
 
-    /**
-     * Enables compression when serializing this event.  When deserializing,
-     * this setting has no effect.
-     */
-    public void enableCompression() {
-        this.compress = true;
-    }
+  public byte[] getPayload() {
+    return this.data;
+  }
 
-    /**
-     * Disables compression when serializing this event.  This is the default
-     * behavior.  When deserializing, this setting has no effect.
-     */
-    public void disableCompression() {
-        this.compress = false;
-    }
+  /**
+   * Enables compression when serializing this event.  When deserializing,
+   * this setting has no effect.
+   */
+  public void enableCompression() {
+    this.compress = true;
+  }
 
-    @Deserialize
-    public EventWithSynopsis(SerializationInputStream in)
-    throws IOException {
-        this.synopsis = in.readString();
-        this.data = in.readCompressableField();
-    }
+  /**
+   * Disables compression when serializing this event.  This is the default
+   * behavior.  When deserializing, this setting has no effect.
+   */
+  public void disableCompression() {
+    this.compress = false;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(synopsis);
-        out.writeCompressableField(data, compress);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeString(synopsis);
+    out.writeCompressableField(data, compress);
+  }
 }

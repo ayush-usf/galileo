@@ -44,71 +44,72 @@ import java.util.logging.Logger;
  */
 public class FeatureSet implements ByteSerializable, Iterable<Feature> {
 
-    private static final Logger logger = Logger.getLogger("edu.colostate.cs.galileo");
+  private static final Logger logger = Logger.getLogger("edu.colostate.cs.galileo");
 
-    private Map<String, Feature> features = new HashMap<String, Feature>();
+  private Map<String, Feature> features = new HashMap<String, Feature>();
 
-    public FeatureSet() { }
+  public FeatureSet() {
+  }
 
-    public void put(Feature feature) {
-        features.put(feature.getName(), feature);
+  @Deserialize
+  public FeatureSet(SerializationInputStream in)
+      throws IOException {
+    int numFeatures = in.readInt();
+    for (int i = 0; i < numFeatures; ++i) {
+      Feature feature = null;
+      try {
+        feature = new Feature(in);
+      } catch (SerializationException e) {
+        logger.log(Level.WARNING, "Error deserializing FeatureSet "
+            + "element", e);
+      }
+      put(feature);
     }
+  }
 
-    public Feature get(String name) {
-        return features.get(name);
-    }
+  public void put(Feature feature) {
+    features.put(feature.getName(), feature);
+  }
 
-    @Override
-    public Iterator<Feature> iterator() {
-        return features.values().iterator();
-    }
+  public Feature get(String name) {
+    return features.get(name);
+  }
 
-    public int size() {
-        return features.size();
-    }
+  @Override
+  public Iterator<Feature> iterator() {
+    return features.values().iterator();
+  }
 
-    public Feature[] toArray() {
-        Feature[] fArray = new Feature[features.size()];
-        int i = 0;
-        for (Map.Entry<String, Feature> entry : features.entrySet()) {
-            fArray[i++] = entry.getValue();
-        }
-        return fArray;
-    }
+  public int size() {
+    return features.size();
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(features.values().size() + " features in FeatureSet:");
-        for (Feature feature : features.values()) {
-            sb.append(System.lineSeparator());
-            sb.append(feature.toString());
-        }
-        return sb.toString();
+  public Feature[] toArray() {
+    Feature[] fArray = new Feature[features.size()];
+    int i = 0;
+    for (Map.Entry<String, Feature> entry : features.entrySet()) {
+      fArray[i++] = entry.getValue();
     }
+    return fArray;
+  }
 
-    @Deserialize
-    public FeatureSet(SerializationInputStream in)
-    throws IOException {
-        int numFeatures = in.readInt();
-        for (int i = 0; i < numFeatures; ++i) {
-            Feature feature = null;
-            try {
-                feature = new Feature(in);
-            } catch (SerializationException e) {
-                logger.log(Level.WARNING, "Error deserializing FeatureSet "
-                        + "element", e);
-            }
-            put(feature);
-        }
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(features.values().size() + " features in FeatureSet:");
+    for (Feature feature : features.values()) {
+      sb.append(System.lineSeparator());
+      sb.append(feature.toString());
     }
+    return sb.toString();
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(features.size());
-        for (Feature feature : features.values()) {
-            out.writeSerializable(feature);
-        }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(features.size());
+    for (Feature feature : features.values()) {
+      out.writeSerializable(feature);
     }
+  }
 }

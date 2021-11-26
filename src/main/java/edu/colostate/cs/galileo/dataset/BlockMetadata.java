@@ -39,91 +39,91 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class BlockMetadata implements ByteSerializable {
 
-    private String name = "";
+  private String name = "";
 
-    private TemporalProperties temporalProperties;
-    private SpatialProperties spatialProperties;
+  private TemporalProperties temporalProperties;
+  private SpatialProperties spatialProperties;
 
-    private FeatureSet features = new FeatureSet();
-    private DeviceSet devices = new DeviceSet();
+  private FeatureSet features = new FeatureSet();
+  private DeviceSet devices = new DeviceSet();
 
-    private RuntimeMetadata runtimeMetadata = new RuntimeMetadata();
+  private RuntimeMetadata runtimeMetadata = new RuntimeMetadata();
 
-    public BlockMetadata(String name, TemporalProperties temporalProperties,
-            SpatialProperties spatialProperties,
-            FeatureSet features, DeviceSet devices) {
-        this(temporalProperties, spatialProperties, features, devices);
-        this.name = name;
-    }
+  public BlockMetadata(String name, TemporalProperties temporalProperties,
+                       SpatialProperties spatialProperties,
+                       FeatureSet features, DeviceSet devices) {
+    this(temporalProperties, spatialProperties, features, devices);
+    this.name = name;
+  }
 
-    public BlockMetadata(TemporalProperties temporalProperties,
-            SpatialProperties spatialProperties,
-            FeatureSet features, DeviceSet devices) {
+  public BlockMetadata(TemporalProperties temporalProperties,
+                       SpatialProperties spatialProperties,
+                       FeatureSet features, DeviceSet devices) {
 
-        this.temporalProperties = temporalProperties;
-        this.spatialProperties = spatialProperties;
-        this.features = features;
-        this.devices  = devices;
-    }
+    this.temporalProperties = temporalProperties;
+    this.spatialProperties = spatialProperties;
+    this.features = features;
+    this.devices = devices;
+  }
 
-    public RuntimeMetadata getRuntimeMetadata() {
-        return runtimeMetadata;
-    }
+  @Deserialize
+  public BlockMetadata(SerializationInputStream in)
+      throws IOException {
+    name = new String(in.readString());
+    temporalProperties = new TemporalProperties(in);
+    spatialProperties = new SpatialProperties(in);
+    features = new FeatureSet(in);
+    devices = new DeviceSet(in);
+    runtimeMetadata = new RuntimeMetadata(in);
+  }
 
-    public void setRuntimeMetadata(RuntimeMetadata runtimeMetadata) {
-        this.runtimeMetadata = runtimeMetadata;
-    }
+  public RuntimeMetadata getRuntimeMetadata() {
+    return runtimeMetadata;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setRuntimeMetadata(RuntimeMetadata runtimeMetadata) {
+    this.runtimeMetadata = runtimeMetadata;
+  }
 
-    public TemporalProperties getTemporalProperties() {
-        return temporalProperties;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public SpatialProperties getSpatialProperties() {
-        return spatialProperties;
-    }
+  public TemporalProperties getTemporalProperties() {
+    return temporalProperties;
+  }
 
-    public FeatureSet getFeatures() {
-        return features;
-    }
+  public SpatialProperties getSpatialProperties() {
+    return spatialProperties;
+  }
 
-    public DeviceSet getDevices() {
-        return devices;
-    }
+  public FeatureSet getFeatures() {
+    return features;
+  }
 
-    @Override
-    public String toString() {
-        return "BlockMetadata Descriptor:" + System.lineSeparator() +
-            "Name: '" + name + "'" + System.lineSeparator() +
-            temporalProperties + System.lineSeparator() +
-            spatialProperties + System.lineSeparator() +
-            features + System.lineSeparator() +
-            devices + System.lineSeparator() +
-            runtimeMetadata;
-    }
+  public DeviceSet getDevices() {
+    return devices;
+  }
 
-    @Deserialize
-    public BlockMetadata(SerializationInputStream in)
-    throws IOException {
-        name = new String(in.readString());
-        temporalProperties = new TemporalProperties(in);
-        spatialProperties = new SpatialProperties(in);
-        features = new FeatureSet(in);
-        devices = new DeviceSet(in);
-        runtimeMetadata = new RuntimeMetadata(in);
-    }
+  @Override
+  public String toString() {
+    return "BlockMetadata Descriptor:" + System.lineSeparator() +
+        "Name: '" + name + "'" + System.lineSeparator() +
+        temporalProperties + System.lineSeparator() +
+        spatialProperties + System.lineSeparator() +
+        features + System.lineSeparator() +
+        devices + System.lineSeparator() +
+        runtimeMetadata;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeString(name);
-        out.writeSerializable(temporalProperties);
-        out.writeSerializable(spatialProperties);
-        out.writeSerializable(features);
-        out.writeSerializable(devices);
-        out.writeSerializable(runtimeMetadata);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeString(name);
+    out.writeSerializable(temporalProperties);
+    out.writeSerializable(spatialProperties);
+    out.writeSerializable(features);
+    out.writeSerializable(devices);
+    out.writeSerializable(runtimeMetadata);
+  }
 }

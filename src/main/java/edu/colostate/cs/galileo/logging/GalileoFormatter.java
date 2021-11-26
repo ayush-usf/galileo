@@ -47,57 +47,56 @@ import java.util.logging.LogRecord;
  */
 public class GalileoFormatter extends Formatter {
 
-    private DateFormat dateFormat;
-    private final String lineSep = System.getProperty("line.separator");
+  private final String lineSep = System.getProperty("line.separator");
+  private DateFormat dateFormat;
+  private Date date = new Date();
 
-    private Date date = new Date();
+  public GalileoFormatter() {
+    super();
+  }
 
-    public GalileoFormatter() {
-        super();
+  @Override
+  public String format(LogRecord record) {
+    StringBuffer sb = new StringBuffer(100);
+
+    if (dateFormat == null) {
+      dateFormat = DateFormat.getDateTimeInstance();
     }
 
-    @Override
-    public String format(LogRecord record) {
-        StringBuffer sb = new StringBuffer(100);
+    Throwable thrown = record.getThrown();
 
-        if (dateFormat == null) {
-            dateFormat = DateFormat.getDateTimeInstance();
-        }
+    if (record.getLevel().intValue() > Level.INFO.intValue() ||
+        thrown != null) {
+      date.setTime(record.getMillis());
 
-        Throwable thrown = record.getThrown();
+      sb.append(dateFormat.format(date));
+      sb.append(' ');
+      if (record.getSourceClassName() != null) {
+        sb.append(record.getSourceClassName());
+      } else {
+        sb.append("logger=" + record.getLoggerName());
+      }
+      if (record.getSourceMethodName() != null) {
+        sb.append(' ');
+        sb.append(record.getSourceMethodName());
+      }
+      sb.append(lineSep);
 
-        if (record.getLevel().intValue() > Level.INFO.intValue() ||
-                thrown != null) {
-            date.setTime(record.getMillis());
-
-            sb.append(dateFormat.format(date));
-            sb.append(' ');
-            if (record.getSourceClassName() != null) {
-                sb.append(record.getSourceClassName());
-            } else {
-                sb.append("logger=" + record.getLoggerName());
-            }
-            if (record.getSourceMethodName() != null) {
-                sb.append(' ');
-                sb.append(record.getSourceMethodName());
-            }
-            sb.append(lineSep);
-
-            sb.append(record.getLevel());
-            sb.append(": ");
-        }
-
-        sb.append(formatMessage(record));
-        sb.append(lineSep);
-
-        if (thrown != null) {
-            StringWriter writer = new StringWriter();
-            PrintWriter printer = new PrintWriter(writer, true);
-            thrown.printStackTrace(printer);
-            sb.append(writer.toString());
-            printer.close();
-        }
-
-        return sb.toString();
+      sb.append(record.getLevel());
+      sb.append(": ");
     }
+
+    sb.append(formatMessage(record));
+    sb.append(lineSep);
+
+    if (thrown != null) {
+      StringWriter writer = new StringWriter();
+      PrintWriter printer = new PrintWriter(writer, true);
+      thrown.printStackTrace(printer);
+      sb.append(writer.toString());
+      printer.close();
+    }
+
+    return sb.toString();
+  }
 }

@@ -68,258 +68,258 @@ import edu.colostate.cs.galileo.util.Version;
  */
 public class StorageNode {
 
-    private static final Logger logger = Logger.getLogger("galileo");
-    private StatusLine nodeStatus;
+  private static final Logger logger = Logger.getLogger("galileo");
+  private StatusLine nodeStatus;
 
-    private int port;
-    private String rootDir;
+  private int port;
+  private String rootDir;
 
-    private File pidFile;
+  private File pidFile;
 
-    private NetworkInfo network;
+  private NetworkInfo network;
 
-    private ServerMessageRouter messageRouter;
-    private ClientConnectionPool connectionPool;
-    private GeospatialFileSystem fs;
+  private ServerMessageRouter messageRouter;
+  private ClientConnectionPool connectionPool;
+  private GeospatialFileSystem fs;
 
-    private GalileoEventMap eventMap = new GalileoEventMap();
-    private EventReactor eventReactor;
+  private GalileoEventMap eventMap = new GalileoEventMap();
+  private EventReactor eventReactor;
 
-    private Partitioner<Metadata> partitioner;
+  private Partitioner<Metadata> partitioner;
 
-    private ConcurrentHashMap<String, QueryTracker> queryTrackers
-        = new ConcurrentHashMap<>();
+  private ConcurrentHashMap<String, QueryTracker> queryTrackers
+      = new ConcurrentHashMap<>();
 
-    private String sessionId;
+  private String sessionId;
 
-    public StorageNode() throws EventLinkException {
-        this.port = NetworkConfig.DEFAULT_PORT;
-        this.rootDir = SystemConfig.getRootDir();
+  public StorageNode() throws EventLinkException {
+    this.port = NetworkConfig.DEFAULT_PORT;
+    this.rootDir = SystemConfig.getRootDir();
 
-        this.eventReactor = new EventReactor(this, eventMap);
+    this.eventReactor = new EventReactor(this, eventMap);
 
-        this.sessionId = HostIdentifier.getSessionId(port);
-        nodeStatus = new StatusLine(SystemConfig.getRootDir() + "/status.txt");
+    this.sessionId = HostIdentifier.getSessionId(port);
+    nodeStatus = new StatusLine(SystemConfig.getRootDir() + "/status.txt");
 
-        String pid = System.getProperty("pidFile");
-        if (pid != null) {
-            this.pidFile = new File(pid);
-        }
-     }
+    String pid = System.getProperty("pidFile");
+    if (pid != null) {
+      this.pidFile = new File(pid);
+    }
+  }
 
-    /**
-     * Begins Server execution.  This method attempts to fail fast to provide
-     * immediate feedback to wrapper scripts or other user interface tools.
-     * Only once all the prerequisite components are initialized and in a sane
-     * state will the StorageNode begin accepting connections.
-     */
-    public void start()
-    throws Exception {
-        Version.printSplash();
+  /**
+   * Executable entrypoint for a Galileo DHT Storage Node
+   */
+  public static void main(String[] args) {
+    try {
+      StorageNode node = new StorageNode();
+      node.start();
+    } catch (Exception e) {
+      logger.log(Level.SEVERE, "Could not start StorageNode.", e);
+    }
+  }
 
-        /* First, make sure the port we're binding to is available. */
-        nodeStatus.set("Attempting to bind to port");
-        if (PortTester.portAvailable(port) == false) {
-            nodeStatus.set("Could not bind to port " + port + ".");
-            throw new IOException("Could not bind to port " + port);
-        }
+  /**
+   * Begins Server execution.  This method attempts to fail fast to provide
+   * immediate feedback to wrapper scripts or other user interface tools.
+   * Only once all the prerequisite components are initialized and in a sane
+   * state will the StorageNode begin accepting connections.
+   */
+  public void start()
+      throws Exception {
+    Version.printSplash();
 
-        /* Read the network configuration; if this is invalid, there is no need
-         * to execute the rest of this method. */
-        nodeStatus.set("Reading network configuration");
-        network = NetworkConfig.readNetworkDescription(
-                SystemConfig.getNetworkConfDir());
-
-        /* Set up the FileSystem. */
-        nodeStatus.set("Initializing file system");
-        try {
-            fs = new GeospatialFileSystem(rootDir);
-        } catch (FileSystemException e) {
-            nodeStatus.set("File system initialization failure");
-            logger.log(Level.SEVERE,
-                    "Could not initialize the Galileo File System!", e);
-            return;
-        }
-
-        nodeStatus.set("Initializing communications");
-
-        /* Set up our Shutdown hook */
-        Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
-
-        /* Pre-scheduler setup tasks */
-        connectionPool = new ClientConnectionPool();
-        connectionPool.addListener(eventReactor);
-        configurePartitioner();
-
-        /* Start listening for incoming messages. */
-        messageRouter = new ServerMessageRouter();
-        messageRouter.addListener(eventReactor);
-        messageRouter.listen(port);
-        nodeStatus.set("Online");
-
-        /* Start processing the message loop */
-        while (true) {
-            eventReactor.processNextEvent();
-        }
+    /* First, make sure the port we're binding to is available. */
+    nodeStatus.set("Attempting to bind to port");
+    if (PortTester.portAvailable(port) == false) {
+      nodeStatus.set("Could not bind to port " + port + ".");
+      throw new IOException("Could not bind to port " + port);
     }
 
-    private void configurePartitioner()
-    throws HashException, HashTopologyException, PartitionException {
-        String[] geohashes = { "8g", "8u", "8v", "8x", "8y", "8z", "94", "95",
-                "96", "97", "9d", "9e", "9g", "9h", "9j", "9k", "9m", "9n",
-                "9p", "9q", "9r", "9s", "9t", "9u", "9v", "9w", "9x", "9y",
-                "9z", "b8", "b9", "bb", "bc", "bf", "c0", "c1", "c2", "c3",
-                "c4", "c6", "c8", "c9", "cb", "cc", "cd", "cf", "d4", "d5",
-                "d6", "d7", "dd", "de", "dh", "dj", "dk", "dm", "dn", "dp",
-                "dq", "dr", "ds", "dt", "dw", "dx", "dz", "f0", "f1", "f2",
-                "f3", "f4", "f6", "f8", "f9", "fb", "fc", "fd", "ff" };
+    /* Read the network configuration; if this is invalid, there is no need
+     * to execute the rest of this method. */
+    nodeStatus.set("Reading network configuration");
+    network = NetworkConfig.readNetworkDescription(
+        SystemConfig.getNetworkConfDir());
 
-        partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
+    /* Set up the FileSystem. */
+    nodeStatus.set("Initializing file system");
+    try {
+      fs = new GeospatialFileSystem(rootDir);
+    } catch (FileSystemException e) {
+      nodeStatus.set("File system initialization failure");
+      logger.log(Level.SEVERE,
+          "Could not initialize the Galileo File System!", e);
+      return;
     }
 
-    private void sendEvent(NodeInfo node, Event event)
-    throws IOException {
-        connectionPool.sendMessage(node, eventReactor.wrapEvent(event));
+    nodeStatus.set("Initializing communications");
+
+    /* Set up our Shutdown hook */
+    Runtime.getRuntime().addShutdownHook(new ShutdownHandler());
+
+    /* Pre-scheduler setup tasks */
+    connectionPool = new ClientConnectionPool();
+    connectionPool.addListener(eventReactor);
+    configurePartitioner();
+
+    /* Start listening for incoming messages. */
+    messageRouter = new ServerMessageRouter();
+    messageRouter.addListener(eventReactor);
+    messageRouter.listen(port);
+    nodeStatus.set("Online");
+
+    /* Start processing the message loop */
+    while (true) {
+      eventReactor.processNextEvent();
     }
+  }
 
-    /**
-     * Handles a storage request from a client.  This involves determining where
-     * the data belongs via a {@link Partitioner} implementation and then
-     * forwarding the data on to its destination.
-     */
-    @EventHandler
-    public void handleStorageRequest(
-            StorageRequest request, EventContext context)
-    throws HashException, IOException, PartitionException {
+  private void configurePartitioner()
+      throws HashException, HashTopologyException, PartitionException {
+    String[] geohashes = {"8g", "8u", "8v", "8x", "8y", "8z", "94", "95",
+        "96", "97", "9d", "9e", "9g", "9h", "9j", "9k", "9m", "9n",
+        "9p", "9q", "9r", "9s", "9t", "9u", "9v", "9w", "9x", "9y",
+        "9z", "b8", "b9", "bb", "bc", "bf", "c0", "c1", "c2", "c3",
+        "c4", "c6", "c8", "c9", "cb", "cc", "cd", "cf", "d4", "d5",
+        "d6", "d7", "dd", "de", "dh", "dj", "dk", "dm", "dn", "dp",
+        "dq", "dr", "ds", "dt", "dw", "dx", "dz", "f0", "f1", "f2",
+        "f3", "f4", "f6", "f8", "f9", "fb", "fc", "fd", "ff"};
 
-        /* Determine where this block goes. */
-        Block file = request.getBlock();
-        Metadata metadata = file.getMetadata();
-        NodeInfo node = partitioner.locateData(metadata);
+    partitioner = new SpatialHierarchyPartitioner(this, network, geohashes);
+  }
 
-        logger.log(Level.INFO, "Storage destination: {0}", node);
-        StorageEvent store = new StorageEvent(file);
-        sendEvent(node, store);
+  private void sendEvent(NodeInfo node, Event event)
+      throws IOException {
+    connectionPool.sendMessage(node, eventReactor.wrapEvent(event));
+  }
+
+  /**
+   * Handles a storage request from a client.  This involves determining where
+   * the data belongs via a {@link Partitioner} implementation and then
+   * forwarding the data on to its destination.
+   */
+  @EventHandler
+  public void handleStorageRequest(
+      StorageRequest request, EventContext context)
+      throws HashException, IOException, PartitionException {
+
+    /* Determine where this block goes. */
+    Block file = request.getBlock();
+    Metadata metadata = file.getMetadata();
+    NodeInfo node = partitioner.locateData(metadata);
+
+    logger.log(Level.INFO, "Storage destination: {0}", node);
+    StorageEvent store = new StorageEvent(file);
+    sendEvent(node, store);
+  }
+
+  @EventHandler
+  public void handleStorage(StorageEvent store, EventContext context)
+      throws FileSystemException, IOException {
+    logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
+    fs.storeBlock(store.getBlock());
+  }
+
+  /**
+   * Handles a query request from a client.  Query requests result in a number
+   * of subqueries being performed across the Galileo network.
+   */
+  @EventHandler
+  public void handleQueryRequest(QueryRequest request, EventContext context)
+      throws IOException {
+    String queryString = request.getQueryString();
+    logger.log(Level.INFO, "Query request: {0}", queryString);
+
+    /* Determine StorageNodes that contain relevant data. */
+    //featureGraph.query(
+    List<NodeInfo> queryNodes = new ArrayList<>();
+    queryNodes.addAll(network.getAllNodes());
+
+    /* Set up QueryTracker for this request */
+    //        QueryTracker tracker = new QueryTracker(
+    //                message.getContext().getSelectionKey());
+    //        String clientId = tracker.getIdString(sessionId);
+    //        queryTrackers.put(clientId, tracker);
+    //
+    //        /* Send a Query Preamble to the client */
+    //        QueryPreamble preamble = new QueryPreamble(
+    //                clientId, queryString, queryNodes);
+    //        publishResponse(preamble);
+    //
+    //        /* Optionally write out where this query is going */
+    //        if (logger.isLoggable(Level.INFO)) {
+    //            StringBuilder sb = new StringBuilder();
+    //            sb.append("Forwarding Query to nodes: ");
+    //            for (NodeInfo node : queryNodes) {
+    //                sb.append(node.toString() + " ");
+    //            }
+    //            logger.info(sb.toString());
+    //        }
+    //
+    //        QueryEvent query = new QueryEvent(tracker.getIdString(sessionId),
+    //                request.getQuery());
+    //        for (NodeInfo node : queryNodes) {
+    //            publishEvent(query, node);
+    //        }
+  }
+
+  /**
+   * Handles an internal Query request (from another StorageNode)
+   */
+  @EventHandler
+  public void handleQuery(QueryEvent query, EventContext context)
+      throws IOException {
+    logger.info(query.getQuery().toString());
+
+    List<Path<Feature, String>> results = fs.query(query.getQuery());
+    logger.info("Got " + results.size() + " results");
+
+    QueryResponse response = new QueryResponse(
+        query.getQueryId(), results);
+    context.sendReply(response);
+  }
+
+  @EventHandler
+  public void handleQueryResponse(
+      QueryResponse response, EventContext context)
+      throws IOException {
+    QueryTracker tracker = queryTrackers.get(response.getId());
+    if (tracker == null) {
+      logger.log(Level.WARNING,
+          "Unknown query response received: {0}",
+          response.getId());
+      return;
     }
+    //sendMessage(tracker.getSelectionKey(), message);
+  }
 
-    @EventHandler
-    public void handleStorage(StorageEvent store, EventContext context)
-    throws FileSystemException, IOException {
-        logger.log(Level.INFO, "Storing block: {0}", store.getBlock());
-        fs.storeBlock(store.getBlock());
+  /**
+   * Handles cleaning up the system for a graceful shutdown.
+   */
+  private class ShutdownHandler extends Thread {
+    @Override
+    public void run() {
+      /* The logging subsystem may have already shut down, so we revert to
+       * stdout for our final messages */
+      System.out.println("Initiated shutdown.");
+
+      try {
+        connectionPool.forceShutdown();
+        messageRouter.shutdown();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      nodeStatus.close();
+
+      if (pidFile != null && pidFile.exists()) {
+        pidFile.delete();
+      }
+
+      fs.shutdown();
+
+      System.out.println("Goodbye!");
     }
-
-    /**
-     * Handles a query request from a client.  Query requests result in a number
-     * of subqueries being performed across the Galileo network.
-     */
-    @EventHandler
-    public void handleQueryRequest(QueryRequest request, EventContext context)
-    throws IOException {
-        String queryString = request.getQueryString();
-        logger.log(Level.INFO, "Query request: {0}", queryString);
-
-        /* Determine StorageNodes that contain relevant data. */
-        //featureGraph.query(
-        List<NodeInfo> queryNodes = new ArrayList<>();
-        queryNodes.addAll(network.getAllNodes());
-
-        /* Set up QueryTracker for this request */
-//        QueryTracker tracker = new QueryTracker(
-//                message.getContext().getSelectionKey());
-//        String clientId = tracker.getIdString(sessionId);
-//        queryTrackers.put(clientId, tracker);
-//
-//        /* Send a Query Preamble to the client */
-//        QueryPreamble preamble = new QueryPreamble(
-//                clientId, queryString, queryNodes);
-//        publishResponse(preamble);
-//
-//        /* Optionally write out where this query is going */
-//        if (logger.isLoggable(Level.INFO)) {
-//            StringBuilder sb = new StringBuilder();
-//            sb.append("Forwarding Query to nodes: ");
-//            for (NodeInfo node : queryNodes) {
-//                sb.append(node.toString() + " ");
-//            }
-//            logger.info(sb.toString());
-//        }
-//
-//        QueryEvent query = new QueryEvent(tracker.getIdString(sessionId),
-//                request.getQuery());
-//        for (NodeInfo node : queryNodes) {
-//            publishEvent(query, node);
-//        }
-    }
-
-    /**
-     * Handles an internal Query request (from another StorageNode)
-     */
-    @EventHandler
-    public void handleQuery(QueryEvent query, EventContext context)
-    throws IOException {
-        logger.info(query.getQuery().toString());
-
-        List<Path<Feature, String>> results = fs.query(query.getQuery());
-        logger.info("Got " + results.size() + " results");
-
-        QueryResponse response = new QueryResponse(
-                query.getQueryId(), results);
-        context.sendReply(response);
-    }
-
-    @EventHandler
-    public void handleQueryResponse(
-            QueryResponse response, EventContext context)
-    throws IOException {
-        QueryTracker tracker = queryTrackers.get(response.getId());
-        if (tracker == null) {
-            logger.log(Level.WARNING,
-                    "Unknown query response received: {0}",
-                    response.getId());
-            return;
-        }
-        //sendMessage(tracker.getSelectionKey(), message);
-    }
-
-    /**
-     * Handles cleaning up the system for a graceful shutdown.
-     */
-    private class ShutdownHandler extends Thread {
-        @Override
-        public void run() {
-            /* The logging subsystem may have already shut down, so we revert to
-             * stdout for our final messages */
-            System.out.println("Initiated shutdown.");
-
-            try {
-                connectionPool.forceShutdown();
-                messageRouter.shutdown();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            nodeStatus.close();
-
-            if (pidFile != null && pidFile.exists()) {
-                pidFile.delete();
-            }
-
-            fs.shutdown();
-
-            System.out.println("Goodbye!");
-        }
-    }
-
-    /**
-     * Executable entrypoint for a Galileo DHT Storage Node
-     */
-    public static void main(String[] args) {
-        try {
-            StorageNode node = new StorageNode();
-            node.start();
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Could not start StorageNode.", e);
-        }
-    }
+  }
 }

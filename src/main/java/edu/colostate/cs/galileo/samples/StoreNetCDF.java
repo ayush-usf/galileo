@@ -40,53 +40,53 @@ import edu.colostate.cs.galileo.net.NetworkEndpoint;
 
 public class StoreNetCDF implements MessageListener {
 
-    private ClientMessageRouter messageRouter;
-    public EventPublisher publisher;
+  public EventPublisher publisher;
+  private ClientMessageRouter messageRouter;
 
-    public StoreNetCDF() throws IOException {
-        messageRouter = new ClientMessageRouter();
-        publisher = new EventPublisher(messageRouter);
+  public StoreNetCDF() throws IOException {
+    messageRouter = new ClientMessageRouter();
+    publisher = new EventPublisher(messageRouter);
 
-        messageRouter.addListener(this);
+    messageRouter.addListener(this);
+  }
+
+  public static void main(String[] args) throws Exception {
+    String serverHostName = args[0];
+    int serverPort = Integer.parseInt(args[1]);
+    String fileName = args[2];
+
+    StoreNetCDF client = new StoreNetCDF();
+    NetworkEndpoint server
+        = new NetworkEndpoint(serverHostName, serverPort);
+
+    Map<String, Metadata> metas = ConvertNetCDF.readFile(fileName);
+    for (Map.Entry<String, Metadata> entry : metas.entrySet()) {
+      Block b = ConvertNetCDF.createBlock("", entry.getValue());
+      StorageRequest store = new StorageRequest(b);
+      client.publisher.publish(server, store);
     }
+  }
 
-    public void disconnect() {
-        messageRouter.shutdown();
+  public void disconnect() {
+    messageRouter.shutdown();
+  }
+
+  @Override
+  public void onConnect(NetworkEndpoint endpoint) {
+    System.out.println("Connected to " + endpoint);
+  }
+
+  @Override
+  public void onDisconnect(NetworkEndpoint endpoint) {
+    System.out.println("Disconnected from " + endpoint);
+  }
+
+  @Override
+  public void onMessage(GalileoMessage message) {
+    if (message == null) {
+      /* Connection was terminated */
+      messageRouter.shutdown();
+      return;
     }
-
-    @Override
-    public void onConnect(NetworkEndpoint endpoint) {
-        System.out.println("Connected to " + endpoint);
-    }
-
-    @Override
-    public void onDisconnect(NetworkEndpoint endpoint) {
-        System.out.println("Disconnected from " + endpoint);
-    }
-
-    @Override
-    public void onMessage(GalileoMessage message) {
-        if (message == null) {
-            /* Connection was terminated */
-            messageRouter.shutdown();
-            return;
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        String serverHostName = args[0];
-        int serverPort = Integer.parseInt(args[1]);
-        String fileName = args[2];
-
-        StoreNetCDF client = new StoreNetCDF();
-        NetworkEndpoint server
-            = new NetworkEndpoint(serverHostName, serverPort);
-
-        Map<String, Metadata> metas = ConvertNetCDF.readFile(fileName);
-        for (Map.Entry<String, Metadata> entry : metas.entrySet()) {
-            Block b = ConvertNetCDF.createBlock("", entry.getValue());
-            StorageRequest store = new StorageRequest(b);
-            client.publisher.publish(server, store);
-        }
-    }
+  }
 }

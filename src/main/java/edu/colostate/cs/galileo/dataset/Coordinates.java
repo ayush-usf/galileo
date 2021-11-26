@@ -37,61 +37,59 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  * @author malensek
  */
 public class Coordinates implements ByteSerializable {
-    private float lat;
-    private float lon;
+  private float lat;
+  private float lon;
 
-    /**
-     * Create Coordinates at the specified latitude and longitude.
-     *
-     * @param lat
-     *     Latitude for this coordinate pair, in degrees.
-     * @param lon
-     *     Longitude for this coordinate pair, in degrees.
-     */
-    public Coordinates(float lat, float lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
+  /**
+   * Create Coordinates at the specified latitude and longitude.
+   *
+   * @param lat Latitude for this coordinate pair, in degrees.
+   * @param lon Longitude for this coordinate pair, in degrees.
+   */
+  public Coordinates(float lat, float lon) {
+    this.lat = lat;
+    this.lon = lon;
+  }
 
-    /**
-     * Get the latitude of this coordinate pair.
-     *
-     * @return latitude, in degrees.
-     */
-    public float getLatitude() {
-        return lat;
-    }
+  public Coordinates(SerializationInputStream in)
+      throws IOException {
+    this.lat = in.readFloat();
+    this.lon = in.readFloat();
+  }
 
-    /**
-     * Get the longitude of this coordinate pair.
-     *
-     * @return longitude, in degrees
-     */
-    public float getLongitude() {
-        return lon;
-    }
+  /**
+   * Get the latitude of this coordinate pair.
+   *
+   * @return latitude, in degrees.
+   */
+  public float getLatitude() {
+    return lat;
+  }
 
-    /**
-     * Print this coordinate pair's String representation:
-     * (lat, lon).
-     *
-     * @return String representation of the Coordinates
-     */
-    @Override
-    public String toString() {
-        return "(" + lat + ", " + lon + ")";
-    }
+  /**
+   * Get the longitude of this coordinate pair.
+   *
+   * @return longitude, in degrees
+   */
+  public float getLongitude() {
+    return lon;
+  }
 
-    public Coordinates(SerializationInputStream in)
-    throws IOException {
-        this.lat = in.readFloat();
-        this.lon = in.readFloat();
-    }
+  /**
+   * Print this coordinate pair's String representation:
+   * (lat, lon).
+   *
+   * @return String representation of the Coordinates
+   */
+  @Override
+  public String toString() {
+    return "(" + lat + ", " + lon + ")";
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeFloat(lat);
-        out.writeFloat(lon);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeFloat(lat);
+    out.writeFloat(lon);
+  }
 }

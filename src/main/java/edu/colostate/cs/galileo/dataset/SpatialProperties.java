@@ -39,98 +39,98 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class SpatialProperties implements ByteSerializable {
 
-    private Coordinates coords;
-    private SpatialRange range;
+  private Coordinates coords;
+  private SpatialRange range;
 
-    public SpatialProperties(Coordinates coords) {
-        this.coords = coords;
+  public SpatialProperties(Coordinates coords) {
+    this.coords = coords;
+  }
+
+  public SpatialProperties(float latitude, float longitude) {
+    this.coords = new Coordinates(latitude, longitude);
+  }
+
+  public SpatialProperties(SpatialRange range) {
+    this.range = range;
+  }
+
+  @Deserialize
+  public SpatialProperties(SerializationInputStream in)
+      throws IOException {
+    boolean hasRange = in.readBoolean();
+    boolean hasCoordinates = in.readBoolean();
+
+    if (hasRange) {
+      range = new SpatialRange(in);
     }
 
-    public SpatialProperties(float latitude, float longitude) {
-        this.coords = new Coordinates(latitude, longitude);
+    if (hasCoordinates) {
+      coords = new Coordinates(in);
+    }
+  }
+
+  public Coordinates getCoordinates() {
+    return coords;
+  }
+
+  public SpatialRange getSpatialRange() {
+    return range;
+  }
+
+  public boolean hasRange() {
+    return has(range);
+  }
+
+  public boolean hasCoordinates() {
+    return has(coords);
+  }
+
+  /**
+   * Used to determine whether this SpatialProperties instance has particular
+   * properties.
+   *
+   * @param obj Object to test for.
+   */
+  private boolean has(Object obj) {
+    if (obj != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (hasRange()) {
+      sb.append("Spatial Range: " + getSpatialRange());
     }
 
-    public SpatialProperties(SpatialRange range) {
-        this.range = range;
+    if (hasRange() && hasCoordinates()) {
+      sb.append(System.lineSeparator());
     }
 
-    public Coordinates getCoordinates() {
-        return coords;
+    if (hasCoordinates()) {
+      sb.append("Coordinates: " + getCoordinates());
     }
 
-    public SpatialRange getSpatialRange() {
-        return range;
+    return sb.toString();
+  }
+
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    boolean hasRange = hasRange();
+    boolean hasCoordinates = hasCoordinates();
+    out.writeBoolean(hasRange);
+    out.writeBoolean(hasCoordinates);
+
+    if (hasRange) {
+      out.writeSerializable(range);
     }
 
-    public boolean hasRange() {
-        return has(range);
+    if (hasCoordinates) {
+      out.writeSerializable(coords);
     }
-
-    public boolean hasCoordinates() {
-        return has(coords);
-    }
-
-    /**
-     * Used to determine whether this SpatialProperties instance has particular
-     * properties.
-     *
-     * @param obj Object to test for.
-     */
-    private boolean has(Object obj) {
-        if (obj != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (hasRange()) {
-            sb.append("Spatial Range: " + getSpatialRange());
-        }
-
-        if (hasRange() && hasCoordinates()) {
-            sb.append(System.lineSeparator());
-        }
-
-        if (hasCoordinates()) {
-            sb.append("Coordinates: " + getCoordinates());
-        }
-
-        return sb.toString();
-    }
-
-    @Deserialize
-    public SpatialProperties(SerializationInputStream in)
-    throws IOException {
-        boolean hasRange = in.readBoolean();
-        boolean hasCoordinates = in.readBoolean();
-
-        if (hasRange) {
-            range = new SpatialRange(in);
-        }
-
-        if (hasCoordinates) {
-            coords = new Coordinates(in);
-        }
-    }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        boolean hasRange = hasRange();
-        boolean hasCoordinates = hasCoordinates();
-        out.writeBoolean(hasRange);
-        out.writeBoolean(hasCoordinates);
-
-        if (hasRange) {
-            out.writeSerializable(range);
-        }
-
-        if (hasCoordinates) {
-            out.writeSerializable(coords);
-        }
-    }
+  }
 }

@@ -35,41 +35,41 @@ import edu.colostate.cs.galileo.serialization.SerializationInputStream;
 import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
 
 public class BlockArray implements ByteSerializable, Iterable<FileBlock> {
-    private ArrayList<FileBlock> blocks =
-        new ArrayList<FileBlock>();
+  private ArrayList<FileBlock> blocks =
+      new ArrayList<FileBlock>();
 
-    public BlockArray() {
+  public BlockArray() {
 
+  }
+
+  public BlockArray(SerializationInputStream in)
+      throws IOException {
+    int numBlocks = in.readInt();
+    for (int i = 0; i < numBlocks; ++i) {
+      FileBlock block = new FileBlock(in);
+      blocks.add(block);
     }
+  }
 
-    public void add(FileBlock block) {
-        blocks.add(block);
-    }
+  public void add(FileBlock block) {
+    blocks.add(block);
+  }
 
-    public int size() {
-        return blocks.size();
-    }
+  public int size() {
+    return blocks.size();
+  }
 
-    @Override
-    public Iterator<FileBlock> iterator() {
-        return blocks.iterator();
-    }
+  @Override
+  public Iterator<FileBlock> iterator() {
+    return blocks.iterator();
+  }
 
-    public BlockArray(SerializationInputStream in)
-    throws IOException {
-        int numBlocks = in.readInt();
-        for (int i = 0; i < numBlocks; ++i) {
-            FileBlock block = new FileBlock(in);
-            blocks.add(block);
-        }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeInt(blocks.size());
+    for (FileBlock block : blocks) {
+      block.serialize(out);
     }
-
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeInt(blocks.size());
-        for (FileBlock block : blocks) {
-            block.serialize(out);
-        }
-    }
+  }
 }

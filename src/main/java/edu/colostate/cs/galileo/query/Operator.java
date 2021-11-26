@@ -34,78 +34,75 @@ import java.util.Map;
  * @author malensek
  */
 public enum Operator {
-    UNKNOWN(0),
-    EQUAL(1),
-    NOTEQUAL(2),
-    LESS(3),
-    GREATER(4),
-    LESSEQUAL(5),
-    GREATEREQUAL(6);
+  UNKNOWN(0),
+  EQUAL(1),
+  NOTEQUAL(2),
+  LESS(3),
+  GREATER(4),
+  LESSEQUAL(5),
+  GREATEREQUAL(6);
 
-    /**
-     * String representation of the operators.  Note that the array index
-     * corresponds to the operator index.  '=' and '/=' for equal and not equal,
-     * respectively, are also allowed (see the strToOp Map).
-     */
-    private static final String[] opStrings = {
-        "??", // UNKNOWN(0)
-        "==", // EQUAL(1)
-        "!=", // NOTEQUAL(2)
-        "<",  // LESS(3)
-        ">",  // GREATER(4)
-        "<=", // LESSEQUAL(5)
-        ">=", // GREATEREQUAL(6)
-    };
+  /**
+   * String representation of the operators.  Note that the array index
+   * corresponds to the operator index.  '=' and '/=' for equal and not equal,
+   * respectively, are also allowed (see the strToOp Map).
+   */
+  private static final String[] opStrings = {
+      "??", // UNKNOWN(0)
+      "==", // EQUAL(1)
+      "!=", // NOTEQUAL(2)
+      "<",  // LESS(3)
+      ">",  // GREATER(4)
+      "<=", // LESSEQUAL(5)
+      ">=", // GREATEREQUAL(6)
+  };
+  static Map<Integer, Operator> opNums = new HashMap<>();
+  static Map<String, Operator> strToOp = new HashMap<>();
+  private final int op;
 
-    private final int op;
+  private Operator(int op) {
+    this.op = op;
+  }
 
-    private Operator(int op) {
-        this.op = op;
+  public static Operator fromInt(int i) {
+    Operator o = opNums.get(i);
+    if (o == null) {
+      return Operator.UNKNOWN;
     }
 
-    public int toInt() {
-        return op;
+    return o;
+  }
+
+  public static Operator fromString(String s) {
+    Operator o = strToOp.get(s);
+    if (s == null) {
+      return Operator.UNKNOWN;
     }
 
-    static Map<Integer, Operator> opNums = new HashMap<>();
+    return o;
+  }
 
-    static {
-        for (Operator o : Operator.values()) {
-            opNums.put(o.toInt(), o);
-        }
+  public int toInt() {
+    return op;
+  }
+
+  @Override
+  public String toString() {
+    return opStrings[this.op];
+  }
+
+  static {
+    for (Operator o : Operator.values()) {
+      opNums.put(o.toInt(), o);
+    }
+  }
+
+  static {
+    for (Operator o : Operator.values()) {
+      strToOp.put(opStrings[o.toInt()], o);
     }
 
-    public static Operator fromInt(int i) {
-        Operator o = opNums.get(i);
-        if (o == null) {
-            return Operator.UNKNOWN;
-        }
-
-        return o;
-    }
-
-    static Map<String, Operator> strToOp = new HashMap<>();
-
-    static {
-        for (Operator o : Operator.values()) {
-            strToOp.put(opStrings[o.toInt()], o);
-        }
-
-        strToOp.put("=", EQUAL);
-        strToOp.put("/=", NOTEQUAL);
-    }
-
-    public static Operator fromString(String s) {
-        Operator o = strToOp.get(s);
-        if (s == null) {
-            return Operator.UNKNOWN;
-        }
-
-        return o;
-    }
-
-    @Override
-    public String toString() {
-        return opStrings[this.op];
-    }
+    strToOp.put("=", EQUAL);
+    strToOp.put("/=", NOTEQUAL);
+  }
 }

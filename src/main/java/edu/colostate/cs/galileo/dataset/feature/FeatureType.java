@@ -35,89 +35,93 @@ import java.util.Map;
  * @author malensek
  */
 public enum FeatureType {
-    NULL(0),
-    INT(1),
-    LONG(2),
-    FLOAT(3),
-    DOUBLE(4),
-    STRING(5),
-    BINARY(6);
+  NULL(0),
+  INT(1),
+  LONG(2),
+  FLOAT(3),
+  DOUBLE(4),
+  STRING(5),
+  BINARY(6);
 
-    private final int type;
+  static Map<Integer, FeatureType> typeMap = new HashMap<>();
+  static Map<Class<?>, FeatureType> primitiveMap = new HashMap<>();
+  private final int type;
 
-    private FeatureType(int type) {
-        this.type = type;
+  private FeatureType(int type) {
+    this.type = type;
+  }
+
+  /**
+   * Determine the FeatureType associated with the given integer.
+   *
+   * @param i Integer representing a FeatureType element.
+   * @return the associated FeatureType for the integer, or null if no
+   * FeatureType exists.
+   */
+  public static FeatureType fromInt(int i) {
+    FeatureType t = typeMap.get(i);
+    if (t == null) {
+      return FeatureType.NULL;
     }
 
-    public int toInt() {
-        return type;
+    return t;
+  }
+
+  /**
+   * Basic Feature types based on Java classes can be ascertained by
+   * inspecting their generic parameters.  Other FeatureTypes, such as
+   * intervals, can't be discovered by this method.
+   *
+   * @param type The basic Java type to inspect
+   * @return Corresponding FeatureType for the Java type, or null if no
+   * FeatureType exists.
+   */
+  public static <T> FeatureType fromPrimitiveType(T type) {
+    return primitiveMap.get(type.getClass());
+  }
+
+  public int toInt() {
+    return type;
+  }
+
+  /**
+   * Provides a mapping between FeatureType elements and their corresponding
+   * FeatureData implementations.
+   */
+  public Class<? extends FeatureData<?>> toClass() {
+    switch (this) {
+      case NULL:
+        return NullFeatureData.class;
+      case INT:
+        return IntegerFeatureData.class;
+      case LONG:
+        return LongFeatureData.class;
+      case FLOAT:
+        return FloatFeatureData.class;
+      case DOUBLE:
+        return DoubleFeatureData.class;
+      case STRING:
+        return StringFeatureData.class;
+      case BINARY:
+        return BinaryFeatureData.class;
+      default:
+        return null;
     }
+  }
 
-    static Map<Integer, FeatureType> typeMap = new HashMap<>();
-
-    static {
-        for (FeatureType t : FeatureType.values()) {
-            typeMap.put(t.toInt(), t);
-        }
+  static {
+    for (FeatureType t : FeatureType.values()) {
+      typeMap.put(t.toInt(), t);
     }
+  }
 
-    /**
-     * Determine the FeatureType associated with the given integer.
-     *
-     * @param i Integer representing a FeatureType element.
-     *
-     * @return the associated FeatureType for the integer, or null if no
-     * FeatureType exists.
-     */
-    public static FeatureType fromInt(int i) {
-        FeatureType t = typeMap.get(i);
-        if (t == null) {
-            return FeatureType.NULL;
-        }
-
-        return t;
-    }
-
-    static Map<Class<?>, FeatureType> primitiveMap = new HashMap<>();
-
-    static {
-        primitiveMap.put(Integer.class, INT);
-        primitiveMap.put(Long.class, LONG);
-        primitiveMap.put(Float.class, FLOAT);
-        primitiveMap.put(Double.class, DOUBLE);
-        primitiveMap.put(String.class, STRING);
-        primitiveMap.put(Byte[].class, BINARY);
-        primitiveMap.put(ByteArray.class, BINARY);
-    }
-
-    /**
-     * Basic Feature types based on Java classes can be ascertained by
-     * inspecting their generic parameters.  Other FeatureTypes, such as
-     * intervals, can't be discovered by this method.
-     *
-     * @param type The basic Java type to inspect
-     *
-     * @return Corresponding FeatureType for the Java type, or null if no
-     * FeatureType exists.
-     */
-    public static <T> FeatureType fromPrimitiveType(T type) {
-        return primitiveMap.get(type.getClass());
-    }
-
-    /**
-     * Provides a mapping between FeatureType elements and their corresponding
-     * FeatureData implementations.
-     */
-    public Class<? extends FeatureData<?>> toClass() {
-        switch (this) {
-            case NULL: return NullFeatureData.class;
-            case INT: return IntegerFeatureData.class;
-            case LONG: return LongFeatureData.class;
-            case FLOAT: return FloatFeatureData.class;
-            case DOUBLE: return DoubleFeatureData.class;
-            case STRING: return StringFeatureData.class;
-            case BINARY: return BinaryFeatureData.class;
-            default: return null;
-        }
-    }
+  static {
+    primitiveMap.put(Integer.class, INT);
+    primitiveMap.put(Long.class, LONG);
+    primitiveMap.put(Float.class, FLOAT);
+    primitiveMap.put(Double.class, DOUBLE);
+    primitiveMap.put(String.class, STRING);
+    primitiveMap.put(Byte[].class, BINARY);
+    primitiveMap.put(ByteArray.class, BINARY);
+  }
 }

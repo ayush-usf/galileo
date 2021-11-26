@@ -27,34 +27,33 @@ package edu.colostate.cs.galileo.util;
 
 public class Version {
 
-    private final static Version version
-        = new edu.colostate.cs.galileo.util.Version();
-    private final static Package pkg = version.getClass().getPackage();
-
-    public static final String PRODUCT_NAME = "Galileo";
-    public static final String VERSION = pkg.getSpecificationVersion();
-
-
-    public Version() { }
-
-    public static String getVersion() {
-        return (PRODUCT_NAME + " " + VERSION);
-    }
+  public static final String PRODUCT_NAME = "Galileo";
+  private final static Version version
+      = new edu.colostate.cs.galileo.util.Version();
+  private final static Package pkg = version.getClass().getPackage();
+  public static final String VERSION = pkg.getSpecificationVersion();
 
 
-    public void printVersionInformation() {
-        System.out.println(getVersion());
-    }
+  public Version() {
+  }
 
-    public static void printSplash() {
-        System.out.println();
-        System.out.println("      ____       _ _ _"               );
-        System.out.println("     / ___| __ _| (_) | ___  ___"     );
-        System.out.println("    | |  _ / _` | | | |/ _ \\/ _ \\"  );
-        System.out.println("    | |_| | (_| | | | |  __/ (_) |"   );
-        System.out.println("     \\____|\\__,_|_|_|_|\\___|\\___/");
-        System.out.println();
-        System.out.println("             Version  " + VERSION);
-        System.out.println();
-    }
+  public static String getVersion() {
+    return (PRODUCT_NAME + " " + VERSION);
+  }
+
+  public static void printSplash() {
+    System.out.println();
+    System.out.println("      ____       _ _ _");
+    System.out.println("     / ___| __ _| (_) | ___  ___");
+    System.out.println("    | |  _ / _` | | | |/ _ \\/ _ \\");
+    System.out.println("    | |_| | (_| | | | |  __/ (_) |");
+    System.out.println("     \\____|\\__,_|_|_|_|\\___|\\___/");
+    System.out.println();
+    System.out.println("             Version  " + VERSION);
+    System.out.println();
+  }
+
+  public void printVersionInformation() {
+    System.out.println(getVersion());
+  }
 }

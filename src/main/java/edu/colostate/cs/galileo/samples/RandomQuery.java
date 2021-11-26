@@ -46,148 +46,147 @@ import edu.colostate.cs.galileo.util.PerformanceTimer;
 
 public class RandomQuery implements MessageListener, Runnable {
 
-    public static int clients;
-    private static int storageOps = 1;
-    private static boolean noNotEqual = true;
-    private static boolean reverseBigRanges = true;
+  public static int clients;
+  public static Random random = new Random();
+  private static int storageOps = 1;
+  private static boolean noNotEqual = true;
+  private static boolean reverseBigRanges = true;
+  private ClientMessageRouter messageRouter;
+  private NetworkEndpoint server;
+  private PerformanceTimer resp = new PerformanceTimer("ResponseTime");
 
-    public static Random random = new Random();
+  /*--------------------------------------------------------------------*/
+  private boolean responded;
 
-    public static Operator randomOperator() {
-        int i = random.nextInt(Operator.values().length - 2) + 1;
-        return Operator.fromInt(i);
-    }
+  public RandomQuery(String serverHostName, int serverPort)
+      throws Exception {
+    clients++;
 
-    public static Feature randomFeature(String name, float min, float max) {
-        float diff = max - min;
-        float rand = random.nextFloat() * diff;
-        float value = min + rand;
-        return new Feature(name, value);
-    }
+    messageRouter = new ClientMessageRouter();
+    messageRouter.addListener(this);
+    server = new NetworkEndpoint(serverHostName, serverPort);
 
-    public static Query randomQuery() {
-        Query q = new Query();
+    /* Sleep for a random amount of time */
+    Thread.sleep(random.nextInt(3000));
+  }
 
-        List<Feature> features = new ArrayList<>();
-        features.add(randomFeature("humidity", 1, 100));
-        features.add(randomFeature("wind_direction", 1, 100));
-        features.add(randomFeature("condensation", 1, 100));
-        features.add(randomFeature("temperature", 1, 100));
+  public static Operator randomOperator() {
+    int i = random.nextInt(Operator.values().length - 2) + 1;
+    return Operator.fromInt(i);
+  }
 
-        List<Expression> expressions = new ArrayList<>();
-        for (Feature f : features) {
-            Operator op = randomOperator();
-            if (noNotEqual == true && op == Operator.NOTEQUAL) {
-                op = Operator.EQUAL;
-            }
-            if (reverseBigRanges == true) {
-                if ((op == Operator.GREATER || op == Operator.GREATEREQUAL)
-                        && f.getFloat() <= 35.0f) {
-                    op = Operator.LESS;
-                }
-                if ((op == Operator.LESS || op == Operator.LESSEQUAL)
-                        && f.getFloat() >= 65.0f) {
-                    op = Operator.GREATER;
-                }
-            }
-            expressions.add(new Expression(op, f));
+  public static Feature randomFeature(String name, float min, float max) {
+    float diff = max - min;
+    float rand = random.nextFloat() * diff;
+    float value = min + rand;
+    return new Feature(name, value);
+  }
+
+  public static Query randomQuery() {
+    Query q = new Query();
+
+    List<Feature> features = new ArrayList<>();
+    features.add(randomFeature("humidity", 1, 100));
+    features.add(randomFeature("wind_direction", 1, 100));
+    features.add(randomFeature("condensation", 1, 100));
+    features.add(randomFeature("temperature", 1, 100));
+
+    List<Expression> expressions = new ArrayList<>();
+    for (Feature f : features) {
+      Operator op = randomOperator();
+      if (noNotEqual == true && op == Operator.NOTEQUAL) {
+        op = Operator.EQUAL;
+      }
+      if (reverseBigRanges == true) {
+        if ((op == Operator.GREATER || op == Operator.GREATEREQUAL)
+            && f.getFloat() <= 35.0f) {
+          op = Operator.LESS;
         }
-
-        Operation op = new Operation(expressions.toArray(
-                    new Expression[expressions.size()]));
-
-        q.addOperation(op);
-
-        return q;
-    }
-
-    /*--------------------------------------------------------------------*/
-
-    private ClientMessageRouter messageRouter;
-    private NetworkEndpoint server;
-    private PerformanceTimer resp = new PerformanceTimer("ResponseTime");
-    private boolean responded;
-
-    public RandomQuery(String serverHostName, int serverPort)
-    throws Exception {
-        clients++;
-
-        messageRouter = new ClientMessageRouter();
-        messageRouter.addListener(this);
-        server = new NetworkEndpoint(serverHostName, serverPort);
-
-        /* Sleep for a random amount of time */
-        Thread.sleep(random.nextInt(3000));
-    }
-
-    public void run() {
-        while (true) {
-            try {
-                send();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if ((op == Operator.LESS || op == Operator.LESSEQUAL)
+            && f.getFloat() >= 65.0f) {
+          op = Operator.GREATER;
         }
+      }
+      expressions.add(new Expression(op, f));
     }
 
-    private void send()
-    throws Exception {
-        byte[] id = new byte[1024];
-        random.nextBytes(id);
-        BigInteger bi = new BigInteger(id);
+    Operation op = new Operation(expressions.toArray(
+        new Expression[expressions.size()]));
 
-        Query q = randomQuery();
-        QueryEvent qe = new QueryEvent(bi.toString(16), q);
+    q.addOperation(op);
 
-        resp.start();
-        messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
-        responded = false;
+    return q;
+  }
 
-        /* Sleep for ~1s. */
-        Thread.sleep(1000);
-        while (responded == false) {
-            Thread.sleep(100);
-        }
+  public static void main(String[] args)
+      throws Exception {
+    if (args.length < 2) {
+      System.out.println("Usage: galileo.samples.RandomQuery host port");
+      System.exit(1);
+    }
+    String serverHostName = args[0];
+    int serverPort = Integer.parseInt(args[1]);
 
-        for (int s = 0; s < storageOps; ++s) {
-            messageRouter.sendMessage(server, EventPublisher.wrapEvent(
-                        new StorageRequest(RandomBlocks.generateData())));
-        }
+    int threads = 1;
+    if (args.length >= 3) {
+      threads = Integer.parseInt(args[2]);
     }
 
-    @Override
-    public void onConnect(NetworkEndpoint endpoint) { }
+    for (int t = 0; t < threads; ++t) {
+      RandomQuery rq = new RandomQuery(serverHostName, serverPort);
+      new Thread(rq).start();
+    }
+  }
 
-    @Override
-    public void onDisconnect(NetworkEndpoint endpoint) {
-        System.out.println("Disconnected from the server.  Goodbye!");
-        System.exit(0);
+  public void run() {
+    while (true) {
+      try {
+        send();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private void send()
+      throws Exception {
+    byte[] id = new byte[1024];
+    random.nextBytes(id);
+    BigInteger bi = new BigInteger(id);
+
+    Query q = randomQuery();
+    QueryEvent qe = new QueryEvent(bi.toString(16), q);
+
+    resp.start();
+    messageRouter.sendMessage(server, EventPublisher.wrapEvent(qe));
+    responded = false;
+
+    /* Sleep for ~1s. */
+    Thread.sleep(1000);
+    while (responded == false) {
+      Thread.sleep(100);
     }
 
-    @Override
-    public void onMessage(GalileoMessage message) {
-        resp.stop();
-        System.out.println(clients + "    " + resp.getLastResult());
-        responded = true;
+    for (int s = 0; s < storageOps; ++s) {
+      messageRouter.sendMessage(server, EventPublisher.wrapEvent(
+          new StorageRequest(RandomBlocks.generateData())));
     }
+  }
 
-    public static void main(String[] args)
-    throws Exception {
-        if (args.length < 2) {
-            System.out.println("Usage: galileo.samples.RandomQuery host port");
-            System.exit(1);
-        }
-        String serverHostName = args[0];
-        int serverPort = Integer.parseInt(args[1]);
+  @Override
+  public void onConnect(NetworkEndpoint endpoint) {
+  }
 
-        int threads = 1;
-        if (args.length >= 3) {
-            threads = Integer.parseInt(args[2]);
-        }
+  @Override
+  public void onDisconnect(NetworkEndpoint endpoint) {
+    System.out.println("Disconnected from the server.  Goodbye!");
+    System.exit(0);
+  }
 
-        for (int t = 0; t < threads; ++t) {
-            RandomQuery rq = new RandomQuery(serverHostName, serverPort);
-            new Thread(rq).start();
-        }
-    }
+  @Override
+  public void onMessage(GalileoMessage message) {
+    resp.stop();
+    System.out.println(clients + "    " + resp.getLastResult());
+    responded = true;
+  }
 }

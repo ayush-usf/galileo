@@ -40,38 +40,38 @@ import edu.colostate.cs.galileo.serialization.SerializationOutputStream;
  */
 public class Block implements ByteSerializable {
 
-    private Metadata metadata;
-    private byte[] data;
+  private Metadata metadata;
+  private byte[] data;
 
-    public Block(byte[] data) {
-        this.metadata = new Metadata();
-        this.data = data;
-    }
+  public Block(byte[] data) {
+    this.metadata = new Metadata();
+    this.data = data;
+  }
 
-    public Block(Metadata metadata, byte[] data) {
-        this.metadata = metadata;
-        this.data = data;
-    }
+  public Block(Metadata metadata, byte[] data) {
+    this.metadata = metadata;
+    this.data = data;
+  }
 
-    public Metadata getMetadata() {
-        return metadata;
-    }
+  @Deserialize
+  public Block(SerializationInputStream in)
+      throws IOException, SerializationException {
+    this.metadata = new Metadata(in);
+    data = in.readField();
+  }
 
-    public byte[] getData() {
-        return data;
-    }
+  public Metadata getMetadata() {
+    return metadata;
+  }
 
-    @Deserialize
-    public Block(SerializationInputStream in)
-    throws IOException, SerializationException {
-        this.metadata = new Metadata(in);
-        data = in.readField();
-    }
+  public byte[] getData() {
+    return data;
+  }
 
-    @Override
-    public void serialize(SerializationOutputStream out)
-    throws IOException {
-        out.writeSerializable(metadata);
-        out.writeField(data);
-    }
+  @Override
+  public void serialize(SerializationOutputStream out)
+      throws IOException {
+    out.writeSerializable(metadata);
+    out.writeField(data);
+  }
 }

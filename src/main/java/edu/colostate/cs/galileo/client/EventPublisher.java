@@ -42,33 +42,33 @@ import edu.colostate.cs.galileo.net.NetworkEndpoint;
  */
 public class EventPublisher {
 
-    private static GalileoEventMap eventMap = new GalileoEventMap();
-    private static EventWrapper wrapper = new BasicEventWrapper(eventMap);
-    private ClientMessageRouter router;
+  private static GalileoEventMap eventMap = new GalileoEventMap();
+  private static EventWrapper wrapper = new BasicEventWrapper(eventMap);
+  private ClientMessageRouter router;
 
-    /**
-     * Creates a new EventPublisher instance using the provided
-     * {@link ClientMessageRouter} instance for communications.
-     */
-    public EventPublisher(ClientMessageRouter router) {
-        this.router = router;
-    }
+  /**
+   * Creates a new EventPublisher instance using the provided
+   * {@link ClientMessageRouter} instance for communications.
+   */
+  public EventPublisher(ClientMessageRouter router) {
+    this.router = router;
+  }
 
-    /**
-     * Publishes an {@link Event} via the client's {@link ClientMessageRouter}.
-     */
-    public void publish(NetworkEndpoint destination, Event event)
-    throws IOException {
-        GalileoMessage message = wrapper.wrap(event);
-        router.sendMessage(destination, message);
-    }
+  /**
+   * Wraps a GalileoEvent inside an EventContainer, and places the container
+   * inside a GalileoMessage, ready to be transmitted across the network.
+   */
+  public static GalileoMessage wrapEvent(Event event)
+      throws IOException {
+    return wrapper.wrap(event);
+  }
 
-    /**
-     * Wraps a GalileoEvent inside an EventContainer, and places the container
-     * inside a GalileoMessage, ready to be transmitted across the network.
-     */
-    public static GalileoMessage wrapEvent(Event event)
-    throws IOException {
-        return wrapper.wrap(event);
-    }
+  /**
+   * Publishes an {@link Event} via the client's {@link ClientMessageRouter}.
+   */
+  public void publish(NetworkEndpoint destination, Event event)
+      throws IOException {
+    GalileoMessage message = wrapper.wrap(event);
+    router.sendMessage(destination, message);
+  }
 }

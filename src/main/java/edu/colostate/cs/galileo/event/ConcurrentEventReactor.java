@@ -39,96 +39,96 @@ package edu.colostate.cs.galileo.event;
  */
 public class ConcurrentEventReactor extends EventReactor {
 
-    private boolean running;
-    private int poolSize;
-    private Thread[] threads;
+  private boolean running;
+  private int poolSize;
+  private Thread[] threads;
 
-    /**
-     * Worker thread that will be used to invoke handler methods as events
-     * arrive.  Each worker simply calls the processNextEvent() method to either
-     * handle an incoming message or block until one is available.
-     */
-    private class EventThread implements Runnable {
-        @Override
-        public void run() {
-            while (Thread.interrupted() == false) {
-                try {
-                    processNextEvent();
-                } catch (Exception e) {
-                    System.out.println("Unhandled event exception");
-                    e.printStackTrace();
-                }
-            }
+  /**
+   * Creates a ConcurrentEventReactor with the default
+   * {@link BasicEventWrapper} EventWrapper implementation.
+   *
+   * @param handlerObject an Object instance that contains the implementations
+   *                      for event handlers, denoted by the {@link EventReactor} annotation.
+   * @param eventMap      a EventMap implementation that provides a mapping from
+   *                      integer identification numbers to specific classes that represent an
+   *                      event.
+   * @param poolSize      the number of worker threads this concurrent event mapper
+   *                      should maintain.
+   */
+  public ConcurrentEventReactor(
+      Object handlerObject, EventMap eventMap, int poolSize)
+      throws EventLinkException {
+    super(handlerObject, eventMap);
+    this.poolSize = poolSize;
+  }
+
+  /**
+   * Creates a ConcurrentEventReactor with a custom EventWrapper
+   * implementation.
+   *
+   * @param handlerObject an Object instance that contains the implementations
+   *                      for event handlers, denoted by the {@link EventHandler} annotation.
+   * @param wrapper       A problem-specific {@link EventWrapper} implementation.
+   * @param poolSize      the number of worker threads this concurrent event mapper
+   *                      should maintain.
+   */
+  public ConcurrentEventReactor(Object handlerObject, EventWrapper wrapper,
+                                int poolSize)
+      throws EventLinkException {
+    super(handlerObject, wrapper);
+    this.poolSize = poolSize;
+  }
+
+  /**
+   * Initializes the event reactor by creating worker threads and having them
+   * block on the event queue.
+   */
+  public void start() {
+    if (running) {
+      return;
+    }
+
+    running = true;
+    threads = new Thread[poolSize];
+    for (int i = 0; i < poolSize; ++i) {
+      threads[i] = new Thread(new EventThread());
+      threads[i].start();
+    }
+  }
+
+  /**
+   * Gracefully shuts down all the worker threads being maintained by this
+   * event reactor.
+   */
+  public void stop() {
+    for (int i = 0; i < threads.length; ++i) {
+      Thread t = threads[i];
+
+      try {
+        t.interrupt();
+        t.join();
+      } catch (InterruptedException e) {
+        Thread.interrupted();
+      }
+    }
+  }
+
+  /**
+   * Worker thread that will be used to invoke handler methods as events
+   * arrive.  Each worker simply calls the processNextEvent() method to either
+   * handle an incoming message or block until one is available.
+   */
+  private class EventThread implements Runnable {
+    @Override
+    public void run() {
+      while (Thread.interrupted() == false) {
+        try {
+          processNextEvent();
+        } catch (Exception e) {
+          System.out.println("Unhandled event exception");
+          e.printStackTrace();
         }
+      }
     }
-
-    /**
-     * Creates a ConcurrentEventReactor with the default
-     * {@link BasicEventWrapper} EventWrapper implementation.
-     *
-     * @param handlerObject an Object instance that contains the implementations
-     * for event handlers, denoted by the {@link EventReactor} annotation.
-     * @param eventMap a EventMap implementation that provides a mapping from
-     * integer identification numbers to specific classes that represent an
-     * event.
-     * @param poolSize the number of worker threads this concurrent event mapper
-     * should maintain.
-     */
-    public ConcurrentEventReactor(
-            Object handlerObject, EventMap eventMap, int poolSize)
-    throws EventLinkException {
-        super(handlerObject, eventMap);
-        this.poolSize = poolSize;
-    }
-
-    /**
-     * Creates a ConcurrentEventReactor with a custom EventWrapper
-     * implementation.
-     *
-     * @param handlerObject an Object instance that contains the implementations
-     * for event handlers, denoted by the {@link EventHandler} annotation.
-     * @param wrapper A problem-specific {@link EventWrapper} implementation.
-     * @param poolSize the number of worker threads this concurrent event mapper
-     * should maintain.
-     */
-    public ConcurrentEventReactor(Object handlerObject, EventWrapper wrapper,
-            int poolSize)
-    throws EventLinkException {
-        super(handlerObject, wrapper);
-        this.poolSize = poolSize;
-    }
-
-    /**
-     * Initializes the event reactor by creating worker threads and having them
-     * block on the event queue.
-     */
-    public void start() {
-        if (running) {
-            return;
-        }
-
-        running = true;
-        threads = new Thread[poolSize];
-        for (int i = 0; i < poolSize; ++i) {
-            threads[i] = new Thread(new EventThread());
-            threads[i].start();
-        }
-    }
-
-    /**
-     * Gracefully shuts down all the worker threads being maintained by this
-     * event reactor.
-     */
-    public void stop() {
-        for (int i = 0; i < threads.length; ++i) {
-            Thread t = threads[i];
-
-            try {
-                t.interrupt();
-                t.join();
-            } catch (InterruptedException e) {
-                Thread.interrupted();
-            }
-        }
-    }
+  }
 }
